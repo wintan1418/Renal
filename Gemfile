@@ -33,7 +33,7 @@ gem "pg_search", "~> 2.3"
 gem "pagy", "~> 9.3"
 
 # Currency handling (NGN)
-gem "money-rails", "~> 1.15"
+gem "money-rails", "~> 3.0"
 
 # Audit trail
 gem "audited", "~> 5.7"
