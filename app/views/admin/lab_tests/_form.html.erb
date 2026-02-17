@@ -1,0 +1,145 @@
+<%= form_with model: [:admin, lab_test], class: "space-y-6" do |f| %>
+  <% if lab_test.errors.any? %>
+    <div role="alert" class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold">Please fix the following errors:</h3>
+        <ul class="list-disc list-inside text-sm mt-1">
+          <% lab_test.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title mb-4">Basic Information</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Name -->
+        <div class="form-control w-full">
+          <%= f.label :name, class: "label" do %>
+            <span class="label-text font-medium">Test Name <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.text_field :name, class: "input input-bordered w-full #{lab_test.errors[:name].any? ? 'input-error' : ''}", placeholder: "e.g. Serum Creatinine" %>
+          <% if lab_test.errors[:name].any? %>
+            <label class="label"><span class="label-text-alt text-error"><%= lab_test.errors[:name].first %></span></label>
+          <% end %>
+        </div>
+
+        <!-- Code -->
+        <div class="form-control w-full">
+          <%= f.label :code, class: "label" do %>
+            <span class="label-text font-medium">Test Code <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.text_field :code, class: "input input-bordered w-full font-mono #{lab_test.errors[:code].any? ? 'input-error' : ''}", placeholder: "e.g. CREAT" %>
+          <% if lab_test.errors[:code].any? %>
+            <label class="label"><span class="label-text-alt text-error"><%= lab_test.errors[:code].first %></span></label>
+          <% end %>
+        </div>
+
+        <!-- Category -->
+        <div class="form-control w-full">
+          <%= f.label :category, class: "label" do %>
+            <span class="label-text font-medium">Category <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.select :category,
+              LabTest.categories.keys.map { |c| [c.humanize.titleize, c] },
+              { prompt: "Select a category" },
+              class: "select select-bordered w-full #{lab_test.errors[:category].any? ? 'select-error' : ''}" %>
+          <% if lab_test.errors[:category].any? %>
+            <label class="label"><span class="label-text-alt text-error"><%= lab_test.errors[:category].first %></span></label>
+          <% end %>
+        </div>
+
+        <!-- Unit -->
+        <div class="form-control w-full">
+          <%= f.label :unit, class: "label" do %>
+            <span class="label-text font-medium">Unit</span>
+          <% end %>
+          <%= f.text_field :unit, class: "input input-bordered w-full", placeholder: "e.g. mg/dL, mmol/L" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Normal Range -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title mb-4">Normal Range</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control w-full">
+          <%= f.label :normal_range_min, class: "label" do %>
+            <span class="label-text font-medium">Minimum Value</span>
+          <% end %>
+          <%= f.number_field :normal_range_min, step: "0.01", class: "input input-bordered w-full", placeholder: "e.g. 0.6" %>
+        </div>
+        <div class="form-control w-full">
+          <%= f.label :normal_range_max, class: "label" do %>
+            <span class="label-text font-medium">Maximum Value</span>
+          <% end %>
+          <%= f.number_field :normal_range_max, step: "0.01", class: "input input-bordered w-full", placeholder: "e.g. 1.2" %>
+        </div>
+      </div>
+      <label class="label">
+        <span class="label-text-alt text-base-content/60">Leave blank if not applicable. Range will display as "min – max unit".</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Pricing & Status -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title mb-4">Pricing & Status</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Price -->
+        <div class="form-control w-full">
+          <%= f.label :price_cents, class: "label" do %>
+            <span class="label-text font-medium">Price (in kobo)</span>
+          <% end %>
+          <div class="input input-bordered flex items-center gap-2">
+            <span class="text-base-content/50 text-sm">₦</span>
+            <%= f.number_field :price_cents, min: 0, class: "grow bg-transparent border-none outline-none", placeholder: "e.g. 500000 for ₦5,000" %>
+          </div>
+          <label class="label">
+            <span class="label-text-alt text-base-content/60">Enter price in kobo (100 kobo = ₦1). Enter 0 if free.</span>
+          </label>
+        </div>
+
+        <!-- Active toggle -->
+        <div class="form-control">
+          <%= f.label :active, class: "label cursor-pointer justify-start gap-4" do %>
+            <%= f.check_box :active, class: "toggle toggle-success" %>
+            <div>
+              <span class="label-text font-medium">Active</span>
+              <p class="text-xs text-base-content/60">Inactive tests will not appear for ordering.</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title mb-4">Description</h2>
+      <div class="form-control w-full">
+        <%= f.label :description, class: "label" do %>
+          <span class="label-text font-medium">Description / Clinical Notes</span>
+        <% end %>
+        <%= f.text_area :description, rows: 4, class: "textarea textarea-bordered w-full", placeholder: "Optional: describe what this test is used for, when to order it, etc." %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex items-center gap-3">
+    <%= f.submit lab_test.persisted? ? "Update Lab Test" : "Create Lab Test", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_lab_tests_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

@@ -1,0 +1,72 @@
+<% content_for(:title, "My Invoices") %>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-extrabold">My Invoices</h1>
+</div>
+
+<!-- Balance Due Summary -->
+<div class="stats shadow mb-6 w-full bg-white">
+  <div class="stat">
+    <div class="stat-title">Total Balance Due</div>
+    <div class="stat-value text-error">₦<%= number_with_delimiter(@balance_due.to_i / 100) %></div>
+    <div class="stat-desc">Across all unpaid invoices</div>
+  </div>
+</div>
+
+<!-- Invoices Table -->
+<div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Invoice #</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Paid</th>
+          <th>Balance</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @invoices.each do |invoice| %>
+          <tr class="hover">
+            <td class="font-mono font-semibold text-sm"><%= invoice.invoice_number %></td>
+            <td class="text-sm"><%= invoice.created_at.strftime("%b %d, %Y") %></td>
+            <td class="font-semibold">₦<%= number_with_delimiter(invoice.total_cents / 100) %></td>
+            <td class="text-success">₦<%= number_with_delimiter(invoice.amount_paid_cents / 100) %></td>
+            <td class="font-semibold <%= invoice.balance_due_cents > 0 ? 'text-error' : 'text-success' %>">
+              ₦<%= number_with_delimiter(invoice.balance_due_cents / 100) %>
+            </td>
+            <td><%= status_badge(invoice.status, type: :invoice) %></td>
+            <td>
+              <div class="flex gap-1">
+                <%= link_to patient_portal_invoice_path(invoice), class: "btn btn-ghost btn-xs" do %>
+                  View
+                <% end %>
+                <% if invoice.balance_due_cents > 0 && !invoice.status_cancelled? && !invoice.status_draft? %>
+                  <%= link_to pay_patient_portal_invoice_path(invoice), class: "btn btn-primary btn-xs" do %>
+                    Pay Now
+                  <% end %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @invoices.empty? %>
+          <tr>
+            <td colspan="7" class="text-center py-8 text-base-content/60">No invoices found.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="flex justify-center mt-6">
+    <div class="join">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>

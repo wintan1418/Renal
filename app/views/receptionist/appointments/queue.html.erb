@@ -1,0 +1,153 @@
+<% content_for(:title, "Live Queue") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= receptionist_root_path %>">Dashboard</a></li>
+    <li><a href="<%= receptionist_appointments_path %>">Appointments</a></li>
+    <li>Live Queue</li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-extrabold">Live Queue</h1>
+    <p class="text-base-content/60 mt-1"><%= Date.current.strftime("%A, %B %d, %Y") %> &middot; <%= @appointments.count %> in queue</p>
+  </div>
+  <div class="flex items-center gap-2">
+    <!-- Doctor Filter -->
+    <%= form_with url: queue_receptionist_appointments_path, method: :get, class: "flex items-center gap-2" do |f| %>
+      <%= f.select :doctor_id, @doctors.map { |d| ["Dr. #{d.full_name}", d.id] }, { prompt: "All Doctors" }, class: "select select-bordered select-sm", onchange: "this.form.requestSubmit()" %>
+    <% end %>
+    <button onclick="location.reload()" class="btn btn-ghost btn-sm btn-square" title="Refresh">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Queue Status Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+  <div class="bg-white rounded-2xl shadow-lg p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold"><%= @appointments.select(&:checked_in?).count %></p>
+        <p class="text-xs text-base-content/60">Checked In</p>
+      </div>
+    </div>
+  </div>
+  <div class="bg-white rounded-2xl shadow-lg p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold"><%= @appointments.select(&:in_progress?).count %></p>
+        <p class="text-xs text-base-content/60">In Progress</p>
+      </div>
+    </div>
+  </div>
+  <div class="bg-white rounded-2xl shadow-lg p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-info/10 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-info" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-2xl font-bold"><%= @appointments.select(&:confirmed?).count %></p>
+        <p class="text-xs text-base-content/60">Waiting</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Queue List -->
+<% if @appointments.any? %>
+  <div class="space-y-3">
+    <% @appointments.each do |appointment| %>
+      <div class="bg-white rounded-2xl shadow-lg p-4 flex items-center gap-4 hover:shadow-xl transition-shadow
+                  <%= 'border-l-4 border-primary' if appointment.in_progress? %>
+                  <%= 'border-l-4 border-accent' if appointment.checked_in? %>
+                  <%= 'border-l-4 border-info' if appointment.confirmed? %>">
+        <!-- Queue Number -->
+        <div class="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-xl
+                    <%= appointment.in_progress? ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content' %>">
+          #<%= appointment.queue_number %>
+        </div>
+
+        <!-- Patient Info -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <%= avatar_for(appointment.patient, size: "w-8 h-8", text_size: "text-xs") %>
+            <div>
+              <p class="font-bold"><%= appointment.patient.full_name %></p>
+              <p class="text-xs text-base-content/60"><%= appointment.patient.patient_profile&.medical_record_number %></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Doctor -->
+        <div class="hidden sm:block">
+          <p class="text-sm font-medium">Dr. <%= appointment.doctor.full_name %></p>
+          <p class="text-xs text-base-content/60"><%= appointment.service.name %></p>
+        </div>
+
+        <!-- Time -->
+        <div class="hidden md:block text-right">
+          <p class="font-mono text-sm"><%= appointment.start_time.strftime("%I:%M %p") %></p>
+          <p class="text-xs text-base-content/60"><%= appointment.duration_minutes %> min</p>
+        </div>
+
+        <!-- Status -->
+        <div>
+          <% if appointment.in_progress? %>
+            <span class="badge badge-primary gap-1">
+              <span class="loading loading-ring loading-xs"></span>
+              In Progress
+            </span>
+          <% elsif appointment.checked_in? %>
+            <span class="badge badge-accent">Checked In</span>
+          <% else %>
+            <span class="badge badge-info badge-outline">Waiting</span>
+          <% end %>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-1">
+          <% if appointment.confirmed? %>
+            <%= button_to check_in_receptionist_appointment_path(appointment), method: :patch, class: "btn btn-accent btn-sm" do %>
+              Check In
+            <% end %>
+          <% end %>
+          <%= link_to receptionist_appointment_path(appointment), class: "btn btn-ghost btn-sm btn-square" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+    <div class="w-16 h-16 rounded-full bg-base-200 flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+      </svg>
+    </div>
+    <h3 class="font-bold text-lg mb-2">Queue is empty</h3>
+    <p class="text-base-content/60">No patients are currently in the queue.</p>
+  </div>
+<% end %>
+
+<!-- Auto-refresh meta (Turbo will handle this) -->
+<meta name="turbo-visit-control" content="reload">

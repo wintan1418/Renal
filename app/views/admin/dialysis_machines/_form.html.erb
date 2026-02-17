@@ -1,0 +1,72 @@
+<%= form_with model: [:admin, machine], class: "space-y-6" do |f| %>
+  <% if machine.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <ul class="list-disc list-inside text-sm">
+          <% machine.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-base mb-4">Machine Details</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control md:col-span-2">
+          <%= f.label :name, class: "label label-text font-medium" %>
+          <%= f.text_field :name, placeholder: "e.g. Nipro Surdial X Unit 1", class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :serial_number, "Serial Number", class: "label label-text font-medium" %>
+          <%= f.text_field :serial_number, placeholder: "e.g. NM-2024-001", class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :model, class: "label label-text font-medium" %>
+          <%= f.text_field :model, placeholder: "e.g. Surdial-X", class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :manufacturer, class: "label label-text font-medium" %>
+          <%= f.text_field :manufacturer, placeholder: "e.g. Nipro", class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :status, class: "label label-text font-medium" %>
+          <%= f.select :status,
+              [["Available", "available"], ["In Use", "in_use"], ["Maintenance", "maintenance"], ["Retired", "retired"]],
+              { prompt: "Select status" },
+              class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :last_serviced_on, "Last Serviced On", class: "label label-text font-medium" %>
+          <%= f.date_field :last_serviced_on, class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :next_service_due, "Next Service Due", class: "label label-text font-medium" %>
+          <%= f.date_field :next_service_due, class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control md:col-span-2">
+          <%= f.label :notes, class: "label label-text font-medium" %>
+          <%= f.text_area :notes, rows: 3, placeholder: "Additional notes about this machine...", class: "textarea textarea-bordered w-full" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit machine.new_record? ? "Add Machine" : "Update Machine", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_dialysis_machines_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

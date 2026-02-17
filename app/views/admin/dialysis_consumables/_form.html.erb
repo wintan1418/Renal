@@ -1,0 +1,82 @@
+<%= form_with model: [:admin, consumable], class: "space-y-6" do |f| %>
+  <% if consumable.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <ul class="list-disc list-inside text-sm">
+          <% consumable.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-base mb-4">Consumable Details</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control md:col-span-2">
+          <%= f.label :name, class: "label label-text font-medium" %>
+          <%= f.text_field :name, placeholder: "e.g. High-Flux Dialyzer 1.8m²", class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :category, class: "label label-text font-medium" %>
+          <%= f.select :category,
+              DialysisConsumable.categories.keys.map { |c| [c.humanize.titleize, c] },
+              { prompt: "Select category" },
+              class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :unit, class: "label label-text font-medium" %>
+          <%= f.text_field :unit, placeholder: "e.g. piece, set, vial, bag", class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :quantity_in_stock, "Current Stock", class: "label label-text font-medium" %>
+          <%= f.number_field :quantity_in_stock, min: 0, class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :reorder_level, "Reorder Level", class: "label label-text font-medium" %>
+          <%= f.number_field :reorder_level, min: 0, class: "input input-bordered w-full" %>
+          <span class="label-text-alt text-base-content/50 mt-1">Alert when stock falls below this level</span>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :unit_cost_cents, "Unit Cost (kobo)", class: "label label-text font-medium" %>
+          <%= f.number_field :unit_cost_cents, min: 0, class: "input input-bordered w-full",
+              placeholder: "e.g. 450000 = ₦4,500" %>
+          <span class="label-text-alt text-base-content/50 mt-1">Enter amount in kobo (1 NGN = 100 kobo)</span>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :supplier, class: "label label-text font-medium" %>
+          <%= f.text_field :supplier, placeholder: "Supplier name (optional)", class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control md:col-span-2">
+          <%= f.label :description, class: "label label-text font-medium" %>
+          <%= f.text_area :description, rows: 3, placeholder: "Description, specifications...", class: "textarea textarea-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-3">
+            <%= f.check_box :active, class: "checkbox checkbox-primary" %>
+            <span class="label-text font-medium">Active (available for use)</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit consumable.new_record? ? "Add Consumable" : "Update Consumable", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_dialysis_consumables_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

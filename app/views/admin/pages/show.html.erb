@@ -1,0 +1,57 @@
+<% content_for(:title, @page.title) %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_pages_path %>">Pages</a></li>
+    <li><%= @page.title %></li>
+  </ul>
+</div>
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold"><%= @page.title %></h1>
+    <div class="flex items-center gap-3 mt-2">
+      <% if @page.published? %>
+        <span class="badge badge-success">Published</span>
+      <% else %>
+        <span class="badge badge-ghost">Draft</span>
+      <% end %>
+      <span class="text-sm text-base-content/60">/<%= @page.slug %></span>
+    </div>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to "Edit", edit_admin_page_path(@page), class: "btn btn-primary btn-sm" %>
+    <%= link_to "Back", admin_pages_path, class: "btn btn-ghost btn-sm" %>
+  </div>
+</div>
+
+<div class="max-w-4xl">
+  <!-- Meta Info -->
+  <div class="card bg-base-100 shadow mb-6">
+    <div class="card-body">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <div>
+          <p class="text-base-content/60">Author</p>
+          <p class="font-medium mt-1"><%= @page.author&.full_name || "-" %></p>
+        </div>
+        <div>
+          <p class="text-base-content/60">Last Updated</p>
+          <p class="mt-1"><%= @page.updated_at.strftime("%B %d, %Y at %H:%M") %></p>
+        </div>
+        <div>
+          <p class="text-base-content/60">Meta Description</p>
+          <p class="mt-1"><%= @page.meta_description || "Not set" %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body prose max-w-none">
+      <%= @page.rich_body %>
+    </div>
+  </div>
+</div>

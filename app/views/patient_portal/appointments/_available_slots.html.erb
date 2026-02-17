@@ -1,0 +1,67 @@
+<%= turbo_frame_tag "time_slots" do %>
+  <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold text-sm">4</div>
+      <h2 class="text-lg font-bold">Select Time & Confirm</h2>
+    </div>
+
+    <div class="mb-4">
+      <p class="text-sm text-base-content/60">
+        <span class="font-medium text-base-content">Dr. <%= doctor.full_name %></span>
+        &middot;
+        <span><%= date.strftime("%A, %B %d, %Y") %></span>
+      </p>
+    </div>
+
+    <% if slots.any? %>
+      <%= form_with(model: [:patient_portal, Appointment.new], url: patient_portal_appointments_path, class: "space-y-4") do |f| %>
+        <%= f.hidden_field :doctor_id, value: doctor.id %>
+        <%= f.hidden_field :scheduled_date, value: date.to_s %>
+
+        <!-- Time Slots -->
+        <div>
+          <label class="label"><span class="label-text font-medium">Available Time Slots</span></label>
+          <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+            <% slots.each_with_index do |slot, i| %>
+              <label class="cursor-pointer">
+                <input type="radio" name="appointment[start_time]" value="<%= slot[:start_time].strftime("%H:%M") %>"
+                       class="hidden peer" <%= "checked" if i == 0 %>>
+                <div class="border-2 border-base-200 rounded-lg p-2 text-center text-sm font-medium
+                            peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary
+                            hover:border-primary/50 transition-all">
+                  <%= slot[:start_time].strftime("%I:%M %p") %>
+                </div>
+              </label>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Service Selection -->
+        <div class="form-control w-full">
+          <label class="label"><span class="label-text font-medium">Service <span class="text-error">*</span></span></label>
+          <%= f.select :service_id,
+                       Service.active.joins(:department).where(departments: { id: doctor.staff_profile&.department_id }).order(:name).map { |s| ["#{s.name} (#{s.duration_minutes} min)", s.id] },
+                       { prompt: "Select a service" },
+                       class: "select select-bordered w-full", required: true %>
+        </div>
+
+        <!-- Reason -->
+        <div class="form-control w-full">
+          <label class="label"><span class="label-text font-medium">Reason for visit</span></label>
+          <%= f.text_area :reason, class: "textarea textarea-bordered w-full h-20", placeholder: "Briefly describe the reason for your visit..." %>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex items-center gap-3 pt-2">
+          <%= f.submit "Confirm Booking", class: "btn btn-primary" %>
+          <%= link_to "Cancel", patient_portal_appointments_path, class: "btn btn-ghost" %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="text-center py-6">
+        <p class="text-base-content/60">No available time slots for this date.</p>
+        <p class="text-sm text-base-content/40 mt-1">Please select a different date.</p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

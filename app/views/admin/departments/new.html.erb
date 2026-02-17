@@ -1,0 +1,20 @@
+<% content_for(:title, "New Department") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_departments_path %>">Departments</a></li>
+    <li>New Department</li>
+  </ul>
+</div>
+
+<div class="max-w-3xl">
+  <h1 class="text-2xl font-bold mb-6">Create New Department</h1>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <%= render "form", department: @department %>
+    </div>
+  </div>
+</div>

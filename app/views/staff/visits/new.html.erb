@@ -1,0 +1,73 @@
+<% content_for(:title, "New Visit - #{@patient.full_name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li><a href="<%= staff_patients_path %>">Patients</a></li>
+    <li><a href="<%= chart_staff_patient_path(@patient) %>"><%= @patient.full_name %></a></li>
+    <li>New Visit</li>
+  </ul>
+</div>
+
+<h1 class="text-2xl font-extrabold mb-6">New Visit</h1>
+
+<div class="card bg-base-100 shadow-xl max-w-2xl">
+  <div class="card-body">
+    <%= form_with(model: @visit, url: staff_patient_visits_path(@patient), class: "space-y-6") do |f| %>
+      <% if @visit.errors.any? %>
+        <div class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h3 class="font-bold"><%= pluralize(@visit.errors.count, "error") %> prevented this visit from being saved:</h3>
+            <ul class="list-disc list-inside mt-1">
+              <% @visit.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @appointment %>
+        <div class="alert alert-info">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Creating visit from appointment on <%= @appointment.scheduled_date.strftime("%B %d, %Y") %></span>
+        </div>
+        <%= f.hidden_field :appointment_id, value: @appointment.id %>
+      <% end %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-control w-full">
+          <%= f.label :visit_date, class: "label" do %>
+            <span class="label-text">Visit Date <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.date_field :visit_date, class: "input input-bordered w-full", required: true %>
+        </div>
+
+        <div class="form-control w-full">
+          <%= f.label :visit_type, class: "label" do %>
+            <span class="label-text">Visit Type <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.select :visit_type, Visit.visit_types.keys.map { |t| [t.humanize, t] }, { prompt: "Select type" }, class: "select select-bordered w-full" %>
+        </div>
+      </div>
+
+      <div class="form-control w-full">
+        <%= f.label :chief_complaint, class: "label" do %>
+          <span class="label-text">Chief Complaint</span>
+        <% end %>
+        <%= f.text_area :chief_complaint, class: "textarea textarea-bordered w-full h-24", placeholder: "Patient's main reason for visit..." %>
+      </div>
+
+      <div class="flex items-center gap-3 pt-4">
+        <%= f.submit "Start Visit", class: "btn btn-primary" %>
+        <%= link_to "Cancel", chart_staff_patient_path(@patient, tab: "visits"), class: "btn btn-ghost" %>
+      </div>
+    <% end %>
+  </div>
+</div>

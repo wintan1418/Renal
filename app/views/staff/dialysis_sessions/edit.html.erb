@@ -1,0 +1,16 @@
+<% content_for(:title, "Edit Dialysis Session") %>
+
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li><a href="<%= staff_dialysis_sessions_path %>">Dialysis Sessions</a></li>
+    <li><a href="<%= staff_dialysis_session_path(@session) %>">Session #<%= @session.id %></a></li>
+    <li>Edit</li>
+  </ul>
+</div>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-extrabold">Edit Dialysis Session</h1>
+</div>
+
+<%= render "form", session: @session %>

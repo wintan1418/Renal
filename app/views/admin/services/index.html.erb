@@ -1,0 +1,115 @@
+<% content_for(:title, "Manage Services") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li>Services</li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <h1 class="text-2xl font-bold">Services</h1>
+  <%= link_to new_admin_service_path, class: "btn btn-primary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    Add Service
+  <% end %>
+</div>
+
+<!-- Search & Filters -->
+<div class="card bg-base-100 shadow mb-6">
+  <div class="card-body p-4">
+    <%= form_with url: admin_services_path, method: :get, class: "flex flex-col sm:flex-row gap-3" do |f| %>
+      <div class="form-control flex-1">
+        <%= f.search_field :q, value: params[:q], class: "input input-bordered input-sm w-full", placeholder: "Search services..." %>
+      </div>
+      <div class="form-control">
+        <%= f.select :department_id, Department.active.order(:name).map { |d| [d.name, d.id] }, { prompt: "All Departments" }, class: "select select-bordered select-sm", value: params[:department_id] %>
+      </div>
+      <div class="form-control">
+        <%= f.select :service_type, Service.service_types.keys.map { |t| [t.humanize, t] }, { prompt: "All Types" }, class: "select select-bordered select-sm", value: params[:service_type] %>
+      </div>
+      <%= f.submit "Search", class: "btn btn-primary btn-sm" %>
+      <% if params[:q].present? || params[:department_id].present? || params[:service_type].present? %>
+        <%= link_to "Clear", admin_services_path, class: "btn btn-ghost btn-sm" %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Services Table -->
+<div class="card bg-base-100 shadow">
+  <div class="card-body p-0">
+    <div class="overflow-x-auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @services.each do |service| %>
+            <tr class="hover">
+              <td>
+                <div>
+                  <div class="font-bold"><%= service.name %></div>
+                  <% if service.description.present? %>
+                    <div class="text-sm text-base-content/60 truncate max-w-xs"><%= service.description %></div>
+                  <% end %>
+                </div>
+              </td>
+              <td><%= service.department&.name || "-" %></td>
+              <td><span class="badge badge-outline badge-sm"><%= service.service_type&.humanize %></span></td>
+              <td class="font-mono"><%= format_naira(service.price_cents) %></td>
+              <td><%= service.duration_minutes %> min</td>
+              <td>
+                <% if service.active? %>
+                  <span class="badge badge-success badge-sm">Active</span>
+                <% else %>
+                  <span class="badge badge-ghost badge-sm">Inactive</span>
+                <% end %>
+              </td>
+              <td>
+                <div class="flex gap-1">
+                  <%= link_to edit_admin_service_path(service), class: "btn btn-ghost btn-xs" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                    </svg>
+                  <% end %>
+                  <% if service.active? %>
+                    <%= button_to admin_service_path(service), method: :delete, class: "btn btn-ghost btn-xs text-error", data: { turbo_confirm: "Are you sure you want to deactivate this service?" } do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                      </svg>
+                    <% end %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+          <% if @services.empty? %>
+            <tr>
+              <td colspan="7" class="text-center py-8 text-base-content/60">No services found.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="flex justify-center mt-6">
+    <div class="join">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>

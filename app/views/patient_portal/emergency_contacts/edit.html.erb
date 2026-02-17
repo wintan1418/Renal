@@ -1,0 +1,14 @@
+<% content_for :title, "Edit Emergency Contact" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">Edit Emergency Contact</h1>
+    <p class="text-base-content/60 text-sm"><%= @contact.name %></p>
+  </div>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <%= render "form", contact: @contact %>
+    </div>
+  </div>
+</div>

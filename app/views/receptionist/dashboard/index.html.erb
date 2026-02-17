@@ -1,0 +1,57 @@
+<% content_for(:title, "Receptionist Dashboard") %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Front Desk</h1>
+    <p class="text-base-content/60"><%= Time.current.strftime("%A, %B %d, %Y") %></p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="stat bg-base-100 rounded-box shadow">
+      <div class="stat-title">Today's Appointments</div>
+      <div class="stat-value text-primary">0</div>
+      <div class="stat-desc">Total scheduled</div>
+    </div>
+    <div class="stat bg-base-100 rounded-box shadow">
+      <div class="stat-title">Checked In</div>
+      <div class="stat-value text-success">0</div>
+      <div class="stat-desc">Waiting to be seen</div>
+    </div>
+    <div class="stat bg-base-100 rounded-box shadow">
+      <div class="stat-title">Walk-ins</div>
+      <div class="stat-value text-warning">0</div>
+      <div class="stat-desc">Today's walk-ins</div>
+    </div>
+    <div class="stat bg-base-100 rounded-box shadow">
+      <div class="stat-title">Pending Invoices</div>
+      <div class="stat-value text-error">0</div>
+      <div class="stat-desc">Awaiting payment</div>
+    </div>
+  </div>
+
+  <div class="flex gap-3">
+    <a href="#" class="btn btn-primary">New Appointment</a>
+    <a href="#" class="btn btn-secondary">Walk-in Registration</a>
+    <a href="#" class="btn btn-accent">Register Patient</a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title">Waiting Queue</h2>
+        <div class="text-center py-8 text-base-content/40">
+          <p>No patients in queue</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title">Today's Appointments</h2>
+        <div class="text-center py-8 text-base-content/40">
+          <p>No appointments today</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

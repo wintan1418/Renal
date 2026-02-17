@@ -1,0 +1,68 @@
+<%= form_with(model: [:admin, testimonial], class: "space-y-6") do |f| %>
+  <% if testimonial.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold"><%= pluralize(testimonial.errors.count, "error") %> prevented this testimonial from being saved:</h3>
+        <ul class="list-disc list-inside mt-1">
+          <% testimonial.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="form-control w-full">
+    <%= f.label :patient_name, class: "label" do %>
+      <span class="label-text">Patient Name <span class="text-error">*</span></span>
+    <% end %>
+    <%= f.text_field :patient_name, class: "input input-bordered w-full", placeholder: "Patient's name", required: true %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :content, class: "label" do %>
+      <span class="label-text">Testimonial Content <span class="text-error">*</span></span>
+    <% end %>
+    <%= f.text_area :content, class: "textarea textarea-bordered w-full h-32", placeholder: "What the patient said...", required: true %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="form-control w-full">
+      <%= f.label :rating, class: "label" do %>
+        <span class="label-text">Rating</span>
+      <% end %>
+      <%= f.select :rating, (1..5).map { |r| ["#{r} Star#{'s' if r > 1}", r] }, { prompt: "Select Rating", include_blank: "No Rating" }, class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control w-full">
+      <%= f.label :approved, class: "label" do %>
+        <span class="label-text">Approval Status</span>
+      <% end %>
+      <label class="label cursor-pointer justify-start gap-3">
+        <%= f.check_box :approved, class: "toggle toggle-success" %>
+        <span class="label-text">Approved for display</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :photo, class: "label" do %>
+      <span class="label-text">Patient Photo</span>
+    <% end %>
+    <%= f.file_field :photo, class: "file-input file-input-bordered w-full", accept: "image/*" %>
+    <% if testimonial.persisted? && testimonial.photo.attached? %>
+      <div class="mt-2 flex items-center gap-2">
+        <%= image_tag testimonial.photo.variant(resize_to_limit: [80, 80]), class: "w-12 h-12 rounded-full object-cover" %>
+        <span class="text-sm text-base-content/60">Current photo</span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-3 pt-4">
+    <%= f.submit testimonial.new_record? ? "Create Testimonial" : "Update Testimonial", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_testimonials_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

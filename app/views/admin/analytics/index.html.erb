@@ -1,0 +1,105 @@
+<% content_for :title, "Analytics Dashboard" %>
+<% content_for :head do %>
+  <%= javascript_include_tag "chartkick" %>
+  <%= javascript_include_tag "Chart.bundle" %>
+<% end %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">Analytics Dashboard</h1>
+      <p class="text-base-content/60 text-sm">Hospital performance overview</p>
+    </div>
+    <div class="text-sm opacity-60">Updated <%= Time.current.strftime("%d %b %Y, %I:%M %p") %></div>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="stats stats-horizontal shadow w-full bg-base-100">
+    <div class="stat">
+      <div class="stat-title">Total Patients</div>
+      <div class="stat-value text-primary"><%= @data[:total_patients] %></div>
+      <div class="stat-desc">+<%= @data[:new_patients_this_month] %> this month</div>
+    </div>
+    <div class="stat">
+      <div class="stat-title">Revenue (Month)</div>
+      <div class="stat-value text-success text-2xl">&#8358;<%= number_with_delimiter((@data[:revenue_this_month] / 100.0).round) %></div>
+      <div class="stat-desc"><%= @data[:outstanding_invoices] %> unpaid invoices</div>
+    </div>
+    <div class="stat">
+      <div class="stat-title">Dialysis Sessions</div>
+      <div class="stat-value"><%= @data[:dialysis_sessions_this_month] %></div>
+      <div class="stat-desc">This month &middot; <%= @data[:active_sessions] %> active now</div>
+    </div>
+    <div class="stat">
+      <div class="stat-title">Transplant Waitlist</div>
+      <div class="stat-value text-warning"><%= @data[:transplant_waitlist] %></div>
+      <div class="stat-desc">Active patients waiting</div>
+    </div>
+  </div>
+
+  <!-- Charts row 1 -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">Patient Growth</h2>
+        <%= line_chart @data[:patient_growth], height: "200px", colors: ["#3b82f6"], legend: false %>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">Revenue Trend (&#8358;)</h2>
+        <%= bar_chart @data[:revenue_trend], height: "200px", colors: ["#22c55e"], legend: false %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts row 2 -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">Dialysis Sessions</h2>
+        <%= bar_chart @data[:dialysis_trend], height: "180px", colors: ["#8b5cf6"], legend: false %>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">Appointments (7 days)</h2>
+        <%= bar_chart @data[:appointment_trend], height: "180px", colors: ["#f59e0b"], legend: false %>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">CKD Stage Distribution</h2>
+        <%= pie_chart @data[:ckd_stage_distribution], height: "180px", legend: true %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick stats -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="card bg-base-100 shadow">
+      <div class="card-body py-4 items-center text-center">
+        <div class="text-2xl font-bold text-primary"><%= @data[:appointment_completion_rate] %>%</div>
+        <div class="text-xs text-base-content/60">Completion Rate</div>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body py-4 items-center text-center">
+        <div class="text-2xl font-bold text-info"><%= @data[:appointments_today] %></div>
+        <div class="text-xs text-base-content/60">Appointments Today</div>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body py-4 items-center text-center">
+        <div class="text-2xl font-bold text-warning"><%= @data[:pending_lab_orders] %></div>
+        <div class="text-xs text-base-content/60">Pending Lab Orders</div>
+      </div>
+    </div>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body py-4 items-center text-center">
+        <div class="text-2xl font-bold text-success"><%= @data[:machines_available] %>/<%= @data[:machines_total] %></div>
+        <div class="text-xs text-base-content/60">Machines Available</div>
+      </div>
+    </div>
+  </div>
+</div>

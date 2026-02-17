@@ -1,0 +1,118 @@
+<% content_for(:title, "Invoices") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= receptionist_root_path %>">Dashboard</a></li>
+    <li>Invoices</li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <h1 class="text-2xl font-extrabold">Invoices</h1>
+  <%= link_to new_receptionist_invoice_path, class: "btn btn-primary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    New Invoice
+  <% end %>
+</div>
+
+<!-- Outstanding Balance Stat -->
+<% outstanding = Invoice.where(status: [:sent, :overdue]).sum("total_cents - amount_paid_cents") %>
+<div class="stats shadow mb-6 w-full">
+  <div class="stat">
+    <div class="stat-title">Total Outstanding Balance</div>
+    <div class="stat-value text-error">₦<%= number_with_delimiter(outstanding / 100) %></div>
+    <div class="stat-desc">Across sent &amp; overdue invoices</div>
+  </div>
+  <div class="stat">
+    <div class="stat-title">Overdue Invoices</div>
+    <div class="stat-value text-warning"><%= Invoice.where(status: :overdue).count %></div>
+    <div class="stat-desc">Require immediate attention</div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="bg-white rounded-2xl shadow-lg p-4 mb-6">
+  <%= form_with url: receptionist_invoices_path, method: :get, class: "flex flex-col sm:flex-row gap-3" do |f| %>
+    <div class="form-control flex-1">
+      <%= f.select :status,
+        [["Draft", "draft"], ["Sent", "sent"], ["Paid", "paid"], ["Overdue", "overdue"], ["Cancelled", "cancelled"]],
+        { prompt: "All Statuses", selected: params[:status] },
+        class: "select select-bordered select-sm" %>
+    </div>
+    <%= f.submit "Filter", class: "btn btn-primary btn-sm" %>
+    <% if params[:status].present? %>
+      <%= link_to "Clear", receptionist_invoices_path, class: "btn btn-ghost btn-sm" %>
+    <% end %>
+  <% end %>
+</div>
+
+<!-- Invoices Table -->
+<div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Invoice #</th>
+          <th>Patient</th>
+          <th>Date</th>
+          <th>Total</th>
+          <th>Paid</th>
+          <th>Balance</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @invoices.each do |invoice| %>
+          <tr class="hover">
+            <td class="font-mono font-semibold text-sm"><%= invoice.invoice_number %></td>
+            <td>
+              <div class="flex items-center gap-2">
+                <%= avatar_for(invoice.patient, size: "w-7 h-7", text_size: "text-xs") %>
+                <span class="text-sm font-medium"><%= invoice.patient&.full_name %></span>
+              </div>
+            </td>
+            <td class="text-sm"><%= invoice.created_at.strftime("%b %d, %Y") %></td>
+            <td class="font-semibold">₦<%= number_with_delimiter(invoice.total_cents / 100) %></td>
+            <td class="text-success">₦<%= number_with_delimiter(invoice.amount_paid_cents / 100) %></td>
+            <td class="font-semibold <%= invoice.balance_due_cents > 0 ? 'text-error' : 'text-success' %>">
+              ₦<%= number_with_delimiter(invoice.balance_due_cents / 100) %>
+            </td>
+            <td><%= status_badge(invoice.status, type: :invoice) %></td>
+            <td>
+              <div class="flex gap-1">
+                <%= link_to receptionist_invoice_path(invoice), class: "btn btn-ghost btn-xs", title: "View" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  </svg>
+                <% end %>
+                <% if invoice.status_draft? %>
+                  <%= button_to send_invoice_receptionist_invoice_path(invoice), method: :patch, class: "btn btn-accent btn-xs", title: "Send to patient" do %>
+                    Send
+                  <% end %>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @invoices.empty? %>
+          <tr>
+            <td colspan="8" class="text-center py-8 text-base-content/60">No invoices found.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="flex justify-center mt-6">
+    <div class="join">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>

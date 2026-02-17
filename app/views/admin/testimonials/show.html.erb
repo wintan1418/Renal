@@ -1,0 +1,75 @@
+<% content_for(:title, "Testimonial from #{@testimonial.patient_name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_testimonials_path %>">Testimonials</a></li>
+    <li><%= @testimonial.patient_name %></li>
+  </ul>
+</div>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold">Testimonial</h1>
+  <div class="flex gap-2">
+    <%= link_to "Edit", edit_admin_testimonial_path(@testimonial), class: "btn btn-primary btn-sm" %>
+    <%= link_to "Back", admin_testimonials_path, class: "btn btn-ghost btn-sm" %>
+  </div>
+</div>
+
+<div class="max-w-3xl">
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <div class="flex items-center gap-4 mb-4">
+        <% if @testimonial.photo.attached? %>
+          <%= image_tag @testimonial.photo.variant(resize_to_limit: [80, 80]), class: "w-16 h-16 rounded-full object-cover" %>
+        <% else %>
+          <div class="w-16 h-16 rounded-full bg-base-300 flex items-center justify-center">
+            <span class="text-xl font-bold"><%= @testimonial.patient_name[0].upcase %></span>
+          </div>
+        <% end %>
+        <div>
+          <h2 class="text-lg font-bold"><%= @testimonial.patient_name %></h2>
+          <div class="flex items-center gap-2">
+            <% if @testimonial.approved? %>
+              <span class="badge badge-success badge-sm">Approved</span>
+            <% else %>
+              <span class="badge badge-warning badge-sm">Pending</span>
+            <% end %>
+            <% if @testimonial.rating %>
+              <div class="flex items-center gap-1">
+                <% @testimonial.rating.times do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-warning">
+                    <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                  </svg>
+                <% end %>
+                <span class="text-sm text-base-content/60"><%= @testimonial.rating %>/5</span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <blockquote class="border-l-4 border-primary pl-4 italic text-lg">
+        "<%= @testimonial.content %>"
+      </blockquote>
+
+      <div class="mt-4 text-sm text-base-content/60">
+        Submitted on <%= @testimonial.created_at.strftime("%B %d, %Y") %>
+      </div>
+
+      <% unless @testimonial.approved? %>
+        <div class="card-actions mt-4">
+          <%= button_to admin_testimonial_path(@testimonial), params: { testimonial: { approved: true } }, method: :patch, class: "btn btn-success btn-sm" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+            Approve Testimonial
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

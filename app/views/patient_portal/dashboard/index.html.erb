@@ -1,0 +1,52 @@
+<% content_for(:title, "Patient Dashboard") %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Welcome, <%= current_user.first_name %></h1>
+    <p class="text-base-content/60">Here's an overview of your health journey</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="stat bg-base-100 rounded-box shadow">
+      <div class="stat-title">Upcoming Appointments</div>
+      <div class="stat-value text-primary">0</div>
+      <div class="stat-desc">Next appointment: --</div>
+    </div>
+    <div class="stat bg-base-100 rounded-box shadow">
+      <div class="stat-title">Lab Results</div>
+      <div class="stat-value text-secondary">0</div>
+      <div class="stat-desc">Pending results</div>
+    </div>
+    <div class="stat bg-base-100 rounded-box shadow">
+      <div class="stat-title">Prescriptions</div>
+      <div class="stat-value text-accent">0</div>
+      <div class="stat-desc">Active prescriptions</div>
+    </div>
+    <div class="stat bg-base-100 rounded-box shadow">
+      <div class="stat-title">Outstanding Balance</div>
+      <div class="stat-value text-error">₦0</div>
+      <div class="stat-desc">Unpaid invoices</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title">Upcoming Appointments</h2>
+        <div class="text-center py-8 text-base-content/40">
+          <p>No upcoming appointments</p>
+          <a href="#" class="btn btn-primary btn-sm mt-4">Book Appointment</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title">Recent Lab Results</h2>
+        <div class="text-center py-8 text-base-content/40">
+          <p>No lab results yet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

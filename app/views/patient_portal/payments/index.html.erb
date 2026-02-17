@@ -1,0 +1,60 @@
+<% content_for(:title, "My Payments") %>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-extrabold">My Payments</h1>
+</div>
+
+<div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Invoice #</th>
+          <th>Method</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @payments.each do |payment| %>
+          <tr class="hover">
+            <td class="text-sm"><%= payment.created_at.strftime("%b %d, %Y") %></td>
+            <td>
+              <% if payment.invoice %>
+                <%= link_to payment.invoice.invoice_number, patient_portal_invoice_path(payment.invoice),
+                  class: "font-mono font-semibold text-primary hover:underline text-sm" %>
+              <% else %>
+                <span class="font-mono text-sm text-base-content/40">N/A</span>
+              <% end %>
+            </td>
+            <td>
+              <span class="badge badge-outline badge-sm"><%= payment.payment_method&.humanize %></span>
+            </td>
+            <td class="font-semibold">₦<%= number_with_delimiter(payment.amount_cents / 100) %></td>
+            <td><%= status_badge(payment.status, type: :payment) %></td>
+            <td>
+              <%= link_to patient_portal_payment_path(payment), class: "btn btn-ghost btn-xs" do %>
+                View
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @payments.empty? %>
+          <tr>
+            <td colspan="6" class="text-center py-8 text-base-content/60">No payments found.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="flex justify-center mt-6">
+    <div class="join">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>

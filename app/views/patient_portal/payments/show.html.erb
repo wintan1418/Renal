@@ -1,0 +1,79 @@
+<% content_for(:title, "Payment Receipt") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= patient_portal_root_path %>">Dashboard</a></li>
+    <li><a href="<%= patient_portal_payments_path %>">Payments</a></li>
+    <li>Receipt</li>
+  </ul>
+</div>
+
+<div class="max-w-md mx-auto">
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <div class="text-center mb-6">
+      <% if @payment.status_successful? %>
+        <div class="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-success">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+        </div>
+        <h1 class="text-xl font-extrabold text-success">Payment Successful</h1>
+      <% elsif @payment.status_failed? %>
+        <div class="w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mx-auto mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-error">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+          </svg>
+        </div>
+        <h1 class="text-xl font-extrabold text-error">Payment Failed</h1>
+      <% else %>
+        <h1 class="text-xl font-extrabold">Payment Receipt</h1>
+      <% end %>
+    </div>
+
+    <div class="space-y-3 text-sm">
+      <div class="flex justify-between">
+        <span class="text-base-content/50">Amount</span>
+        <span class="font-bold text-lg">₦<%= number_with_delimiter(@payment.amount_cents / 100) %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-base-content/50">Method</span>
+        <span class="font-semibold"><%= @payment.payment_method&.humanize %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-base-content/50">Status</span>
+        <%= status_badge(@payment.status, type: :payment) %>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-base-content/50">Date</span>
+        <span><%= @payment.created_at.strftime("%B %d, %Y %H:%M") %></span>
+      </div>
+      <% if @payment.paystack_reference.present? %>
+        <div class="flex justify-between">
+          <span class="text-base-content/50">Reference</span>
+          <span class="font-mono text-xs"><%= @payment.paystack_reference %></span>
+        </div>
+      <% end %>
+      <% if @payment.invoice %>
+        <div class="flex justify-between">
+          <span class="text-base-content/50">Invoice</span>
+          <%= link_to @payment.invoice.invoice_number, patient_portal_invoice_path(@payment.invoice),
+            class: "font-mono text-primary hover:underline" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="flex gap-2">
+      <%= link_to patient_portal_payments_path, class: "btn btn-ghost btn-sm flex-1" do %>
+        All Payments
+      <% end %>
+      <% if @payment.invoice %>
+        <%= link_to patient_portal_invoice_path(@payment.invoice), class: "btn btn-primary btn-sm flex-1" do %>
+          View Invoice
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

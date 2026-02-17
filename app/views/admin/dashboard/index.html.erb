@@ -1,0 +1,123 @@
+<% content_for(:title, "Admin Dashboard") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li>Dashboard</li>
+  </ul>
+</div>
+
+<!-- Welcome Message -->
+<div class="mb-8">
+  <h1 class="text-3xl font-bold text-base-content">Welcome back, <%= current_user.first_name %></h1>
+  <p class="text-base-content/60 mt-1">Here's an overview of your hospital management system.</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <div class="stat bg-base-100 shadow rounded-box">
+    <div class="stat-figure text-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+      </svg>
+    </div>
+    <div class="stat-title">Total Patients</div>
+    <div class="stat-value text-primary"><%= @total_patients %></div>
+    <div class="stat-desc">Registered patients</div>
+  </div>
+
+  <div class="stat bg-base-100 shadow rounded-box">
+    <div class="stat-figure text-secondary">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 0-6.23.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+      </svg>
+    </div>
+    <div class="stat-title">Total Doctors</div>
+    <div class="stat-value text-secondary"><%= @total_doctors %></div>
+    <div class="stat-desc">Active physicians</div>
+  </div>
+
+  <div class="stat bg-base-100 shadow rounded-box">
+    <div class="stat-figure text-accent">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+      </svg>
+    </div>
+    <div class="stat-title">Total Staff</div>
+    <div class="stat-value text-accent"><%= @total_staff %></div>
+    <div class="stat-desc">All staff members</div>
+  </div>
+
+  <div class="stat bg-base-100 shadow rounded-box">
+    <div class="stat-figure text-info">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+      </svg>
+    </div>
+    <div class="stat-title">Departments</div>
+    <div class="stat-value text-info"><%= @departments.count %></div>
+    <div class="stat-desc">Active departments</div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="flex flex-wrap gap-3 mb-8">
+  <%= link_to new_admin_user_path, class: "btn btn-primary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+    </svg>
+    Add User
+  <% end %>
+  <%= link_to new_admin_department_path, class: "btn btn-secondary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    Add Department
+  <% end %>
+  <%= link_to new_admin_blog_post_path, class: "btn btn-accent btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+    </svg>
+    New Blog Post
+  <% end %>
+</div>
+
+<!-- Recent Users Table -->
+<div class="card bg-base-100 shadow">
+  <div class="card-body">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="card-title">Recent Registrations</h2>
+      <%= link_to "View All", admin_users_path, class: "btn btn-ghost btn-sm" %>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_users.each do |user| %>
+            <tr>
+              <td>
+                <div class="flex items-center gap-3">
+                  <%= avatar_for(user, size: "w-8 h-8", text_size: "text-xs") %>
+                  <div>
+                    <div class="font-bold"><%= user.full_name %></div>
+                  </div>
+                </div>
+              </td>
+              <td><%= user.email %></td>
+              <td><%= role_badge(user.role) %></td>
+              <td><%= user.created_at.strftime("%b %d, %Y") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

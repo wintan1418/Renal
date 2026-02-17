@@ -1,0 +1,67 @@
+<%= form_with model: [:patient_portal, log], local: true, class: "space-y-4" do |f| %>
+  <% if log.errors.any? %>
+    <div class="alert alert-error">
+      <ul class="list-disc list-inside">
+        <% log.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <%= f.label :log_date, "Date", class: "label label-text font-medium" %>
+      <%= f.date_field :log_date, class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :meal_type, "Meal Type", class: "label label-text font-medium" %>
+      <%= f.select :meal_type,
+            DietLog.meal_types.keys.map { |t| [t.capitalize, t] },
+            { include_blank: "-- Select Meal --" },
+            class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :fluid_intake_ml, "Fluid Intake (ml)", class: "label label-text font-medium" %>
+      <%= f.number_field :fluid_intake_ml, min: 0, step: 10, class: "input input-bordered w-full", placeholder: "e.g. 250" %>
+      <label class="label"><span class="label-text-alt text-base-content/60">Daily limit for dialysis: 1,500ml</span></label>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :sodium_mg, "Sodium (mg)", class: "label label-text font-medium" %>
+      <%= f.number_field :sodium_mg, min: 0, step: 1, class: "input input-bordered w-full", placeholder: "mg" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :potassium_mg, "Potassium (mg)", class: "label label-text font-medium" %>
+      <%= f.number_field :potassium_mg, min: 0, step: 1, class: "input input-bordered w-full", placeholder: "mg" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :phosphorus_mg, "Phosphorus (mg)", class: "label label-text font-medium" %>
+      <%= f.number_field :phosphorus_mg, min: 0, step: 1, class: "input input-bordered w-full", placeholder: "mg" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :protein_g, "Protein (g)", class: "label label-text font-medium" %>
+      <%= f.number_field :protein_g, min: 0, step: 0.1, class: "input input-bordered w-full", placeholder: "grams" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :calories_kcal, "Calories (kcal)", class: "label label-text font-medium" %>
+      <%= f.number_field :calories_kcal, min: 0, step: 1, class: "input input-bordered w-full", placeholder: "kcal" %>
+    </div>
+  </div>
+
+  <div class="form-control">
+    <%= f.label :notes, "Notes", class: "label label-text font-medium" %>
+    <%= f.text_area :notes, class: "textarea textarea-bordered w-full", rows: 2, placeholder: "e.g. Rice and beans, cup of water..." %>
+  </div>
+
+  <div class="flex gap-3 pt-2">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", patient_portal_diet_logs_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

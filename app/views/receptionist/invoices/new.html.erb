@@ -1,0 +1,17 @@
+<% content_for(:title, "New Invoice") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= receptionist_root_path %>">Dashboard</a></li>
+    <li><a href="<%= receptionist_invoices_path %>">Invoices</a></li>
+    <li>New</li>
+  </ul>
+</div>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-extrabold">New Invoice</h1>
+  <p class="text-base-content/60 text-sm mt-1">Create an invoice for a patient visit or service.</p>
+</div>
+
+<%= render "form", invoice: @invoice %>

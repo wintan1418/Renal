@@ -1,0 +1,92 @@
+<%= form_with(model: [:admin, blog_post], class: "space-y-6") do |f| %>
+  <% if blog_post.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold"><%= pluralize(blog_post.errors.count, "error") %> prevented this blog post from being saved:</h3>
+        <ul class="list-disc list-inside mt-1">
+          <% blog_post.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="form-control w-full">
+    <%= f.label :title, class: "label" do %>
+      <span class="label-text">Title <span class="text-error">*</span></span>
+    <% end %>
+    <%= f.text_field :title, class: "input input-bordered w-full", placeholder: "Enter post title", required: true %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :slug, class: "label" do %>
+      <span class="label-text">Slug</span>
+    <% end %>
+    <%= f.text_field :slug, class: "input input-bordered w-full", placeholder: "auto-generated-from-title" %>
+    <label class="label">
+      <span class="label-text-alt text-base-content/50">Leave blank to auto-generate from title</span>
+    </label>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :excerpt, class: "label" do %>
+      <span class="label-text">Excerpt</span>
+    <% end %>
+    <%= f.text_area :excerpt, class: "textarea textarea-bordered w-full h-20", placeholder: "Brief summary of this post..." %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :rich_body, "Body", class: "label" do %>
+      <span class="label-text">Content</span>
+    <% end %>
+    <%= f.rich_text_area :rich_body, class: "min-h-[300px]" %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="form-control w-full">
+      <%= f.label :category, class: "label" do %>
+        <span class="label-text">Category</span>
+      <% end %>
+      <%= f.select :category, BlogPost.categories.keys.map { |c| [c.humanize, c] }, { prompt: "Select Category" }, class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control w-full">
+      <%= f.label :status, class: "label" do %>
+        <span class="label-text">Status</span>
+      <% end %>
+      <%= f.select :status, BlogPost.statuses.keys.map { |s| [s.humanize, s] }, {}, class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control w-full">
+      <%= f.label :published_at, class: "label" do %>
+        <span class="label-text">Publish Date</span>
+      <% end %>
+      <%= f.datetime_local_field :published_at, class: "input input-bordered w-full" %>
+    </div>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :featured_image, class: "label" do %>
+      <span class="label-text">Featured Image</span>
+    <% end %>
+    <%= f.file_field :featured_image, class: "file-input file-input-bordered w-full", accept: "image/*" %>
+    <% if blog_post.persisted? && blog_post.featured_image.attached? %>
+      <div class="mt-2">
+        <%= image_tag blog_post.featured_image.variant(resize_to_limit: [400, 200]), class: "rounded-lg max-h-40 object-cover" %>
+        <p class="text-sm text-base-content/60 mt-1">Current featured image</p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-3 pt-4">
+    <%= f.submit blog_post.new_record? ? "Create Post" : "Update Post", class: "btn btn-primary" %>
+    <% if blog_post.new_record? || blog_post.draft? %>
+      <%= f.submit "Save as Draft", class: "btn btn-ghost", name: "blog_post[status]", value: "draft" %>
+    <% end %>
+    <%= link_to "Cancel", admin_blog_posts_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

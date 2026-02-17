@@ -1,0 +1,55 @@
+<%= form_with model: [:admin, station], class: "space-y-6" do |f| %>
+  <% if station.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <ul class="list-disc list-inside text-sm">
+          <% station.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-base mb-4">Station Details</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control md:col-span-2">
+          <%= f.label :name, class: "label label-text font-medium" %>
+          <%= f.text_field :name, placeholder: "e.g. Chair 1, Bed A", class: "input input-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :station_type, "Type", class: "label label-text font-medium" %>
+          <%= f.select :station_type,
+              [["Chair", "chair"], ["Bed", "bed"]],
+              { prompt: "Select type" },
+              class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control">
+          <%= f.label :status, class: "label label-text font-medium" %>
+          <%= f.select :status,
+              [["Available", "available"], ["Occupied", "occupied"], ["Maintenance", "maintenance"], ["Reserved", "reserved"]],
+              { prompt: "Select status" },
+              class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control md:col-span-2">
+          <%= f.label :notes, class: "label label-text font-medium" %>
+          <%= f.text_area :notes, rows: 3, placeholder: "Additional notes...", class: "textarea textarea-bordered w-full" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit station.new_record? ? "Add Station" : "Update Station", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_dialysis_stations_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

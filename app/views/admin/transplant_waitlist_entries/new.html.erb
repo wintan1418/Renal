@@ -1,0 +1,14 @@
+<% content_for :title, "Add to Transplant Waitlist" %>
+
+<div class="max-w-3xl mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold">Add Patient to Transplant Waitlist</h1>
+    <p class="text-base-content/60 text-sm">Enter patient transplant waitlist details below.</p>
+  </div>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <%= render "form", entry: @entry %>
+    </div>
+  </div>
+</div>

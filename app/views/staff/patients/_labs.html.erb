@@ -1,0 +1,86 @@
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-bold">Lab Orders & Results</h2>
+  <%= link_to new_staff_patient_lab_order_path(patient), class: "btn btn-primary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+    New Lab Order
+  <% end %>
+</div>
+
+<% if lab_orders.any? %>
+  <div class="space-y-4">
+    <% lab_orders.each do |order| %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold">
+                Lab Order #<%= order.id %>
+                <span class="badge badge-sm ml-2 <%= order.status_pending? ? 'badge-warning' : order.status_completed? ? 'badge-success' : 'badge-info' %>">
+                  <%= order.status.humanize %>
+                </span>
+                <% if order.urgent? || order.stat? %>
+                  <span class="badge badge-error badge-sm ml-1"><%= order.priority.humanize %></span>
+                <% end %>
+              </h3>
+              <p class="text-sm text-base-content/60">
+                Ordered by <%= order.ordered_by.full_name %> on <%= order.created_at.strftime("%b %d, %Y") %>
+              </p>
+            </div>
+            <%= link_to "View Details", staff_patient_lab_order_path(patient, order), class: "btn btn-ghost btn-sm" %>
+          </div>
+
+          <% if order.lab_results.any? %>
+            <div class="overflow-x-auto mt-2">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Test</th>
+                    <th>Result</th>
+                    <th>Normal Range</th>
+                    <th>Flag</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% order.lab_results.each do |result| %>
+                    <tr>
+                      <td><%= result.lab_test.name %></td>
+                      <td class="font-medium">
+                        <% if result.value.present? %>
+                          <%= result.value %> <%= result.lab_test.unit %>
+                        <% else %>
+                          <span class="text-base-content/40">Pending</span>
+                        <% end %>
+                      </td>
+                      <td class="text-sm text-base-content/60"><%= result.lab_test.normal_range || "--" %></td>
+                      <td>
+                        <% if result.value.present? %>
+                          <% case result.flag %>
+                          <% when "normal" %>
+                            <span class="badge badge-success badge-xs">Normal</span>
+                          <% when "low" %>
+                            <span class="badge badge-warning badge-xs">Low</span>
+                          <% when "high" %>
+                            <span class="badge badge-warning badge-xs">High</span>
+                          <% when "critical" %>
+                            <span class="badge badge-error badge-xs">Critical</span>
+                          <% end %>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body items-center text-center py-12">
+      <p class="text-base-content/60">No lab orders yet.</p>
+      <%= link_to "Create Lab Order", new_staff_patient_lab_order_path(patient), class: "btn btn-primary btn-sm mt-2" %>
+    </div>
+  </div>
+<% end %>

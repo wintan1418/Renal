@@ -1,0 +1,134 @@
+<% content_for(:title, "Invoice #{@invoice.invoice_number}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= patient_portal_root_path %>">Dashboard</a></li>
+    <li><a href="<%= patient_portal_invoices_path %>">Invoices</a></li>
+    <li><%= @invoice.invoice_number %></li>
+  </ul>
+</div>
+
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-3">
+    <h1 class="text-2xl font-extrabold">Invoice <%= @invoice.invoice_number %></h1>
+    <%= status_badge(@invoice.status, type: :invoice) %>
+  </div>
+  <% if @invoice.balance_due_cents > 0 && !@invoice.status_cancelled? && !@invoice.status_draft? %>
+    <%= link_to pay_patient_portal_invoice_path(@invoice), class: "btn btn-primary" do %>
+      Pay Now &mdash; ₦<%= number_with_delimiter(@invoice.balance_due_cents / 100) %>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="max-w-3xl mx-auto space-y-6">
+  <!-- Invoice Details -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <div class="grid grid-cols-2 gap-4 mb-6 text-sm">
+      <div>
+        <p class="text-base-content/50">Invoice Number</p>
+        <p class="font-mono font-bold"><%= @invoice.invoice_number %></p>
+      </div>
+      <div>
+        <p class="text-base-content/50">Issue Date</p>
+        <p class="font-semibold"><%= @invoice.created_at.strftime("%B %d, %Y") %></p>
+      </div>
+      <div>
+        <p class="text-base-content/50">Due Date</p>
+        <p class="font-semibold <%= @invoice.due_date&.past? && !@invoice.status_paid? ? 'text-error' : '' %>">
+          <%= @invoice.due_date&.strftime("%B %d, %Y") || "Not set" %>
+        </p>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="overflow-x-auto mb-6">
+      <table class="table table-sm">
+        <thead>
+          <tr class="bg-base-200">
+            <th>Description</th>
+            <th class="text-right">Qty</th>
+            <th class="text-right">Unit Price</th>
+            <th class="text-right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @invoice.invoice_items.each do |item| %>
+            <tr>
+              <td><%= item.description || item.service&.name %></td>
+              <td class="text-right"><%= item.quantity %></td>
+              <td class="text-right">₦<%= number_with_delimiter(item.unit_price_cents / 100) %></td>
+              <td class="text-right font-semibold">₦<%= number_with_delimiter(item.total_cents / 100) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Totals -->
+    <div class="flex justify-end">
+      <div class="w-64 space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-base-content/70">Subtotal</span>
+          <span>₦<%= number_with_delimiter(@invoice.subtotal_cents / 100) %></span>
+        </div>
+        <% if @invoice.discount_cents > 0 %>
+          <div class="flex justify-between text-success">
+            <span>Discount</span>
+            <span>-₦<%= number_with_delimiter(@invoice.discount_cents / 100) %></span>
+          </div>
+        <% end %>
+        <% if @invoice.tax_cents > 0 %>
+          <div class="flex justify-between">
+            <span>Tax</span>
+            <span>₦<%= number_with_delimiter(@invoice.tax_cents / 100) %></span>
+          </div>
+        <% end %>
+        <div class="divider my-1"></div>
+        <div class="flex justify-between font-semibold text-base">
+          <span>Total</span>
+          <span>₦<%= number_with_delimiter(@invoice.total_cents / 100) %></span>
+        </div>
+        <div class="flex justify-between text-success">
+          <span>Amount Paid</span>
+          <span>₦<%= number_with_delimiter(@invoice.amount_paid_cents / 100) %></span>
+        </div>
+        <div class="flex justify-between font-bold text-xl <%= @invoice.balance_due_cents > 0 ? 'text-error' : 'text-success' %>">
+          <span>Balance Due</span>
+          <span>₦<%= number_with_delimiter(@invoice.balance_due_cents / 100) %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment History -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <h3 class="font-semibold mb-4">Payment History</h3>
+    <% if @payments.any? %>
+      <div class="space-y-3">
+        <% @payments.each do |payment| %>
+          <div class="flex items-center justify-between p-3 bg-base-200 rounded-xl">
+            <div>
+              <p class="font-semibold">₦<%= number_with_delimiter(payment.amount_cents / 100) %></p>
+              <p class="text-xs text-base-content/50"><%= payment.payment_method&.humanize %> &mdash; <%= payment.created_at.strftime("%b %d, %Y") %></p>
+            </div>
+            <%= status_badge(payment.status, type: :payment) %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-sm text-base-content/50 text-center py-4">No payments recorded yet.</p>
+    <% end %>
+  </div>
+
+  <!-- Pay Now CTA -->
+  <% if @invoice.balance_due_cents > 0 && !@invoice.status_cancelled? && !@invoice.status_draft? %>
+    <div class="bg-primary/10 border border-primary/20 rounded-2xl p-6 text-center">
+      <p class="text-lg font-semibold mb-1">Ready to pay?</p>
+      <p class="text-base-content/60 text-sm mb-4">Pay securely online with your card or bank account.</p>
+      <%= link_to pay_patient_portal_invoice_path(@invoice), class: "btn btn-primary btn-lg" do %>
+        Pay ₦<%= number_with_delimiter(@invoice.balance_due_cents / 100) %> Now
+      <% end %>
+    </div>
+  <% end %>
+</div>

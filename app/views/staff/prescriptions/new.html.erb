@@ -1,0 +1,254 @@
+<% content_for(:title, "New Prescription - #{@patient.full_name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li><a href="<%= staff_patients_path %>">Patients</a></li>
+    <li><a href="<%= chart_staff_patient_path(@patient) %>"><%= @patient.full_name %></a></li>
+    <li>New Prescription</li>
+  </ul>
+</div>
+
+<h1 class="text-2xl font-extrabold mb-6">Write Prescription</h1>
+
+<% if @visit %>
+  <div class="alert alert-info mb-6">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span>Writing prescription for Visit #<%= @visit.id %> (<%= @visit.visit_date.strftime("%b %d, %Y") %>)</span>
+  </div>
+<% end %>
+
+<%= form_with(model: @prescription, url: staff_patient_prescriptions_path(@patient), data: { controller: "prescription-builder" }) do |f| %>
+  <% if @prescription.errors.any? %>
+    <div class="alert alert-error mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <ul class="list-disc list-inside">
+          <% @prescription.errors.full_messages.each do |m| %>
+            <li><%= m %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @visit %>
+    <%= f.hidden_field :visit_id, value: @visit.id %>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main: Prescription Items -->
+    <div class="lg:col-span-2 space-y-4">
+      <!-- Notes -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-base">Prescription Notes</h2>
+          <div class="form-control w-full mt-2">
+            <%= f.label :notes, class: "label" do %>
+              <span class="label-text">General Notes / Instructions</span>
+            <% end %>
+            <%= f.text_area :notes, class: "textarea textarea-bordered w-full h-20", placeholder: "e.g. Take all medications as directed. Return in 2 weeks." %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medication Items -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="card-title text-base">Medications</h2>
+            <button type="button" class="btn btn-primary btn-sm" data-action="prescription-builder#add">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add Medication
+            </button>
+          </div>
+
+          <!-- Items Container -->
+          <div data-prescription-builder-target="items" class="space-y-4">
+            <% @prescription.prescription_items.each_with_index do |item, index| %>
+              <div class="border border-base-300 rounded-xl p-4 space-y-4" data-prescription-item>
+                <div class="flex items-center justify-between">
+                  <h3 class="font-semibold text-sm">Medication #<%= index + 1 %></h3>
+                  <button type="button" class="btn btn-ghost btn-xs text-error" data-action="prescription-builder#remove">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Remove
+                  </button>
+                </div>
+
+                <%= f.fields_for :prescription_items, item do |pf| %>
+                  <%= pf.hidden_field :id %>
+                  <%= pf.hidden_field :_destroy, value: "0" %>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control w-full">
+                      <%= pf.label :medication_name, class: "label" do %>
+                        <span class="label-text">Medication Name <span class="text-error">*</span></span>
+                      <% end %>
+                      <%= pf.text_field :medication_name, class: "input input-bordered input-sm w-full", placeholder: "e.g. Furosemide", required: true %>
+                    </div>
+
+                    <div class="form-control w-full">
+                      <%= pf.label :dosage, class: "label" do %>
+                        <span class="label-text">Dosage <span class="text-error">*</span></span>
+                      <% end %>
+                      <%= pf.text_field :dosage, class: "input input-bordered input-sm w-full", placeholder: "e.g. 40mg", required: true %>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-control w-full">
+                      <%= pf.label :frequency, class: "label" do %>
+                        <span class="label-text">Frequency <span class="text-error">*</span></span>
+                      <% end %>
+                      <%= pf.text_field :frequency, class: "input input-bordered input-sm w-full", placeholder: "e.g. Twice daily", required: true %>
+                    </div>
+
+                    <div class="form-control w-full">
+                      <%= pf.label :route, class: "label" do %>
+                        <span class="label-text">Route</span>
+                      <% end %>
+                      <%= pf.select :route, [["Oral", "oral"], ["Intravenous (IV)", "iv"], ["Intramuscular (IM)", "im"], ["Subcutaneous (SC)", "sc"], ["Topical", "topical"], ["Inhaled", "inhaled"], ["Other", "other"]], { include_blank: "Select..." }, class: "select select-bordered select-sm w-full" %>
+                    </div>
+
+                    <div class="form-control w-full">
+                      <%= pf.label :duration, class: "label" do %>
+                        <span class="label-text">Duration</span>
+                      <% end %>
+                      <%= pf.text_field :duration, class: "input input-bordered input-sm w-full", placeholder: "e.g. 7 days" %>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-control w-full">
+                      <%= pf.label :quantity, class: "label" do %>
+                        <span class="label-text">Quantity</span>
+                      <% end %>
+                      <%= pf.text_field :quantity, class: "input input-bordered input-sm w-full", placeholder: "e.g. 14 tablets" %>
+                    </div>
+
+                    <div class="form-control w-full">
+                      <%= pf.label :instructions, class: "label" do %>
+                        <span class="label-text">Special Instructions</span>
+                      <% end %>
+                      <%= pf.text_field :instructions, class: "input input-bordered input-sm w-full", placeholder: "e.g. Take with food" %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <% if @prescription.prescription_items.empty? %>
+            <p class="text-base-content/50 text-sm text-center py-4" id="no-items-msg">
+              No medications added yet. Click "Add Medication" to start.
+            </p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-4">
+      <!-- Patient Info -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h3 class="font-bold">Patient</h3>
+          <div class="flex items-center gap-3 mt-2">
+            <%= avatar_for(@patient, size: "w-10 h-10", text_size: "text-sm") %>
+            <div>
+              <p class="font-medium text-sm"><%= @patient.full_name %></p>
+              <p class="text-xs text-base-content/50 font-mono"><%= @patient.patient_profile&.medical_record_number %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h3 class="font-bold">Actions</h3>
+          <div class="space-y-2 mt-3">
+            <%= f.submit "Save Prescription", class: "btn btn-primary btn-block" %>
+            <% if @visit %>
+              <%= link_to "Cancel", staff_patient_visit_path(@patient, @visit), class: "btn btn-ghost btn-block" %>
+            <% else %>
+              <%= link_to "Cancel", chart_staff_patient_path(@patient, tab: "prescriptions"), class: "btn btn-ghost btn-block" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<!-- Hidden template for dynamic item addition via Stimulus -->
+<template data-prescription-builder-target="template">
+  <div class="border border-base-300 rounded-xl p-4 space-y-4" data-prescription-item>
+    <div class="flex items-center justify-between">
+      <h3 class="font-semibold text-sm">New Medication</h3>
+      <button type="button" class="btn btn-ghost btn-xs text-error" data-action="prescription-builder#remove">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Remove
+      </button>
+    </div>
+
+    <input type="hidden" name="prescription[prescription_items_attributes][NEW_RECORD][_destroy]" value="0">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="form-control w-full">
+        <label class="label"><span class="label-text">Medication Name <span class="text-error">*</span></span></label>
+        <input type="text" name="prescription[prescription_items_attributes][NEW_RECORD][medication_name]" class="input input-bordered input-sm w-full" placeholder="e.g. Furosemide" required>
+      </div>
+      <div class="form-control w-full">
+        <label class="label"><span class="label-text">Dosage <span class="text-error">*</span></span></label>
+        <input type="text" name="prescription[prescription_items_attributes][NEW_RECORD][dosage]" class="input input-bordered input-sm w-full" placeholder="e.g. 40mg" required>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="form-control w-full">
+        <label class="label"><span class="label-text">Frequency <span class="text-error">*</span></span></label>
+        <input type="text" name="prescription[prescription_items_attributes][NEW_RECORD][frequency]" class="input input-bordered input-sm w-full" placeholder="e.g. Twice daily" required>
+      </div>
+      <div class="form-control w-full">
+        <label class="label"><span class="label-text">Route</span></label>
+        <select name="prescription[prescription_items_attributes][NEW_RECORD][route]" class="select select-bordered select-sm w-full">
+          <option value="">Select...</option>
+          <option value="oral">Oral</option>
+          <option value="iv">Intravenous (IV)</option>
+          <option value="im">Intramuscular (IM)</option>
+          <option value="sc">Subcutaneous (SC)</option>
+          <option value="topical">Topical</option>
+          <option value="inhaled">Inhaled</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-control w-full">
+        <label class="label"><span class="label-text">Duration</span></label>
+        <input type="text" name="prescription[prescription_items_attributes][NEW_RECORD][duration]" class="input input-bordered input-sm w-full" placeholder="e.g. 7 days">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="form-control w-full">
+        <label class="label"><span class="label-text">Quantity</span></label>
+        <input type="text" name="prescription[prescription_items_attributes][NEW_RECORD][quantity]" class="input input-bordered input-sm w-full" placeholder="e.g. 14 tablets">
+      </div>
+      <div class="form-control w-full">
+        <label class="label"><span class="label-text">Special Instructions</span></label>
+        <input type="text" name="prescription[prescription_items_attributes][NEW_RECORD][instructions]" class="input input-bordered input-sm w-full" placeholder="e.g. Take with food">
+      </div>
+    </div>
+  </div>
+</template>

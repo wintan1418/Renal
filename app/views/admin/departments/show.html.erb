@@ -1,0 +1,149 @@
+<% content_for(:title, @department.name) %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_departments_path %>">Departments</a></li>
+    <li><%= @department.name %></li>
+  </ul>
+</div>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold"><%= @department.name %></h1>
+  <div class="flex gap-2">
+    <%= link_to "Edit", edit_admin_department_path(@department), class: "btn btn-primary btn-sm" %>
+    <%= link_to "Back", admin_departments_path, class: "btn btn-ghost btn-sm" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Department Info -->
+  <div class="card bg-base-100 shadow lg:col-span-2">
+    <div class="card-body">
+      <h2 class="card-title text-lg">Department Information</h2>
+      <div class="divider mt-0"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-base-content/60">Name</p>
+          <p class="font-medium"><%= @department.name %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Status</p>
+          <p>
+            <% if @department.active? %>
+              <span class="badge badge-success badge-sm">Active</span>
+            <% else %>
+              <span class="badge badge-ghost badge-sm">Inactive</span>
+            <% end %>
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Head of Department</p>
+          <p class="font-medium"><%= @department.head_of_department&.full_name || "Not assigned" %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Created</p>
+          <p class="font-medium"><%= @department.created_at.strftime("%B %d, %Y") %></p>
+        </div>
+      </div>
+
+      <% if @department.description.present? %>
+        <div class="mt-4">
+          <p class="text-sm text-base-content/60">Description</p>
+          <p class="mt-1"><%= @department.description %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="space-y-4">
+    <div class="stat bg-base-100 shadow rounded-box">
+      <div class="stat-title">Staff Members</div>
+      <div class="stat-value text-primary"><%= @department.staff_profiles.count %></div>
+    </div>
+    <div class="stat bg-base-100 shadow rounded-box">
+      <div class="stat-title">Services</div>
+      <div class="stat-value text-secondary"><%= @department.services.count %></div>
+    </div>
+  </div>
+</div>
+
+<!-- Staff in this Department -->
+<% if @department.staff_profiles.any? %>
+  <div class="card bg-base-100 shadow mt-6">
+    <div class="card-body">
+      <h2 class="card-title text-lg">Staff Members</h2>
+      <div class="divider mt-0"></div>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Specialization</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @department.staff_profiles.includes(:user).each do |profile| %>
+              <tr class="hover">
+                <td>
+                  <div class="flex items-center gap-3">
+                    <%= avatar_for(profile.user, size: "w-8 h-8", text_size: "text-xs") %>
+                    <div>
+                      <%= link_to profile.user.full_name, admin_user_path(profile.user), class: "link link-hover font-medium" %>
+                    </div>
+                  </div>
+                </td>
+                <td><%= role_badge(profile.user.role) %></td>
+                <td><%= profile.specialization || "-" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<!-- Services in this Department -->
+<% if @department.services.any? %>
+  <div class="card bg-base-100 shadow mt-6">
+    <div class="card-body">
+      <h2 class="card-title text-lg">Services</h2>
+      <div class="divider mt-0"></div>
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Price</th>
+              <th>Duration</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @department.services.each do |service| %>
+              <tr class="hover">
+                <td class="font-medium"><%= service.name %></td>
+                <td><span class="badge badge-outline badge-sm"><%= service.service_type&.humanize %></span></td>
+                <td class="font-mono"><%= format_naira(service.price_cents) %></td>
+                <td><%= service.duration_minutes %> min</td>
+                <td>
+                  <% if service.active? %>
+                    <span class="badge badge-success badge-sm">Active</span>
+                  <% else %>
+                    <span class="badge badge-ghost badge-sm">Inactive</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% end %>

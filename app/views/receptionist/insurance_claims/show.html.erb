@@ -1,0 +1,96 @@
+<% content_for(:title, "Insurance Claim ##{@claim.id}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= receptionist_root_path %>">Dashboard</a></li>
+    <li><a href="<%= receptionist_insurance_claims_path %>">Insurance Claims</a></li>
+    <li>Claim #<%= @claim.id %></li>
+  </ul>
+</div>
+
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-3">
+    <h1 class="text-2xl font-extrabold">Insurance Claim #<%= @claim.id %></h1>
+    <%= status_badge(@claim.status, type: :claim) %>
+  </div>
+  <%= link_to edit_receptionist_insurance_claim_path(@claim), class: "btn btn-ghost btn-sm" do %>
+    Edit Claim
+  <% end %>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Claim Details -->
+  <div class="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+    <h3 class="font-semibold text-sm uppercase tracking-wider text-base-content/50">Claim Information</h3>
+    <div class="grid grid-cols-2 gap-3 text-sm">
+      <div>
+        <p class="text-base-content/50">Provider</p>
+        <p class="font-semibold"><%= @claim.provider_name %></p>
+      </div>
+      <div>
+        <p class="text-base-content/50">Policy Number</p>
+        <p class="font-semibold"><%= @claim.policy_number %></p>
+      </div>
+      <div>
+        <p class="text-base-content/50">Member ID</p>
+        <p class="font-semibold"><%= @claim.member_id || "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-base-content/50">Submitted At</p>
+        <p class="font-semibold"><%= @claim.submitted_at&.strftime("%b %d, %Y") %></p>
+      </div>
+      <div>
+        <p class="text-base-content/50">Claim Amount</p>
+        <p class="font-semibold text-lg">₦<%= number_with_delimiter(@claim.claim_amount_cents / 100) %></p>
+      </div>
+      <div>
+        <p class="text-base-content/50">Approved Amount</p>
+        <p class="font-semibold text-lg <%= @claim.approved_amount_cents.to_i > 0 ? 'text-success' : 'text-base-content/40' %>">
+          ₦<%= number_with_delimiter(@claim.approved_amount_cents.to_i / 100) %>
+        </p>
+      </div>
+      <% if @claim.responded_at %>
+        <div>
+          <p class="text-base-content/50">Response Date</p>
+          <p class="font-semibold"><%= @claim.responded_at.strftime("%b %d, %Y") %></p>
+        </div>
+      <% end %>
+    </div>
+    <% if @claim.notes.present? %>
+      <div class="p-3 bg-base-200 rounded-xl">
+        <p class="text-xs font-semibold text-base-content/50 uppercase mb-1">Notes</p>
+        <p class="text-sm"><%= @claim.notes %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Invoice Reference -->
+  <div class="bg-white rounded-2xl shadow-lg p-6 space-y-4">
+    <h3 class="font-semibold text-sm uppercase tracking-wider text-base-content/50">Invoice Reference</h3>
+    <% if @claim.invoice %>
+      <div class="p-4 bg-base-200 rounded-xl">
+        <p class="font-mono font-bold"><%= @claim.invoice.invoice_number %></p>
+        <p class="text-sm text-base-content/60"><%= @claim.patient&.full_name %></p>
+        <p class="text-sm mt-2">Total: <span class="font-semibold">₦<%= number_with_delimiter(@claim.invoice.total_cents / 100) %></span></p>
+        <p class="text-sm">Balance: <span class="font-semibold text-error">₦<%= number_with_delimiter(@claim.invoice.balance_due_cents / 100) %></span></p>
+      </div>
+      <%= link_to receptionist_invoice_path(@claim.invoice), class: "btn btn-outline btn-sm btn-block mt-2" do %>
+        View Invoice
+      <% end %>
+    <% else %>
+      <p class="text-sm text-base-content/50">No invoice linked.</p>
+    <% end %>
+
+    <h3 class="font-semibold text-sm uppercase tracking-wider text-base-content/50 mt-4">Patient</h3>
+    <% if @claim.patient %>
+      <div class="flex items-center gap-3">
+        <%= avatar_for(@claim.patient, size: "w-10 h-10", text_size: "text-sm") %>
+        <div>
+          <p class="font-semibold"><%= @claim.patient.full_name %></p>
+          <p class="text-xs text-base-content/50"><%= @claim.patient.email %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

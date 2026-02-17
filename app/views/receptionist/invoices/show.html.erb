@@ -1,0 +1,199 @@
+<% content_for(:title, "Invoice #{@invoice.invoice_number}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= receptionist_root_path %>">Dashboard</a></li>
+    <li><a href="<%= receptionist_invoices_path %>">Invoices</a></li>
+    <li><%= @invoice.invoice_number %></li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <div class="flex items-center gap-3">
+    <h1 class="text-2xl font-extrabold">Invoice <%= @invoice.invoice_number %></h1>
+    <%= status_badge(@invoice.status, type: :invoice) %>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to edit_receptionist_invoice_path(@invoice), class: "btn btn-ghost btn-sm" do %>
+      Edit
+    <% end %>
+    <% if @invoice.status_draft? %>
+      <%= button_to send_invoice_receptionist_invoice_path(@invoice), method: :patch, class: "btn btn-accent btn-sm" do %>
+        Send to Patient
+      <% end %>
+    <% end %>
+    <% if @invoice.balance_due_cents > 0 && !@invoice.status_cancelled? %>
+      <%= link_to new_receptionist_payment_path(invoice_id: @invoice.id), class: "btn btn-primary btn-sm" do %>
+        Record Payment
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Left: Invoice Details -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Invoice Header -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+          <p class="text-xs text-base-content/50 uppercase tracking-wider">Invoice Number</p>
+          <p class="font-mono font-bold text-lg"><%= @invoice.invoice_number %></p>
+        </div>
+        <div>
+          <p class="text-xs text-base-content/50 uppercase tracking-wider">Issue Date</p>
+          <p class="font-semibold"><%= @invoice.created_at.strftime("%B %d, %Y") %></p>
+        </div>
+        <div>
+          <p class="text-xs text-base-content/50 uppercase tracking-wider">Due Date</p>
+          <p class="font-semibold <%= @invoice.due_date&.past? && !@invoice.status_paid? ? 'text-error' : '' %>">
+            <%= @invoice.due_date&.strftime("%B %d, %Y") || "Not set" %>
+          </p>
+        </div>
+        <div>
+          <p class="text-xs text-base-content/50 uppercase tracking-wider">Visit</p>
+          <p class="font-semibold"><%= @invoice.visit&.visit_number || "N/A" %></p>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <div class="overflow-x-auto mb-6">
+        <table class="table table-sm">
+          <thead>
+            <tr class="bg-base-200">
+              <th>Description</th>
+              <th class="text-right">Qty</th>
+              <th class="text-right">Unit Price</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @invoice.invoice_items.each do |item| %>
+              <tr>
+                <td><%= item.description || item.service&.name %></td>
+                <td class="text-right"><%= item.quantity %></td>
+                <td class="text-right">₦<%= number_with_delimiter(item.unit_price_cents / 100) %></td>
+                <td class="text-right font-semibold">₦<%= number_with_delimiter(item.total_cents / 100) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Totals Summary -->
+      <div class="flex justify-end">
+        <div class="w-64 space-y-2">
+          <div class="flex justify-between text-sm">
+            <span class="text-base-content/70">Subtotal</span>
+            <span>₦<%= number_with_delimiter(@invoice.subtotal_cents / 100) %></span>
+          </div>
+          <% if @invoice.discount_cents > 0 %>
+            <div class="flex justify-between text-sm text-success">
+              <span>Discount</span>
+              <span>-₦<%= number_with_delimiter(@invoice.discount_cents / 100) %></span>
+            </div>
+          <% end %>
+          <% if @invoice.tax_cents > 0 %>
+            <div class="flex justify-between text-sm">
+              <span>Tax</span>
+              <span>₦<%= number_with_delimiter(@invoice.tax_cents / 100) %></span>
+            </div>
+          <% end %>
+          <div class="divider my-1"></div>
+          <div class="flex justify-between font-semibold">
+            <span>Total</span>
+            <span>₦<%= number_with_delimiter(@invoice.total_cents / 100) %></span>
+          </div>
+          <div class="flex justify-between text-sm text-success">
+            <span>Amount Paid</span>
+            <span>₦<%= number_with_delimiter(@invoice.amount_paid_cents / 100) %></span>
+          </div>
+          <div class="flex justify-between font-bold text-lg <%= @invoice.balance_due_cents > 0 ? 'text-error' : 'text-success' %>">
+            <span>Balance Due</span>
+            <span>₦<%= number_with_delimiter(@invoice.balance_due_cents / 100) %></span>
+          </div>
+        </div>
+      </div>
+
+      <% if @invoice.notes.present? %>
+        <div class="mt-6 p-4 bg-base-200 rounded-xl">
+          <p class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-1">Notes</p>
+          <p class="text-sm"><%= @invoice.notes %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Right: Patient, Payments, Claims -->
+  <div class="space-y-6">
+    <!-- Patient Card -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h3 class="font-semibold text-sm uppercase tracking-wider text-base-content/50 mb-3">Patient</h3>
+      <% if @invoice.patient %>
+        <div class="flex items-center gap-3">
+          <%= avatar_for(@invoice.patient, size: "w-10 h-10", text_size: "text-sm") %>
+          <div>
+            <p class="font-semibold"><%= @invoice.patient.full_name %></p>
+            <p class="text-xs text-base-content/50"><%= @invoice.patient.email %></p>
+            <p class="text-xs text-base-content/50"><%= @invoice.patient.patient_profile&.phone_number %></p>
+          </div>
+        </div>
+      <% else %>
+        <p class="text-sm text-base-content/50">No patient assigned</p>
+      <% end %>
+    </div>
+
+    <!-- Payment History -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-semibold text-sm uppercase tracking-wider text-base-content/50">Payments</h3>
+        <% if @invoice.balance_due_cents > 0 && !@invoice.status_cancelled? %>
+          <%= link_to new_receptionist_payment_path(invoice_id: @invoice.id), class: "btn btn-primary btn-xs" do %>
+            + Record
+          <% end %>
+        <% end %>
+      </div>
+      <% if @payments.any? %>
+        <div class="space-y-3">
+          <% @payments.each do |payment| %>
+            <div class="flex items-center justify-between p-3 bg-base-200 rounded-xl">
+              <div>
+                <p class="text-sm font-semibold">₦<%= number_with_delimiter(payment.amount_cents / 100) %></p>
+                <p class="text-xs text-base-content/50"><%= payment.payment_method&.humanize %></p>
+                <p class="text-xs text-base-content/50"><%= payment.created_at.strftime("%b %d, %Y") %></p>
+              </div>
+              <%= status_badge(payment.status, type: :payment) %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-base-content/50 text-center py-4">No payments recorded.</p>
+      <% end %>
+    </div>
+
+    <!-- Insurance Claims -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-semibold text-sm uppercase tracking-wider text-base-content/50">Insurance Claims</h3>
+        <%= link_to new_receptionist_insurance_claim_path(invoice_id: @invoice.id), class: "btn btn-outline btn-xs" do %>
+          + Claim
+        <% end %>
+      </div>
+      <% if @insurance_claims.any? %>
+        <div class="space-y-3">
+          <% @insurance_claims.each do |claim| %>
+            <div class="p-3 bg-base-200 rounded-xl">
+              <p class="text-sm font-semibold"><%= claim.provider_name %></p>
+              <p class="text-xs text-base-content/50">Policy: <%= claim.policy_number %></p>
+              <p class="text-xs">Claim: ₦<%= number_with_delimiter(claim.claim_amount_cents / 100) %></p>
+              <%= status_badge(claim.status, type: :claim) %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-base-content/50 text-center py-4">No insurance claims.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

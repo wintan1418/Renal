@@ -1,0 +1,188 @@
+<%= form_with model: [:staff, session], class: "space-y-6" do |f| %>
+  <% if session.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <ul class="list-disc list-inside text-sm">
+          <% session.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Patient & Staff -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-base mb-4">Patient & Staff</h2>
+
+        <div class="form-control mb-4">
+          <%= f.label :patient_id, "Patient", class: "label label-text font-medium" %>
+          <%= f.select :patient_id,
+              @patients.map { |p| ["#{p.full_name} (#{p.patient_profile&.medical_record_number || p.email})", p.id] },
+              { prompt: "Select patient" },
+              class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control mb-4">
+          <%= f.label :doctor_id, "Doctor", class: "label label-text font-medium" %>
+          <%= f.select :doctor_id,
+              @doctors.map { |d| ["Dr. #{d.full_name}", d.id] },
+              { prompt: "Select doctor" },
+              class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control mb-4">
+          <%= f.label :nurse_id, "Nurse", class: "label label-text font-medium" %>
+          <%= f.select :nurse_id,
+              @nurses.map { |n| [n.full_name, n.id] },
+              { prompt: "Select nurse (optional)" },
+              class: "select select-bordered w-full" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Details -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-base mb-4">Session Details</h2>
+
+        <div class="form-control mb-4">
+          <%= f.label :session_type, "Session Type", class: "label label-text font-medium" %>
+          <%= f.select :session_type,
+              [["Hemodialysis", "hemodialysis"], ["Peritoneal Dialysis", "peritoneal_dialysis"], ["CRRT", "crrt"]],
+              { prompt: "Select type" },
+              class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="form-control mb-4">
+            <%= f.label :session_date, "Session Date", class: "label label-text font-medium" %>
+            <%= f.date_field :session_date, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4">
+            <%= f.label :start_time, "Start Time", class: "label label-text font-medium" %>
+            <%= f.time_field :start_time, class: "input input-bordered w-full" %>
+          </div>
+        </div>
+
+        <div class="form-control mb-4">
+          <%= f.label :access_type, "Access Type", class: "label label-text font-medium" %>
+          <%= f.select :access_type,
+              [["AV Fistula", "av_fistula"], ["AV Graft", "av_graft"], ["Central Venous Catheter", "central_venous_catheter"], ["Peritoneal Catheter", "peritoneal_catheter"]],
+              { prompt: "Select access type" },
+              class: "select select-bordered w-full" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pre-Session Parameters -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-base mb-4">Pre-Session Parameters</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="form-control mb-4">
+            <%= f.label :dry_weight_kg, "Dry Weight (kg)", class: "label label-text font-medium" %>
+            <%= f.number_field :dry_weight_kg, step: 0.1, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4">
+            <%= f.label :target_fluid_removal_ml, "Target Fluid Removal (mL)", class: "label label-text font-medium" %>
+            <%= f.number_field :target_fluid_removal_ml, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4">
+            <%= f.label :pre_weight_kg, "Pre-weight (kg)", class: "label label-text font-medium" %>
+            <%= f.number_field :pre_weight_kg, step: 0.1, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4">
+            <%= f.label :pre_heart_rate, "Pre Heart Rate (bpm)", class: "label label-text font-medium" %>
+            <%= f.number_field :pre_heart_rate, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4">
+            <%= f.label :pre_systolic_bp, "Pre Systolic BP", class: "label label-text font-medium" %>
+            <%= f.number_field :pre_systolic_bp, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4">
+            <%= f.label :pre_diastolic_bp, "Pre Diastolic BP", class: "label label-text font-medium" %>
+            <%= f.number_field :pre_diastolic_bp, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4 col-span-2">
+            <%= f.label :pre_temperature, "Pre Temperature (°C)", class: "label label-text font-medium" %>
+            <%= f.number_field :pre_temperature, step: 0.1, class: "input input-bordered w-full" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialysis Parameters -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-base mb-4">Dialysis Parameters</h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="form-control mb-4">
+            <%= f.label :blood_flow_rate, "Blood Flow Rate (mL/min)", class: "label label-text font-medium" %>
+            <%= f.number_field :blood_flow_rate, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4">
+            <%= f.label :dialysate_flow_rate, "Dialysate Flow Rate (mL/min)", class: "label label-text font-medium" %>
+            <%= f.number_field :dialysate_flow_rate, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4 col-span-2">
+            <%= f.label :heparin_dose_units, "Heparin Dose (units)", class: "label label-text font-medium" %>
+            <%= f.number_field :heparin_dose_units, class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mb-4 col-span-2">
+            <%= f.label :dialysate_composition, "Dialysate Composition", class: "label label-text font-medium" %>
+            <%= f.text_field :dialysate_composition, placeholder: "e.g. K2, Ca2.5, Bicarb 35", class: "input input-bordered w-full" %>
+          </div>
+        </div>
+
+        <div class="form-control mb-4">
+          <%= f.label :dialysis_machine_id, "Dialysis Machine", class: "label label-text font-medium" %>
+          <%= f.select :dialysis_machine_id,
+              @machines.map { |m| ["#{m.name} (#{m.serial_number})", m.id] },
+              { prompt: "Select machine (optional)" },
+              class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control mb-4">
+          <%= f.label :dialysis_station_id, "Station", class: "label label-text font-medium" %>
+          <%= f.select :dialysis_station_id,
+              @stations.map { |s| ["#{s.name} (#{s.station_type})", s.id] },
+              { prompt: "Select station (optional)" },
+              class: "select select-bordered w-full" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nursing Notes -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-base mb-4">Nursing Notes</h2>
+      <div class="form-control">
+        <%= f.text_area :nursing_notes, rows: 4, placeholder: "Pre-session notes, observations, patient concerns...", class: "textarea textarea-bordered w-full" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit session.new_record? ? "Schedule Session" : "Update Session", class: "btn btn-primary" %>
+    <%= link_to "Cancel", session.new_record? ? staff_dialysis_sessions_path : staff_dialysis_session_path(session), class: "btn btn-ghost" %>
+  </div>
+<% end %>

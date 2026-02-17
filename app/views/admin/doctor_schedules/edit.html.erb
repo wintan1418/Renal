@@ -1,0 +1,23 @@
+<% content_for(:title, "Edit Doctor Schedule") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_doctor_schedules_path %>">Doctor Schedules</a></li>
+    <li>Edit</li>
+  </ul>
+</div>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-extrabold">Edit Doctor Schedule</h1>
+  <p class="text-base-content/60 mt-1">
+    Editing schedule for <strong>Dr. <%= @schedule.doctor.full_name %></strong> on <strong><%= @schedule.day_name %></strong>.
+  </p>
+</div>
+
+<div class="max-w-2xl">
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <%= render "form", doctor_schedule: @schedule %>
+  </div>
+</div>

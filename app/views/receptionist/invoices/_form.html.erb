@@ -1,0 +1,77 @@
+<%= form_with model: [:receptionist, invoice], class: "space-y-6", data: { controller: "invoice-builder" } do |f| %>
+  <% if invoice.errors.any? %>
+    <div class="alert alert-error">
+      <ul class="list-disc list-inside">
+        <% invoice.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Basic Info -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <h3 class="font-semibold mb-4">Invoice Details</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="form-control">
+        <%= f.label :patient_id, "Patient", class: "label label-text font-medium" %>
+        <%= f.select :patient_id, @patients.map { |p| [p.full_name, p.id] },
+          { prompt: "Select patient..." },
+          class: "select select-bordered w-full" %>
+      </div>
+      <div class="form-control">
+        <%= f.label :due_date, "Due Date", class: "label label-text font-medium" %>
+        <%= f.date_field :due_date, class: "input input-bordered w-full" %>
+      </div>
+      <div class="form-control">
+        <%= f.label :status, "Status", class: "label label-text font-medium" %>
+        <%= f.select :status,
+          [["Draft", "draft"], ["Sent", "sent"], ["Paid", "paid"], ["Cancelled", "cancelled"]],
+          { selected: invoice.status || "draft" },
+          class: "select select-bordered w-full" %>
+      </div>
+      <div class="form-control">
+        <%= f.label :discount_cents, "Discount (kobo)", class: "label label-text font-medium" %>
+        <%= f.number_field :discount_cents, min: 0, step: 100, class: "input input-bordered w-full", placeholder: "0" %>
+      </div>
+      <div class="form-control">
+        <%= f.label :tax_cents, "Tax (kobo)", class: "label label-text font-medium" %>
+        <%= f.number_field :tax_cents, min: 0, step: 100, class: "input input-bordered w-full", placeholder: "0" %>
+      </div>
+    </div>
+    <div class="form-control mt-4">
+      <%= f.label :notes, "Notes", class: "label label-text font-medium" %>
+      <%= f.text_area :notes, rows: 3, class: "textarea textarea-bordered w-full", placeholder: "Additional notes..." %>
+    </div>
+  </div>
+
+  <!-- Invoice Items -->
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold">Invoice Items</h3>
+      <button type="button" class="btn btn-outline btn-sm"
+              data-action="click->invoice-builder#addItem">
+        + Add Item
+      </button>
+    </div>
+
+    <div data-invoice-builder-target="items" class="space-y-3">
+      <%= f.fields_for :invoice_items do |item_fields| %>
+        <%= render "receptionist/invoices/invoice_item_fields", f: item_fields, services: @services %>
+      <% end %>
+    </div>
+
+    <!-- Item Total -->
+    <div class="flex justify-end mt-4">
+      <div class="text-sm text-base-content/60">
+        Items total shown after save. Discount and tax are applied automatically.
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex gap-3 justify-end">
+    <%= link_to "Cancel", receptionist_invoices_path, class: "btn btn-ghost" %>
+    <%= f.submit invoice.new_record? ? "Create Invoice" : "Update Invoice", class: "btn btn-primary" %>
+  </div>
+<% end %>

@@ -1,0 +1,108 @@
+<% content_for(:title, "Contact Submissions") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li>Contact Submissions</li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <h1 class="text-2xl font-bold">Contact Submissions</h1>
+</div>
+
+<!-- Search & Filter -->
+<div class="card bg-base-100 shadow mb-6">
+  <div class="card-body p-4">
+    <%= form_with url: admin_contact_submissions_path, method: :get, class: "flex flex-col sm:flex-row gap-3" do |f| %>
+      <div class="form-control flex-1">
+        <%= f.search_field :q, value: params[:q], class: "input input-bordered input-sm w-full", placeholder: "Search by name, email or subject..." %>
+      </div>
+      <div class="form-control">
+        <%= f.select :status, ContactSubmission.statuses.keys.map { |s| [s.humanize, s] }, { prompt: "All Statuses" }, class: "select select-bordered select-sm", value: params[:status] %>
+      </div>
+      <%= f.submit "Search", class: "btn btn-primary btn-sm" %>
+      <% if params[:q].present? || params[:status].present? %>
+        <%= link_to "Clear", admin_contact_submissions_path, class: "btn btn-ghost btn-sm" %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Status Filter Tabs -->
+<div class="tabs tabs-boxed mb-6 bg-base-100 p-1">
+  <%= link_to "All", admin_contact_submissions_path(q: params[:q]), class: "tab #{params[:status].blank? ? 'tab-active' : ''}" %>
+  <% ContactSubmission.statuses.keys.each do |status| %>
+    <%= link_to status.humanize, admin_contact_submissions_path(status: status, q: params[:q]), class: "tab #{params[:status] == status ? 'tab-active' : ''}" %>
+  <% end %>
+</div>
+
+<!-- Submissions Table -->
+<div class="card bg-base-100 shadow">
+  <div class="card-body p-0">
+    <div class="overflow-x-auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Received</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @contact_submissions.each do |submission| %>
+            <tr class="hover <%= submission.unread? ? 'font-semibold bg-base-200/50' : '' %>">
+              <td>
+                <div class="flex items-center gap-2">
+                  <% if submission.unread? %>
+                    <span class="w-2 h-2 rounded-full bg-primary inline-block"></span>
+                  <% end %>
+                  <%= submission.name %>
+                </div>
+              </td>
+              <td><%= submission.email %></td>
+              <td><%= submission.subject || "-" %></td>
+              <td>
+                <% case submission.status %>
+                <% when "unread" %>
+                  <span class="badge badge-primary badge-sm">Unread</span>
+                <% when "read" %>
+                  <span class="badge badge-info badge-sm">Read</span>
+                <% when "responded" %>
+                  <span class="badge badge-success badge-sm">Responded</span>
+                <% end %>
+              </td>
+              <td><%= submission.created_at.strftime("%b %d, %Y %H:%M") %></td>
+              <td>
+                <%= link_to admin_contact_submission_path(submission), class: "btn btn-ghost btn-xs" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  </svg>
+                  View
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @contact_submissions.empty? %>
+            <tr>
+              <td colspan="6" class="text-center py-8 text-base-content/60">No contact submissions found.</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="flex justify-center mt-6">
+    <div class="join">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>

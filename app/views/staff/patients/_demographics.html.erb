@@ -1,0 +1,132 @@
+<div class="card bg-base-100 shadow-xl">
+  <div class="card-body">
+    <h2 class="card-title">Patient Demographics</h2>
+    <div class="divider mt-0"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div>
+        <p class="text-xs text-base-content/50 uppercase tracking-wider">Full Name</p>
+        <p class="font-medium mt-1"><%= patient.full_name %></p>
+      </div>
+      <div>
+        <p class="text-xs text-base-content/50 uppercase tracking-wider">Email</p>
+        <p class="font-medium mt-1"><%= patient.email %></p>
+      </div>
+      <div>
+        <p class="text-xs text-base-content/50 uppercase tracking-wider">Phone</p>
+        <p class="font-medium mt-1"><%= patient.phone || "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-base-content/50 uppercase tracking-wider">Date of Birth</p>
+        <p class="font-medium mt-1"><%= profile&.date_of_birth&.strftime("%B %d, %Y") || "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-base-content/50 uppercase tracking-wider">Age</p>
+        <p class="font-medium mt-1"><%= profile&.age ? "#{profile.age} years" : "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-base-content/50 uppercase tracking-wider">Gender</p>
+        <p class="font-medium mt-1"><%= profile&.gender&.humanize || "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-base-content/50 uppercase tracking-wider">Blood Group</p>
+        <p class="font-medium mt-1"><%= profile&.blood_group_display || "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-base-content/50 uppercase tracking-wider">Genotype</p>
+        <p class="font-medium mt-1"><%= profile&.genotype_display || "N/A" %></p>
+      </div>
+      <div>
+        <p class="text-xs text-base-content/50 uppercase tracking-wider">Marital Status</p>
+        <p class="font-medium mt-1"><%= profile&.marital_status&.humanize || "N/A" %></p>
+      </div>
+    </div>
+
+    <% if profile %>
+      <div class="divider">Renal Information</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
+          <p class="text-xs text-base-content/50 uppercase tracking-wider">CKD Stage</p>
+          <p class="font-medium mt-1">
+            <% if profile.ckd_stage %>
+              <span class="badge badge-warning"><%= profile.ckd_stage.humanize %></span>
+            <% else %>
+              N/A
+            <% end %>
+          </p>
+        </div>
+        <div>
+          <p class="text-xs text-base-content/50 uppercase tracking-wider">Dialysis Status</p>
+          <p class="font-medium mt-1">
+            <% if profile.on_dialysis? %>
+              <span class="badge badge-error">On Dialysis</span>
+            <% else %>
+              <span class="badge badge-ghost">Not on Dialysis</span>
+            <% end %>
+          </p>
+        </div>
+        <div>
+          <p class="text-xs text-base-content/50 uppercase tracking-wider">Transplant Status</p>
+          <p class="font-medium mt-1">
+            <% if profile.transplant_status %>
+              <span class="badge badge-info"><%= profile.transplant_status.humanize %></span>
+            <% else %>
+              N/A
+            <% end %>
+          </p>
+        </div>
+        <div>
+          <p class="text-xs text-base-content/50 uppercase tracking-wider">Medical Record Number</p>
+          <p class="font-mono font-medium mt-1"><%= profile.medical_record_number %></p>
+        </div>
+      </div>
+
+      <% if profile.address.present? || profile.city.present? || profile.state.present? %>
+        <div class="divider">Address</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% if profile.respond_to?(:address) && profile.address.present? %>
+            <div>
+              <p class="text-xs text-base-content/50 uppercase tracking-wider">Address</p>
+              <p class="font-medium mt-1"><%= profile.address %></p>
+            </div>
+          <% end %>
+          <% if profile.respond_to?(:city) && profile.city.present? %>
+            <div>
+              <p class="text-xs text-base-content/50 uppercase tracking-wider">City</p>
+              <p class="font-medium mt-1"><%= profile.city %></p>
+            </div>
+          <% end %>
+          <% if profile.respond_to?(:state) && profile.state.present? %>
+            <div>
+              <p class="text-xs text-base-content/50 uppercase tracking-wider">State</p>
+              <p class="font-medium mt-1"><%= profile.state %></p>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if profile.respond_to?(:emergency_contact_name) && profile.emergency_contact_name.present? %>
+        <div class="divider">Emergency Contact</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
+            <p class="text-xs text-base-content/50 uppercase tracking-wider">Contact Name</p>
+            <p class="font-medium mt-1"><%= profile.emergency_contact_name %></p>
+          </div>
+          <% if profile.respond_to?(:emergency_contact_phone) %>
+            <div>
+              <p class="text-xs text-base-content/50 uppercase tracking-wider">Contact Phone</p>
+              <p class="font-medium mt-1"><%= profile.emergency_contact_phone %></p>
+            </div>
+          <% end %>
+          <% if profile.respond_to?(:emergency_contact_relationship) %>
+            <div>
+              <p class="text-xs text-base-content/50 uppercase tracking-wider">Relationship</p>
+              <p class="font-medium mt-1"><%= profile.emergency_contact_relationship %></p>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>

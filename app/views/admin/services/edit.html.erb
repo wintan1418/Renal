@@ -1,0 +1,20 @@
+<% content_for(:title, "Edit #{@service.name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_services_path %>">Services</a></li>
+    <li>Edit <%= @service.name %></li>
+  </ul>
+</div>
+
+<div class="max-w-3xl">
+  <h1 class="text-2xl font-bold mb-6">Edit Service</h1>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <%= render "form", service: @service %>
+    </div>
+  </div>
+</div>

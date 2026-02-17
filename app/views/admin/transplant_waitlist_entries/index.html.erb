@@ -1,0 +1,99 @@
+<% content_for :title, "Transplant Waitlist" %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">Transplant Waitlist</h1>
+      <p class="text-base-content/60 text-sm"><%= @entries.count rescue 0 %> patients listed</p>
+    </div>
+    <%= link_to new_admin_transplant_waitlist_entry_path, class: "btn btn-primary btn-sm" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+      Add Patient
+    <% end %>
+  </div>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body p-0">
+      <div class="overflow-x-auto">
+        <table class="table table-zebra">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Blood Group</th>
+              <th>Listed Date</th>
+              <th>Days Waiting</th>
+              <th>Priority</th>
+              <th>PRA Level</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @entries.each do |entry| %>
+              <tr>
+                <td>
+                  <div class="font-medium"><%= entry.patient.full_name %></div>
+                  <div class="text-xs text-base-content/60"><%= entry.patient.email %></div>
+                </td>
+                <td>
+                  <span class="badge badge-outline font-mono"><%= entry.blood_group %></span>
+                </td>
+                <td><%= entry.listed_date.strftime("%d %b %Y") %></td>
+                <td>
+                  <span class="font-semibold <%= entry.days_waiting > 365 ? 'text-error' : entry.days_waiting > 180 ? 'text-warning' : '' %>">
+                    <%= entry.days_waiting %> days
+                  </span>
+                </td>
+                <td>
+                  <% priority_class = { "standard" => "badge-ghost", "urgent" => "badge-warning", "super_urgent" => "badge-error" }[entry.priority] %>
+                  <span class="badge <%= priority_class %> badge-sm">
+                    <%= entry.priority.humanize %>
+                  </span>
+                </td>
+                <td>
+                  <% if entry.pra_level.present? %>
+                    <span class="<%= entry.pra_level > 80 ? 'text-error font-bold' : entry.pra_level > 50 ? 'text-warning' : '' %>">
+                      <%= entry.pra_level %>%
+                    </span>
+                  <% else %>
+                    <span class="text-base-content/40">N/A</span>
+                  <% end %>
+                </td>
+                <td>
+                  <% status_class = { "active" => "badge-success", "on_hold" => "badge-warning", "transplanted" => "badge-info", "removed" => "badge-ghost" }[entry.status] %>
+                  <span class="badge <%= status_class %> badge-sm">
+                    <%= entry.status.humanize %>
+                  </span>
+                </td>
+                <td>
+                  <div class="flex gap-1">
+                    <%= link_to admin_transplant_waitlist_entry_path(entry), class: "btn btn-ghost btn-xs" do %>
+                      View
+                    <% end %>
+                    <%= link_to edit_admin_transplant_waitlist_entry_path(entry), class: "btn btn-ghost btn-xs" do %>
+                      Edit
+                    <% end %>
+                    <%= link_to admin_transplant_waitlist_entry_path(entry), data: { turbo_method: :delete, turbo_confirm: "Remove this entry?" }, class: "btn btn-ghost btn-xs text-error" do %>
+                      Remove
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+            <% if @entries.empty? %>
+              <tr>
+                <td colspan="8" class="text-center text-base-content/40 py-8">No patients on the transplant waitlist.</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <% if @pagy && @pagy.pages > 1 %>
+    <div class="flex justify-center">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  <% end %>
+</div>

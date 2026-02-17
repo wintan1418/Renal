@@ -1,0 +1,66 @@
+<%= form_with(model: [:admin, page], class: "space-y-6") do |f| %>
+  <% if page.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold"><%= pluralize(page.errors.count, "error") %> prevented this page from being saved:</h3>
+        <ul class="list-disc list-inside mt-1">
+          <% page.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="form-control w-full">
+    <%= f.label :title, class: "label" do %>
+      <span class="label-text">Title <span class="text-error">*</span></span>
+    <% end %>
+    <%= f.text_field :title, class: "input input-bordered w-full", placeholder: "Page title", required: true %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :slug, class: "label" do %>
+      <span class="label-text">Slug</span>
+    <% end %>
+    <%= f.text_field :slug, class: "input input-bordered w-full", placeholder: "auto-generated-from-title" %>
+    <label class="label">
+      <span class="label-text-alt text-base-content/50">Leave blank to auto-generate from title</span>
+    </label>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :meta_description, class: "label" do %>
+      <span class="label-text">Meta Description</span>
+    <% end %>
+    <%= f.text_area :meta_description, class: "textarea textarea-bordered w-full h-16", placeholder: "SEO meta description...", maxlength: 160 %>
+    <label class="label">
+      <span class="label-text-alt text-base-content/50">Recommended: 155-160 characters</span>
+    </label>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :rich_body, "Body", class: "label" do %>
+      <span class="label-text">Content</span>
+    <% end %>
+    <%= f.rich_text_area :rich_body, class: "min-h-[300px]" %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :published, class: "label" do %>
+      <span class="label-text">Published</span>
+    <% end %>
+    <label class="label cursor-pointer justify-start gap-3">
+      <%= f.check_box :published, class: "toggle toggle-primary" %>
+      <span class="label-text">Publish this page</span>
+    </label>
+  </div>
+
+  <div class="flex items-center gap-3 pt-4">
+    <%= f.submit page.new_record? ? "Create Page" : "Update Page", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_pages_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

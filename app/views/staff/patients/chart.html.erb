@@ -1,0 +1,83 @@
+<% content_for(:title, "Patient Chart - #{@patient.full_name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li><a href="<%= staff_patients_path %>">Patients</a></li>
+    <li><%= @patient.full_name %></li>
+  </ul>
+</div>
+
+<!-- Patient Header -->
+<div class="card bg-base-100 shadow-xl mb-6">
+  <div class="card-body">
+    <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+      <%= avatar_for(@patient, size: "w-16 h-16", text_size: "text-xl") %>
+      <div class="flex-1">
+        <h1 class="text-2xl font-extrabold"><%= @patient.full_name %></h1>
+        <div class="flex flex-wrap items-center gap-2 mt-1">
+          <span class="font-mono text-sm text-base-content/60">MRN: <%= @profile&.medical_record_number || "N/A" %></span>
+          <% if @profile&.age %>
+            <span class="badge badge-ghost badge-sm"><%= @profile.age %> yrs</span>
+          <% end %>
+          <% if @profile&.gender %>
+            <span class="badge badge-ghost badge-sm"><%= @profile.gender.humanize %></span>
+          <% end %>
+          <% if @profile&.blood_group %>
+            <span class="badge badge-info badge-sm"><%= @profile.blood_group_display %></span>
+          <% end %>
+          <% if @profile&.ckd_stage %>
+            <span class="badge badge-warning badge-sm">CKD <%= @profile.ckd_stage.humanize %></span>
+          <% end %>
+          <% if @profile&.on_dialysis? %>
+            <span class="badge badge-error badge-sm">On Dialysis</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <%= link_to new_staff_patient_visit_path(@patient), class: "btn btn-primary btn-sm" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+          New Visit
+        <% end %>
+        <%= link_to new_staff_patient_vital_sign_path(@patient), class: "btn btn-sm btn-outline" do %>
+          Record Vitals
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tabs tabs-boxed bg-base-100 shadow mb-6 p-1">
+  <%= link_to "Demographics", chart_staff_patient_path(@patient, tab: "demographics"),
+      class: "tab #{@tab == 'demographics' ? 'tab-active' : ''}" %>
+  <%= link_to "Visits", chart_staff_patient_path(@patient, tab: "visits"),
+      class: "tab #{@tab == 'visits' ? 'tab-active' : ''}" %>
+  <%= link_to "Vitals", chart_staff_patient_path(@patient, tab: "vitals"),
+      class: "tab #{@tab == 'vitals' ? 'tab-active' : ''}" %>
+  <%= link_to "Labs", chart_staff_patient_path(@patient, tab: "labs"),
+      class: "tab #{@tab == 'labs' ? 'tab-active' : ''}" %>
+  <%= link_to "Prescriptions", chart_staff_patient_path(@patient, tab: "prescriptions"),
+      class: "tab #{@tab == 'prescriptions' ? 'tab-active' : ''}" %>
+  <%= link_to "Diagnoses & Allergies", chart_staff_patient_path(@patient, tab: "diagnoses"),
+      class: "tab #{@tab == 'diagnoses' ? 'tab-active' : ''}" %>
+</div>
+
+<!-- Tab Content -->
+<div id="chart-content">
+  <% case @tab %>
+  <% when "demographics" %>
+    <%= render "staff/patients/demographics", patient: @patient, profile: @profile %>
+  <% when "visits" %>
+    <%= render "staff/patients/visits", patient: @patient, visits: @visits %>
+  <% when "vitals" %>
+    <%= render "staff/patients/vitals", patient: @patient, vital_signs: @vital_signs %>
+  <% when "labs" %>
+    <%= render "staff/patients/labs", patient: @patient, lab_orders: @lab_orders %>
+  <% when "prescriptions" %>
+    <%= render "staff/patients/prescriptions", patient: @patient, prescriptions: @prescriptions %>
+  <% when "diagnoses" %>
+    <%= render "staff/patients/diagnoses_allergies", patient: @patient, diagnoses: @diagnoses, allergies: @allergies, medications: @medications %>
+  <% end %>
+</div>

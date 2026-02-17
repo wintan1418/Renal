@@ -1,0 +1,40 @@
+<div class="grid grid-cols-12 gap-2 items-end p-3 bg-base-200 rounded-xl" data-invoice-builder-target="item">
+  <%= f.hidden_field :_destroy, data: { invoice_builder_target: "destroy" } %>
+
+  <div class="col-span-12 sm:col-span-4 form-control">
+    <%= f.label :service_id, "Service", class: "label label-text text-xs" %>
+    <%= f.select :service_id,
+      services.map { |s| [s.name, s.id] },
+      { prompt: "Select service..." },
+      class: "select select-bordered select-sm w-full",
+      data: { action: "change->invoice-builder#fillPrice" } %>
+  </div>
+
+  <div class="col-span-12 sm:col-span-3 form-control">
+    <%= f.label :description, "Description", class: "label label-text text-xs" %>
+    <%= f.text_field :description, class: "input input-bordered input-sm w-full", placeholder: "Override description..." %>
+  </div>
+
+  <div class="col-span-4 sm:col-span-2 form-control">
+    <%= f.label :quantity, "Qty", class: "label label-text text-xs" %>
+    <%= f.number_field :quantity, min: 1, value: f.object.quantity || 1,
+      class: "input input-bordered input-sm w-full",
+      data: { action: "input->invoice-builder#recalculate" } %>
+  </div>
+
+  <div class="col-span-6 sm:col-span-2 form-control">
+    <%= f.label :unit_price_cents, "Unit Price (kobo)", class: "label label-text text-xs" %>
+    <%= f.number_field :unit_price_cents, min: 0, step: 100,
+      class: "input input-bordered input-sm w-full", placeholder: "0",
+      data: { action: "input->invoice-builder#recalculate" } %>
+  </div>
+
+  <div class="col-span-2 sm:col-span-1 flex items-end pb-1">
+    <button type="button" class="btn btn-ghost btn-sm btn-square text-error"
+            data-action="click->invoice-builder#removeItem">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+</div>

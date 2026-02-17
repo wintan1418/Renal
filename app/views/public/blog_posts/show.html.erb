@@ -1,0 +1,113 @@
+<% content_for(:title) { @post.title } %>
+<% content_for(:meta_description) { @post.excerpt.presence || truncate(strip_tags(@post.body.to_s), length: 160) } %>
+
+<%
+  chip_styles = {
+    "kidney_health" => { bg: "rgba(43,139,117,0.12)", color: "var(--hr-teal)" },
+    "dialysis"      => { bg: "rgba(59,130,246,0.12)", color: "#3b82f6" },
+    "nutrition"     => { bg: "rgba(234,179,8,0.12)", color: "#ca8a04" },
+    "lifestyle"     => { bg: "rgba(168,85,247,0.12)", color: "#a855f7" },
+    "news"          => { bg: "rgba(232,119,63,0.12)", color: "var(--hr-orange)" }
+  }
+  chip = chip_styles[@post.category] || { bg: "rgba(43,139,117,0.12)", color: "var(--hr-teal)" }
+%>
+
+<!-- Article Header -->
+<section class="hr-page-header" style="padding: 3.5rem 0 3rem">
+  <div class="relative max-w-4xl mx-auto px-4">
+    <div class="breadcrumbs-text mb-6">
+      <%= link_to "Home", root_path %> &nbsp;/&nbsp; <%= link_to "Blog", blog_posts_path %> &nbsp;/&nbsp; <span class="text-white font-medium truncate"><%= truncate(@post.title, length: 40) %></span>
+    </div>
+
+    <!-- Category Badge -->
+    <span class="hr-blog-chip mb-4 inline-block" style="background: <%= chip[:bg] %>; color: <%= chip[:color] %>"><%= @post.category.humanize %></span>
+
+    <!-- Title -->
+    <h1><%= @post.title %></h1>
+
+    <!-- Meta Info -->
+    <div class="flex flex-wrap items-center gap-4 mt-6">
+      <div class="flex items-center gap-2">
+        <%= avatar_for(@post.author, size: "w-10 h-10", text_size: "text-sm") %>
+        <div>
+          <p class="text-sm font-semibold text-white"><%= @post.author.full_name %></p>
+          <p class="text-xs" style="color: rgba(255,255,255,0.4)">Author</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 text-sm" style="color: rgba(255,255,255,0.5)">
+        <span class="flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <%= @post.published_at&.strftime("%B %d, %Y") || @post.created_at.strftime("%B %d, %Y") %>
+        </span>
+        <span class="flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <%= @post.reading_time %> min read
+        </span>
+        <span class="flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          <%= @post.views_count %> views
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Article Body -->
+<section class="py-12 lg:py-16 bg-white">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- Featured Image -->
+    <% if @post.featured_image.attached? %>
+      <div class="mb-10 rounded-xl overflow-hidden">
+        <%= image_tag @post.featured_image.variant(resize_to_limit: [1200, 600]),
+            class: "w-full h-auto object-cover",
+            alt: @post.title %>
+      </div>
+    <% end %>
+
+    <!-- Content -->
+    <article class="prose prose-lg max-w-none" style="--tw-prose-headings: var(--hr-navy); --tw-prose-links: var(--hr-teal);">
+      <% if @post.rich_body.present? %>
+        <%= @post.rich_body %>
+      <% elsif @post.body.present? %>
+        <%= simple_format(@post.body) %>
+      <% end %>
+    </article>
+
+    <!-- Divider -->
+    <div class="my-12" style="border-top: 1px solid #f0f0f0"></div>
+
+    <!-- Author Bio -->
+    <div class="rounded-xl p-6 flex flex-col sm:flex-row gap-4 items-start" style="background-color: var(--hr-cream)">
+      <%= avatar_for(@post.author, size: "w-16 h-16", text_size: "text-xl") %>
+      <div>
+        <p class="text-sm uppercase tracking-wider" style="color: rgba(43,139,117,0.6)">Written by</p>
+        <p class="font-bold text-lg" style="color: var(--hr-navy)"><%= @post.author.full_name %></p>
+        <% if @post.author.staff_profile&.bio.present? %>
+          <p class="text-sm text-gray-500 mt-1 line-clamp-3"><%= @post.author.staff_profile.bio %></p>
+        <% else %>
+          <p class="text-sm text-gray-500 mt-1">
+            Medical professional at Healthroom Renal Centre, contributing to our health and wellness blog.
+          </p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Back to Blog -->
+    <div class="mt-10">
+      <%= link_to blog_posts_path, class: "inline-flex items-center gap-2 text-sm font-semibold transition-all hover:gap-3", style: "color: var(--hr-teal)" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+        </svg>
+        Back to Blog
+      <% end %>
+    </div>
+  </div>
+</section>

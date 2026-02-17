@@ -1,0 +1,78 @@
+<% content_for :title, "Transplant Waitlist Entry" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">Transplant Waitlist Entry</h1>
+      <p class="text-base-content/60 text-sm"><%= @entry.patient.full_name %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to edit_admin_transplant_waitlist_entry_path(@entry), class: "btn btn-sm btn-outline" do %>
+        Edit
+      <% end %>
+      <%= link_to admin_transplant_waitlist_entries_path, class: "btn btn-sm btn-ghost" do %>
+        Back to List
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-base-content/60">Patient</p>
+          <p class="font-semibold"><%= @entry.patient.full_name %></p>
+          <p class="text-sm text-base-content/60"><%= @entry.patient.email %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Blood Group</p>
+          <p class="font-semibold text-lg font-mono"><%= @entry.blood_group %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Listed Date</p>
+          <p class="font-semibold"><%= @entry.listed_date.strftime("%d %B %Y") %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Days Waiting</p>
+          <p class="font-semibold text-lg <%= @entry.days_waiting > 365 ? 'text-error' : @entry.days_waiting > 180 ? 'text-warning' : 'text-success' %>">
+            <%= @entry.days_waiting %> days
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Priority</p>
+          <% priority_class = { "standard" => "badge-ghost", "urgent" => "badge-warning", "super_urgent" => "badge-error" }[@entry.priority] %>
+          <span class="badge <%= priority_class %>"><%= @entry.priority.humanize %></span>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Status</p>
+          <% status_class = { "active" => "badge-success", "on_hold" => "badge-warning", "transplanted" => "badge-info", "removed" => "badge-ghost" }[@entry.status] %>
+          <span class="badge <%= status_class %>"><%= @entry.status.humanize %></span>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">PRA Level</p>
+          <p class="font-semibold"><%= @entry.pra_level.present? ? "#{@entry.pra_level}%" : "Not recorded" %></p>
+        </div>
+        <% if @entry.transplant_date.present? %>
+          <div>
+            <p class="text-sm text-base-content/60">Transplant Date</p>
+            <p class="font-semibold"><%= @entry.transplant_date.strftime("%d %B %Y") %></p>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @entry.notes.present? %>
+        <div class="divider"></div>
+        <div>
+          <p class="text-sm text-base-content/60 mb-1">Notes</p>
+          <p class="text-sm"><%= @entry.notes %></p>
+        </div>
+      <% end %>
+
+      <div class="divider"></div>
+      <div class="text-xs text-base-content/40">
+        <p>Added: <%= @entry.created_at.strftime("%d %b %Y %H:%M") %></p>
+        <p>Last updated: <%= @entry.updated_at.strftime("%d %b %Y %H:%M") %></p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<%= form_with model: [:admin, entry], local: true, class: "space-y-4" do |f| %>
+  <% if entry.errors.any? %>
+    <div class="alert alert-error">
+      <ul class="list-disc list-inside">
+        <% entry.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <%= f.label :patient_id, "Patient", class: "label label-text font-medium" %>
+      <%= f.select :patient_id,
+            User.patient.order(:first_name, :last_name).map { |u| [u.full_name, u.id] },
+            { include_blank: "-- Select Patient --" },
+            class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :listed_date, "Listed Date", class: "label label-text font-medium" %>
+      <%= f.date_field :listed_date, class: "input input-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :blood_group, "Blood Group", class: "label label-text font-medium" %>
+      <%= f.select :blood_group,
+            TransplantWaitlistEntry::BLOOD_GROUPS,
+            { include_blank: "-- Select Blood Group --" },
+            class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :status, "Status", class: "label label-text font-medium" %>
+      <%= f.select :status,
+            TransplantWaitlistEntry.statuses.keys.map { |s| [s.humanize, s] },
+            { include_blank: "-- Select Status --" },
+            class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :priority, "Priority", class: "label label-text font-medium" %>
+      <%= f.select :priority,
+            TransplantWaitlistEntry.priorities.keys.map { |p| [p.humanize, p] },
+            { include_blank: "-- Select Priority --" },
+            class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :pra_level, "PRA Level (%)", class: "label label-text font-medium" %>
+      <%= f.number_field :pra_level, min: 0, max: 100, class: "input input-bordered w-full", placeholder: "0-100" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :transplant_date, "Transplant Date (if completed)", class: "label label-text font-medium" %>
+      <%= f.date_field :transplant_date, class: "input input-bordered w-full" %>
+    </div>
+  </div>
+
+  <div class="form-control">
+    <%= f.label :notes, "Notes", class: "label label-text font-medium" %>
+    <%= f.text_area :notes, class: "textarea textarea-bordered w-full", rows: 3, placeholder: "Additional clinical notes..." %>
+  </div>
+
+  <div class="flex gap-3 pt-2">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_transplant_waitlist_entries_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

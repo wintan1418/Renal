@@ -1,0 +1,178 @@
+<% content_for(:title, "Visit ##{@visit.id}") %>
+
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Dashboard</a></li>
+    <li><a href="<%= admin_visits_path %>">Visits</a></li>
+    <li>Visit #<%= @visit.id %></li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+  <h1 class="text-2xl font-extrabold">Visit #<%= @visit.id %></h1>
+  <% status_class = case @visit.status
+       when "completed" then "badge-success"
+       when "in_progress" then "badge-warning"
+       when "cancelled" then "badge-error"
+       else "badge-ghost"
+     end %>
+  <span class="badge <%= status_class %> badge-lg"><%= @visit.status.humanize %></span>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Left: Main Visit Info -->
+  <div class="lg:col-span-2 space-y-6">
+
+    <!-- Visit Details -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Visit Details</h2>
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+          <div class="space-y-1">
+            <dt class="text-xs text-base-content/60 uppercase tracking-wider font-medium">Visit Date</dt>
+            <dd class="font-semibold"><%= @visit.visit_date.strftime("%A, %B %d, %Y") %></dd>
+          </div>
+          <div class="space-y-1">
+            <dt class="text-xs text-base-content/60 uppercase tracking-wider font-medium">Visit Type</dt>
+            <dd>
+              <span class="badge badge-outline"><%= @visit.visit_type.humanize %></span>
+            </dd>
+          </div>
+          <div class="space-y-1 sm:col-span-2">
+            <dt class="text-xs text-base-content/60 uppercase tracking-wider font-medium">Chief Complaint</dt>
+            <dd class="text-base-content/80">
+              <%= @visit.chief_complaint.presence || "<span class='text-base-content/40 italic'>Not recorded</span>".html_safe %>
+            </dd>
+          </div>
+          <% if @visit.notes.present? %>
+            <div class="space-y-1 sm:col-span-2">
+              <dt class="text-xs text-base-content/60 uppercase tracking-wider font-medium">Visit Notes</dt>
+              <dd class="text-base-content/80 text-sm bg-base-200 rounded-lg p-3"><%= @visit.notes %></dd>
+            </div>
+          <% end %>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Clinical Counts -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Clinical Records</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
+          <div class="stat bg-base-200 rounded-xl p-4">
+            <div class="stat-title text-xs">Clinical Notes</div>
+            <div class="stat-value text-2xl text-primary"><%= @visit.clinical_notes.size %></div>
+          </div>
+          <div class="stat bg-base-200 rounded-xl p-4">
+            <div class="stat-title text-xs">Vitals Recorded</div>
+            <div class="stat-value text-2xl text-secondary"><%= @visit.vital_signs.size %></div>
+          </div>
+          <div class="stat bg-base-200 rounded-xl p-4">
+            <div class="stat-title text-xs">Lab Orders</div>
+            <div class="stat-value text-2xl text-accent"><%= @visit.lab_orders.size %></div>
+          </div>
+          <div class="stat bg-base-200 rounded-xl p-4">
+            <div class="stat-title text-xs">Prescriptions</div>
+            <div class="stat-value text-2xl text-info"><%= @visit.prescriptions.size %></div>
+          </div>
+        </div>
+        <% if @visit.diagnoses.any? %>
+          <div class="mt-4">
+            <p class="text-sm font-semibold mb-2">Diagnoses from this visit:</p>
+            <div class="flex flex-wrap gap-2">
+              <% @visit.diagnoses.each do |diagnosis| %>
+                <span class="badge badge-outline badge-sm"><%= diagnosis.description %></span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: Patient + Doctor Info -->
+  <div class="space-y-6">
+
+    <!-- Patient Info -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Patient</h2>
+        <div class="flex items-center gap-3 mt-2">
+          <%= avatar_for(@visit.patient, size: "w-12 h-12", text_size: "text-sm") %>
+          <div>
+            <p class="font-bold"><%= @visit.patient.full_name %></p>
+            <p class="text-sm text-base-content/60"><%= @visit.patient.email %></p>
+            <% if @visit.patient.patient_profile %>
+              <p class="text-xs font-mono text-primary mt-1"><%= @visit.patient.patient_profile.medical_record_number %></p>
+            <% end %>
+          </div>
+        </div>
+        <% if @visit.patient.patient_profile %>
+          <dl class="mt-3 space-y-2 text-sm border-t border-base-200 pt-3">
+            <div class="flex justify-between">
+              <dt class="text-base-content/60">Date of Birth</dt>
+              <dd class="font-medium">
+                <%= @visit.patient.patient_profile.date_of_birth&.strftime("%b %d, %Y") || "—" %>
+              </dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-base-content/60">Blood Group</dt>
+              <dd>
+                <% if @visit.patient.patient_profile.blood_group %>
+                  <span class="badge badge-error badge-xs"><%= @visit.patient.patient_profile.blood_group_display %></span>
+                <% else %>
+                  <span class="text-base-content/40">—</span>
+                <% end %>
+              </dd>
+            </div>
+          </dl>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Doctor Info -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Doctor</h2>
+        <div class="flex items-center gap-3 mt-2">
+          <%= avatar_for(@visit.doctor, size: "w-12 h-12", text_size: "text-sm") %>
+          <div>
+            <p class="font-bold">Dr. <%= @visit.doctor.full_name %></p>
+            <p class="text-sm text-base-content/60"><%= @visit.doctor.email %></p>
+            <% if @visit.doctor.staff_profile&.specialization.present? %>
+              <p class="text-xs text-base-content/60 mt-0.5"><%= @visit.doctor.staff_profile.specialization %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Visit Timing -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Timestamps</h2>
+        <dl class="mt-2 space-y-2 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-base-content/60">Created</dt>
+            <dd class="font-medium"><%= @visit.created_at.strftime("%b %d, %Y %I:%M %p") %></dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-base-content/60">Last Updated</dt>
+            <dd class="font-medium"><%= @visit.updated_at.strftime("%b %d, %Y %I:%M %p") %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="flex justify-start mt-6">
+  <%= link_to admin_visits_path, class: "btn btn-ghost btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+    </svg>
+    Back to Visits
+  <% end %>
+</div>

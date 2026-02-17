@@ -1,0 +1,20 @@
+<% content_for(:title, "Edit: #{@page.title}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_pages_path %>">Pages</a></li>
+    <li>Edit</li>
+  </ul>
+</div>
+
+<div class="max-w-4xl">
+  <h1 class="text-2xl font-bold mb-6">Edit Page</h1>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <%= render "form", page: @page %>
+    </div>
+  </div>
+</div>

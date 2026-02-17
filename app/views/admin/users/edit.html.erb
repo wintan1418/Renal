@@ -1,0 +1,21 @@
+<% content_for(:title, "Edit #{@user.full_name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_users_path %>">Users</a></li>
+    <li><a href="<%= admin_user_path(@user) %>"><%= @user.full_name %></a></li>
+    <li>Edit</li>
+  </ul>
+</div>
+
+<div class="max-w-3xl">
+  <h1 class="text-2xl font-bold mb-6">Edit User</h1>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <%= render "form", user: @user %>
+    </div>
+  </div>
+</div>

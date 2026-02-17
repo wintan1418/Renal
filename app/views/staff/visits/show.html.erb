@@ -1,0 +1,289 @@
+<% content_for(:title, "Visit ##{@visit.id} - #{@patient.full_name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li><a href="<%= staff_patients_path %>">Patients</a></li>
+    <li><a href="<%= chart_staff_patient_path(@patient) %>"><%= @patient.full_name %></a></li>
+    <li>Visit #<%= @visit.id %></li>
+  </ul>
+</div>
+
+<!-- Visit Header -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-extrabold">Visit #<%= @visit.id %></h1>
+    <p class="text-base-content/60">
+      <%= @visit.visit_date.strftime("%B %d, %Y") %> &middot;
+      <span class="badge badge-ghost badge-sm"><%= @visit.visit_type.humanize %></span>
+      <%= status_badge(@visit.status, type: :appointment) %>
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <% if @visit.status_in_progress? %>
+      <%= button_to "Complete Visit", staff_patient_visit_path(@patient, @visit), method: :patch,
+        params: { visit: { status: :completed } }, class: "btn btn-success btn-sm" %>
+    <% end %>
+    <%= link_to "Back to Chart", chart_staff_patient_path(@patient, tab: "visits"), class: "btn btn-ghost btn-sm" %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Main Content -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Chief Complaint -->
+    <% if @visit.chief_complaint.present? %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-base">Chief Complaint</h2>
+          <p><%= @visit.chief_complaint %></p>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Clinical Notes Section -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Clinical Notes</h2>
+        </div>
+        <div class="divider mt-0"></div>
+        <% if @clinical_notes.any? %>
+          <% @clinical_notes.each do |note| %>
+            <div class="border-l-4 border-primary pl-4 mb-4">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="badge badge-ghost badge-xs"><%= note.note_type.humanize %></span>
+                <span class="text-xs text-base-content/50"><%= note.author.full_name %> &middot; <%= note.created_at.strftime("%b %d, %Y %H:%M") %></span>
+              </div>
+              <% if note.soap? %>
+                <% if note.subjective.present? %>
+                  <p class="text-sm"><strong>S:</strong> <%= note.subjective %></p>
+                <% end %>
+                <% if note.objective.present? %>
+                  <p class="text-sm"><strong>O:</strong> <%= note.objective %></p>
+                <% end %>
+                <% if note.assessment.present? %>
+                  <p class="text-sm"><strong>A:</strong> <%= note.assessment %></p>
+                <% end %>
+                <% if note.plan.present? %>
+                  <p class="text-sm"><strong>P:</strong> <%= note.plan %></p>
+                <% end %>
+              <% else %>
+                <p class="text-sm"><%= note.body %></p>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-base-content/60 text-sm">No clinical notes yet.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Vital Signs Section -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Vital Signs</h2>
+          <%= link_to new_staff_patient_vital_sign_path(@patient, visit_id: @visit.id), class: "btn btn-primary btn-xs" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Add
+          <% end %>
+        </div>
+        <div class="divider mt-0"></div>
+        <% if @vital_signs.any? %>
+          <div class="overflow-x-auto">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>BP</th>
+                  <th>HR</th>
+                  <th>Temp</th>
+                  <th>Weight</th>
+                  <th>O2</th>
+                  <th>By</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @vital_signs.each do |vs| %>
+                  <tr>
+                    <td><%= vs.recorded_at.strftime("%H:%M") %></td>
+                    <td class="font-medium"><%= vs.blood_pressure || "--" %></td>
+                    <td><%= vs.heart_rate || "--" %></td>
+                    <td><%= vs.temperature ? "#{vs.temperature}°C" : "--" %></td>
+                    <td><%= vs.weight_kg ? "#{vs.weight_kg} kg" : "--" %></td>
+                    <td><%= vs.oxygen_saturation ? "#{vs.oxygen_saturation}%" : "--" %></td>
+                    <td><%= vs.recorded_by.initials %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-base-content/60 text-sm">No vitals recorded for this visit.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Diagnoses Section -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Diagnoses</h2>
+          <%= link_to new_staff_patient_diagnosis_path(@patient, visit_id: @visit.id), class: "btn btn-primary btn-xs" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Add
+          <% end %>
+        </div>
+        <div class="divider mt-0"></div>
+        <% if @diagnoses.any? %>
+          <ul class="space-y-2">
+            <% @diagnoses.each do |dx| %>
+              <li class="flex items-center justify-between">
+                <div>
+                  <span class="font-medium"><%= dx.description %></span>
+                  <% if dx.icd_code.present? %>
+                    <span class="font-mono text-xs text-base-content/50 ml-1">(<%= dx.icd_code %>)</span>
+                  <% end %>
+                  <span class="badge badge-ghost badge-xs ml-1"><%= dx.diagnosis_type.humanize %></span>
+                </div>
+                <%= link_to "Edit", edit_staff_patient_diagnosis_path(@patient, dx), class: "btn btn-ghost btn-xs" %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-base-content/60 text-sm">No diagnoses for this visit.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Lab Orders Section -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Lab Orders</h2>
+          <%= link_to new_staff_patient_lab_order_path(@patient, visit_id: @visit.id), class: "btn btn-primary btn-xs" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Add
+          <% end %>
+        </div>
+        <div class="divider mt-0"></div>
+        <% if @lab_orders.any? %>
+          <% @lab_orders.each do |order| %>
+            <div class="mb-4 last:mb-0">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-medium text-sm">
+                  Order #<%= order.id %>
+                  <span class="badge badge-sm ml-1 <%= order.status_completed? ? 'badge-success' : 'badge-warning' %>"><%= order.status.humanize %></span>
+                </span>
+                <%= link_to "View", staff_patient_lab_order_path(@patient, order), class: "btn btn-ghost btn-xs" %>
+              </div>
+              <% order.lab_results.each do |result| %>
+                <p class="text-sm text-base-content/70 ml-4">
+                  <%= result.lab_test.name %>:
+                  <% if result.value.present? %>
+                    <span class="font-medium"><%= result.value %> <%= result.lab_test.unit %></span>
+                    <% if result.abnormal? %>
+                      <span class="badge badge-error badge-xs"><%= result.flag.humanize %></span>
+                    <% end %>
+                  <% else %>
+                    <span class="text-base-content/40">Pending</span>
+                  <% end %>
+                </p>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-base-content/60 text-sm">No lab orders for this visit.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Prescriptions Section -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Prescriptions</h2>
+          <%= link_to new_staff_patient_prescription_path(@patient, visit_id: @visit.id), class: "btn btn-primary btn-xs" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+            Add
+          <% end %>
+        </div>
+        <div class="divider mt-0"></div>
+        <% if @prescriptions.any? %>
+          <% @prescriptions.each do |rx| %>
+            <div class="mb-4 last:mb-0">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-medium text-sm">
+                  Prescription #<%= rx.id %>
+                  <span class="badge badge-sm ml-1 <%= rx.status_active? ? 'badge-success' : 'badge-ghost' %>"><%= rx.status.humanize %></span>
+                </span>
+                <%= link_to "View", staff_patient_prescription_path(@patient, rx), class: "btn btn-ghost btn-xs" %>
+              </div>
+              <% rx.prescription_items.each do |item| %>
+                <p class="text-sm text-base-content/70 ml-4"><%= item.display %></p>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-base-content/60 text-sm">No prescriptions for this visit.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="space-y-6">
+    <!-- Visit Info -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="font-bold">Visit Information</h3>
+        <div class="space-y-3 mt-2">
+          <div>
+            <p class="text-xs text-base-content/50">Status</p>
+            <p><%= status_badge(@visit.status, type: :appointment) %></p>
+          </div>
+          <div>
+            <p class="text-xs text-base-content/50">Doctor</p>
+            <div class="flex items-center gap-2 mt-1">
+              <%= avatar_for(@visit.doctor, size: "w-6 h-6", text_size: "text-xs") %>
+              <span class="text-sm">Dr. <%= @visit.doctor.full_name %></span>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs text-base-content/50">Date</p>
+            <p class="font-medium"><%= @visit.visit_date.strftime("%B %d, %Y") %></p>
+          </div>
+          <div>
+            <p class="text-xs text-base-content/50">Type</p>
+            <p class="font-medium"><%= @visit.visit_type.humanize %></p>
+          </div>
+          <% if @visit.appointment %>
+            <div>
+              <p class="text-xs text-base-content/50">Linked Appointment</p>
+              <p class="font-medium">#<%= @visit.appointment.id %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient Quick Info -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="font-bold">Patient</h3>
+        <div class="flex items-center gap-3 mt-2">
+          <%= avatar_for(@patient, size: "w-10 h-10", text_size: "text-sm") %>
+          <div>
+            <p class="font-medium"><%= @patient.full_name %></p>
+            <p class="text-xs text-base-content/50 font-mono"><%= @patient.patient_profile&.medical_record_number %></p>
+          </div>
+        </div>
+        <div class="mt-3">
+          <%= link_to "View Full Chart", chart_staff_patient_path(@patient), class: "btn btn-ghost btn-sm btn-block" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

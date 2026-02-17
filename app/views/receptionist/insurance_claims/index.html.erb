@@ -1,0 +1,76 @@
+<% content_for(:title, "Insurance Claims") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= receptionist_root_path %>">Dashboard</a></li>
+    <li>Insurance Claims</li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <h1 class="text-2xl font-extrabold">Insurance Claims</h1>
+  <%= link_to new_receptionist_insurance_claim_path, class: "btn btn-primary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+    New Claim
+  <% end %>
+</div>
+
+<div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Claim ID</th>
+          <th>Patient</th>
+          <th>Provider</th>
+          <th>Claim Amount</th>
+          <th>Approved</th>
+          <th>Status</th>
+          <th>Submitted</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @claims.each do |claim| %>
+          <tr class="hover">
+            <td class="font-mono text-sm">#<%= claim.id %></td>
+            <td class="font-medium text-sm"><%= claim.patient&.full_name %></td>
+            <td class="text-sm"><%= claim.provider_name %></td>
+            <td class="font-semibold">₦<%= number_with_delimiter(claim.claim_amount_cents / 100) %></td>
+            <td class="<%= claim.approved_amount_cents > 0 ? 'text-success' : 'text-base-content/40' %>">
+              ₦<%= number_with_delimiter(claim.approved_amount_cents.to_i / 100) %>
+            </td>
+            <td><%= status_badge(claim.status, type: :claim) %></td>
+            <td class="text-sm text-base-content/60"><%= claim.submitted_at&.strftime("%b %d, %Y") %></td>
+            <td>
+              <div class="flex gap-1">
+                <%= link_to receptionist_insurance_claim_path(claim), class: "btn btn-ghost btn-xs" do %>
+                  View
+                <% end %>
+                <%= link_to edit_receptionist_insurance_claim_path(claim), class: "btn btn-ghost btn-xs" do %>
+                  Edit
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+        <% if @claims.empty? %>
+          <tr>
+            <td colspan="8" class="text-center py-8 text-base-content/60">No insurance claims found.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="flex justify-center mt-6">
+    <div class="join">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>

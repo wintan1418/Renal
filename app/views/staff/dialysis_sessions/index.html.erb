@@ -1,0 +1,124 @@
+<% content_for(:title, "Dialysis Sessions") %>
+
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li>Dialysis Sessions</li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <h1 class="text-2xl font-extrabold">Dialysis Sessions</h1>
+  <div class="flex items-center gap-2">
+    <%= link_to board_staff_dialysis_sessions_path, class: "btn btn-outline btn-sm" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+      </svg>
+      Unit Board
+    <% end %>
+    <%= link_to new_staff_dialysis_session_path, class: "btn btn-primary btn-sm" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Schedule Session
+    <% end %>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card bg-base-100 shadow-xl mb-6">
+  <div class="card-body py-4">
+    <%= form_with url: staff_dialysis_sessions_path, method: :get, class: "flex flex-col sm:flex-row gap-3 flex-wrap" do |f| %>
+      <div class="form-control">
+        <%= f.date_field :date, value: params[:date], class: "input input-bordered input-sm" %>
+      </div>
+      <div class="form-control">
+        <%= f.select :status,
+            DialysisSession.statuses.keys.map { |s| [s.humanize.titleize, s] },
+            { prompt: "All Statuses", selected: params[:status] },
+            class: "select select-bordered select-sm" %>
+      </div>
+      <%= f.submit "Filter", class: "btn btn-primary btn-sm" %>
+      <% if params[:date].present? || params[:status].present? %>
+        <%= link_to "Clear", staff_dialysis_sessions_path, class: "btn btn-ghost btn-sm" %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Sessions Table -->
+<div class="card bg-base-100 shadow-xl">
+  <div class="card-body p-0">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Type</th>
+            <th>Machine / Station</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @sessions.each do |session| %>
+            <tr class="hover">
+              <td>
+                <div class="font-medium"><%= session.session_date.strftime("%b %d, %Y") %></div>
+                <div class="text-xs text-base-content/50"><%= session.start_time&.strftime("%H:%M") || "TBD" %></div>
+              </td>
+              <td>
+                <div class="font-medium"><%= session.patient&.full_name || "N/A" %></div>
+              </td>
+              <td class="text-sm"><%= session.doctor&.full_name || "N/A" %></td>
+              <td>
+                <% type_color = session.session_type == "hemodialysis" ? "badge-primary" : "badge-secondary" %>
+                <span class="badge <%= type_color %> badge-sm"><%= session.session_type&.humanize %></span>
+              </td>
+              <td class="text-sm text-base-content/70">
+                <div><%= session.dialysis_machine&.name || "No machine" %></div>
+                <div class="text-xs"><%= session.dialysis_station&.name || "No station" %></div>
+              </td>
+              <td>
+                <%
+                  status_class = case session.status
+                  when "scheduled" then "badge-info"
+                  when "in_progress" then "badge-warning"
+                  when "completed" then "badge-success"
+                  when "cancelled" then "badge-ghost"
+                  when "aborted" then "badge-error"
+                  else "badge-ghost"
+                  end
+                %>
+                <span class="badge <%= status_class %> badge-sm"><%= session.status&.humanize %></span>
+              </td>
+              <td>
+                <%= link_to staff_dialysis_session_path(session), class: "btn btn-ghost btn-xs" do %>
+                  View
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @sessions.empty? %>
+            <tr>
+              <td colspan="7" class="text-center py-10 text-base-content/60">
+                No dialysis sessions found.
+                <% if params[:date].present? || params[:status].present? %>
+                  <%= link_to "Clear filters", staff_dialysis_sessions_path, class: "link link-primary" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="flex justify-center mt-6">
+    <%== pagy_nav(@pagy) %>
+  </div>
+<% end %>

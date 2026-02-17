@@ -1,0 +1,209 @@
+<% content_for(:title, "Dialysis Session Details") %>
+
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= patient_portal_root_path %>">Dashboard</a></li>
+    <li><a href="<%= patient_portal_dialysis_history_index_path %>">Dialysis History</a></li>
+    <li>Session Details</li>
+  </ul>
+</div>
+
+<%
+  status_class = case @session.status
+  when "scheduled" then "badge-info"
+  when "in_progress" then "badge-warning"
+  when "completed" then "badge-success"
+  when "cancelled" then "badge-ghost"
+  when "aborted" then "badge-error"
+  else "badge-ghost"
+  end
+%>
+
+<div class="flex items-center gap-3 mb-6">
+  <h1 class="text-2xl font-extrabold">Dialysis Session</h1>
+  <span class="badge <%= status_class %> badge-md"><%= @session.status&.humanize %></span>
+</div>
+
+<p class="text-base-content/60 mb-6"><%= @session.session_date.strftime("%A, %B %d, %Y") %></p>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Session Information -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-base">Session Information</h2>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Date</span>
+          <span class="font-medium"><%= @session.session_date.strftime("%b %d, %Y") %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Start Time</span>
+          <span class="font-medium"><%= @session.start_time&.strftime("%H:%M") || "TBD" %></span>
+        </div>
+        <% if @session.start_time && @session.end_time %>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Duration</span>
+            <%
+              duration_minutes = ((@session.end_time - @session.start_time) / 60).round
+              hours = duration_minutes / 60
+              mins = duration_minutes % 60
+            %>
+            <span class="font-medium"><%= "#{hours}h #{mins}m" %></span>
+          </div>
+        <% end %>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Session Type</span>
+          <span class="badge badge-primary badge-sm"><%= @session.session_type&.humanize %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Access Type</span>
+          <span class="font-medium"><%= @session.access_type&.humanize || "N/A" %></span>
+        </div>
+        <div class="divider my-1"></div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Doctor</span>
+          <span class="font-medium">Dr. <%= @session.doctor&.full_name || "N/A" %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Nurse</span>
+          <span class="font-medium"><%= @session.nurse&.full_name || "N/A" %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Machine</span>
+          <span class="font-medium"><%= @session.dialysis_machine&.name || "N/A" %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Station</span>
+          <span class="font-medium"><%= @session.dialysis_station&.name || "N/A" %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre & Post Vitals Comparison -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-base">Vitals Comparison</h2>
+      <div class="overflow-x-auto">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Measurement</th>
+              <th class="text-center">Pre-Session</th>
+              <th class="text-center">Post-Session</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-base-content/70">Weight (kg)</td>
+              <td class="text-center font-mono"><%= @session.pre_weight_kg&.to_f || "--" %></td>
+              <td class="text-center font-mono"><%= @session.post_weight_kg&.to_f || "--" %></td>
+            </tr>
+            <tr>
+              <td class="text-base-content/70">Systolic BP (mmHg)</td>
+              <td class="text-center font-mono"><%= @session.pre_systolic_bp || "--" %></td>
+              <td class="text-center font-mono"><%= @session.post_systolic_bp || "--" %></td>
+            </tr>
+            <tr>
+              <td class="text-base-content/70">Diastolic BP (mmHg)</td>
+              <td class="text-center font-mono"><%= @session.pre_diastolic_bp || "--" %></td>
+              <td class="text-center font-mono"><%= @session.post_diastolic_bp || "--" %></td>
+            </tr>
+            <tr>
+              <td class="text-base-content/70">Heart Rate (bpm)</td>
+              <td class="text-center font-mono"><%= @session.pre_heart_rate || "--" %></td>
+              <td class="text-center font-mono"><%= @session.post_heart_rate || "--" %></td>
+            </tr>
+            <tr>
+              <td class="text-base-content/70">Temperature (°C)</td>
+              <td class="text-center font-mono"><%= @session.pre_temperature&.to_f || "--" %></td>
+              <td class="text-center font-mono"><%= @session.post_temperature&.to_f || "--" %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <% if @session.fluid_removed_ml %>
+        <div class="mt-4 p-3 bg-info/10 rounded-lg">
+          <div class="text-sm text-info font-semibold">Fluid Removed</div>
+          <div class="text-2xl font-bold font-mono text-info"><%= @session.fluid_removed_ml %> mL</div>
+          <div class="text-xs text-base-content/60">Target: <%= @session.target_fluid_removal_ml ? "#{@session.target_fluid_removal_ml} mL" : "Not set" %></div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Session Parameters -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-base">Session Parameters</h2>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Blood Flow Rate</span>
+          <span class="font-medium"><%= @session.blood_flow_rate ? "#{@session.blood_flow_rate} mL/min" : "N/A" %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Dialysate Flow Rate</span>
+          <span class="font-medium"><%= @session.dialysate_flow_rate ? "#{@session.dialysate_flow_rate} mL/min" : "N/A" %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Dry Weight</span>
+          <span class="font-medium"><%= @session.dry_weight_kg ? "#{@session.dry_weight_kg} kg" : "N/A" %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Dialysate Composition</span>
+          <span class="font-medium"><%= @session.dialysate_composition.presence || "N/A" %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Outcomes -->
+  <% if @session.status.in?(["completed", "aborted"]) %>
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-base">Outcomes</h2>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between items-center">
+            <span class="text-base-content/60">Tolerated Session Well</span>
+            <% if @session.patient_tolerated_well %>
+              <span class="badge badge-success badge-sm">Yes</span>
+            <% else %>
+              <span class="badge badge-warning badge-sm">No</span>
+            <% end %>
+          </div>
+
+          <% if @session.complications.present? %>
+            <div>
+              <span class="text-base-content/60 block mb-1">Complications Noted</span>
+              <div class="alert alert-warning text-sm p-3">
+                <%= @session.complications %>
+              </div>
+            </div>
+          <% else %>
+            <div class="flex justify-between">
+              <span class="text-base-content/60">Complications</span>
+              <span class="text-success text-xs">None reported</span>
+            </div>
+          <% end %>
+
+          <% if @session.nursing_notes.present? %>
+            <div>
+              <span class="text-base-content/60 block mb-1">Nursing Notes</span>
+              <p class="text-sm bg-base-200 rounded-lg p-3 whitespace-pre-wrap"><%= @session.nursing_notes %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<div class="mt-6">
+  <%= link_to patient_portal_dialysis_history_index_path, class: "btn btn-ghost btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+    Back to Dialysis History
+  <% end %>
+</div>

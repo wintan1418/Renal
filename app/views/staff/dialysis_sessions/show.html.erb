@@ -1,0 +1,418 @@
+<% content_for(:title, "Dialysis Session ##{@session.id}") %>
+
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li><a href="<%= staff_dialysis_sessions_path %>">Dialysis Sessions</a></li>
+    <li>Session #<%= @session.id %></li>
+  </ul>
+</div>
+
+<%
+  status_class = case @session.status
+  when "scheduled" then "badge-info"
+  when "in_progress" then "badge-warning"
+  when "completed" then "badge-success"
+  when "cancelled" then "badge-ghost"
+  when "aborted" then "badge-error"
+  else "badge-ghost"
+  end
+%>
+
+<!-- Header -->
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <div>
+    <div class="flex items-center gap-3">
+      <h1 class="text-2xl font-extrabold">Dialysis Session #<%= @session.id %></h1>
+      <span class="badge <%= status_class %> badge-md"><%= @session.status&.humanize %></span>
+    </div>
+    <p class="text-sm text-base-content/60 mt-1"><%= @session.session_date.strftime("%A, %B %d, %Y") %></p>
+  </div>
+
+  <div class="flex items-center gap-2 flex-wrap">
+    <% if @session.status == "scheduled" %>
+      <%= button_to start_staff_dialysis_session_path(@session), method: :patch, class: "btn btn-warning btn-sm",
+          data: { turbo_confirm: "Start this dialysis session?" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Start Session
+      <% end %>
+    <% end %>
+
+    <% if @session.status == "in_progress" %>
+      <button onclick="document.getElementById('complete-session-modal').showModal()" class="btn btn-success btn-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Complete Session
+      </button>
+    <% end %>
+
+    <% if @session.status.in?(["scheduled", "in_progress"]) %>
+      <%= link_to edit_staff_dialysis_session_path(@session), class: "btn btn-ghost btn-sm" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edit
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- LEFT COLUMN -->
+  <div class="space-y-6">
+
+    <!-- Session Info -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-base">Session Information</h2>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Date</span>
+            <span class="font-medium"><%= @session.session_date.strftime("%b %d, %Y") %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Start Time</span>
+            <span class="font-medium"><%= @session.start_time&.strftime("%H:%M") || "TBD" %></span>
+          </div>
+          <% if @session.start_time %>
+            <div class="flex justify-between">
+              <span class="text-base-content/60">Actual Start</span>
+              <span class="font-medium"><%= @session.start_time.strftime("%H:%M") %></span>
+            </div>
+          <% end %>
+          <% if @session.end_time %>
+            <div class="flex justify-between">
+              <span class="text-base-content/60">End Time</span>
+              <span class="font-medium"><%= @session.end_time.strftime("%H:%M") %></span>
+            </div>
+          <% end %>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Type</span>
+            <span class="badge badge-primary badge-sm"><%= @session.session_type&.humanize %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Access Type</span>
+            <span class="font-medium"><%= @session.access_type&.humanize || "N/A" %></span>
+          </div>
+          <div class="divider my-1"></div>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Patient</span>
+            <span class="font-medium"><%= @session.patient&.full_name || "N/A" %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Doctor</span>
+            <span class="font-medium">Dr. <%= @session.doctor&.full_name || "N/A" %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Nurse</span>
+            <span class="font-medium"><%= @session.nurse&.full_name || "N/A" %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Machine & Station -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Machine & Station</h2>
+          <% if @session.status.in?(["scheduled", "in_progress"]) %>
+            <button onclick="document.getElementById('assign-resources-modal').showModal()" class="btn btn-ghost btn-xs">
+              Reassign
+            </button>
+          <% end %>
+        </div>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between items-center">
+            <span class="text-base-content/60">Machine</span>
+            <span class="font-medium">
+              <% if @session.dialysis_machine %>
+                <%= @session.dialysis_machine.name %>
+                <span class="text-xs text-base-content/50">(<%= @session.dialysis_machine.serial_number %>)</span>
+              <% else %>
+                <span class="text-base-content/40">Not assigned</span>
+              <% end %>
+            </span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-base-content/60">Station</span>
+            <span class="font-medium">
+              <%= @session.dialysis_station&.name || %(<span class="text-base-content/40">Not assigned</span>).html_safe %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pre-Session Vitals -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-base">Pre-Session Vitals</h2>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat-title text-xs">Weight</div>
+            <div class="stat-value text-lg"><%= @session.pre_weight_kg&.to_f || "--" %></div>
+            <div class="stat-desc">kg</div>
+          </div>
+          <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat-title text-xs">Dry Weight</div>
+            <div class="stat-value text-lg"><%= @session.dry_weight_kg&.to_f || "--" %></div>
+            <div class="stat-desc">kg</div>
+          </div>
+          <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat-title text-xs">Blood Pressure</div>
+            <div class="stat-value text-lg">
+              <% if @session.pre_systolic_bp %>
+                <%= @session.pre_systolic_bp %>/<%= @session.pre_diastolic_bp %>
+              <% else %>
+                --
+              <% end %>
+            </div>
+            <div class="stat-desc">mmHg</div>
+          </div>
+          <div class="stat bg-base-200 rounded-box p-3">
+            <div class="stat-title text-xs">Heart Rate</div>
+            <div class="stat-value text-lg"><%= @session.pre_heart_rate || "--" %></div>
+            <div class="stat-desc">bpm</div>
+          </div>
+          <div class="stat bg-base-200 rounded-box p-3 col-span-2">
+            <div class="stat-title text-xs">Temperature</div>
+            <div class="stat-value text-lg"><%= @session.pre_temperature&.to_f || "--" %></div>
+            <div class="stat-desc">°C</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialysis Parameters -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-base">Dialysis Parameters</h2>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Blood Flow Rate</span>
+            <span class="font-medium"><%= @session.blood_flow_rate ? "#{@session.blood_flow_rate} mL/min" : "N/A" %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Dialysate Flow Rate</span>
+            <span class="font-medium"><%= @session.dialysate_flow_rate ? "#{@session.dialysate_flow_rate} mL/min" : "N/A" %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Target Fluid Removal</span>
+            <span class="font-medium"><%= @session.target_fluid_removal_ml ? "#{@session.target_fluid_removal_ml} mL" : "N/A" %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Heparin Dose</span>
+            <span class="font-medium"><%= @session.heparin_dose_units ? "#{@session.heparin_dose_units} units" : "N/A" %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Dialysate Composition</span>
+            <span class="font-medium"><%= @session.dialysate_composition.presence || "N/A" %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In-Progress Timer -->
+    <% if @session.status == "in_progress" && @session.start_time %>
+      <div class="card bg-warning/10 border border-warning shadow-xl">
+        <div class="card-body py-4 items-center text-center"
+             data-controller="dialysis-timer"
+             data-dialysis-timer-start-time-value="<%= @session.start_time.iso8601 %>">
+          <div class="text-xs font-semibold text-warning uppercase tracking-wide">Session In Progress</div>
+          <div class="font-mono text-4xl font-bold text-warning" data-dialysis-timer-target="display">--:--:--</div>
+          <div class="text-xs text-base-content/60">elapsed time</div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="space-y-6">
+
+    <!-- Post-Session Vitals (shown when completed) -->
+    <% if @session.status.in?(["completed", "aborted"]) %>
+      <div class="card bg-success/5 border border-success/20 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-base text-success">Post-Session Vitals</h2>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">Post Weight</div>
+              <div class="stat-value text-lg"><%= @session.post_weight_kg&.to_f || "--" %></div>
+              <div class="stat-desc">kg</div>
+            </div>
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">Fluid Removed</div>
+              <div class="stat-value text-lg"><%= @session.fluid_removed_ml || "--" %></div>
+              <div class="stat-desc">mL</div>
+            </div>
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">Post BP</div>
+              <div class="stat-value text-lg">
+                <% if @session.post_systolic_bp %>
+                  <%= @session.post_systolic_bp %>/<%= @session.post_diastolic_bp %>
+                <% else %>
+                  --
+                <% end %>
+              </div>
+              <div class="stat-desc">mmHg</div>
+            </div>
+            <div class="stat bg-base-200 rounded-box p-3">
+              <div class="stat-title text-xs">Post Heart Rate</div>
+              <div class="stat-value text-lg"><%= @session.post_heart_rate || "--" %></div>
+              <div class="stat-desc">bpm</div>
+            </div>
+            <div class="stat bg-base-200 rounded-box p-3 col-span-2">
+              <div class="stat-title text-xs">Post Temperature</div>
+              <div class="stat-value text-lg"><%= @session.post_temperature&.to_f || "--" %></div>
+              <div class="stat-desc">°C</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Outcomes -->
+    <% if @session.status.in?(["completed", "aborted"]) %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-base">Session Outcomes</h2>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between items-center">
+              <span class="text-base-content/60">Patient Tolerated Well</span>
+              <% if @session.patient_tolerated_well %>
+                <span class="badge badge-success badge-sm">Yes</span>
+              <% else %>
+                <span class="badge badge-error badge-sm">No</span>
+              <% end %>
+            </div>
+            <% if @session.complications.present? %>
+              <div>
+                <span class="text-base-content/60 block mb-1">Complications</span>
+                <div class="alert alert-warning text-sm p-3">
+                  <%= @session.complications %>
+                </div>
+              </div>
+            <% else %>
+              <div class="flex justify-between">
+                <span class="text-base-content/60">Complications</span>
+                <span class="text-success text-xs">None reported</span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Nursing Notes -->
+    <% if @session.nursing_notes.present? %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-base">Nursing Notes</h2>
+          <p class="text-sm text-base-content/80 whitespace-pre-wrap"><%= @session.nursing_notes %></p>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Consumables Used -->
+    <% if @session.session_consumables.any? %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body p-0">
+          <div class="p-4 border-b border-base-200">
+            <h2 class="font-bold">Consumables Used</h2>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Qty</th>
+                  <th>Unit Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @session.session_consumables.includes(:dialysis_consumable).each do |sc| %>
+                  <tr>
+                    <td class="font-medium"><%= sc.dialysis_consumable&.name %></td>
+                    <td><%= sc.quantity_used %> <%= sc.dialysis_consumable&.unit %></td>
+                    <td class="text-sm text-base-content/70">
+                      &#8358;<%= number_with_delimiter((sc.dialysis_consumable&.unit_cost_cents.to_i / 100.0).to_i) %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Assign Resources Form (for scheduled/in_progress) -->
+    <% if @session.status.in?(["scheduled", "in_progress"]) %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-base">Assign Resources</h2>
+          <%= form_with url: assign_resources_staff_dialysis_session_path(@session), method: :patch, class: "space-y-3" do |f| %>
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Machine</span></label>
+              <%= select_tag :dialysis_machine_id,
+                  options_for_select(DialysisMachine.active.order(:name).map { |m| ["#{m.name} (#{m.serial_number})", m.id] }, @session.dialysis_machine_id),
+                  prompt: "Select machine",
+                  class: "select select-bordered select-sm w-full" %>
+            </div>
+            <div class="form-control">
+              <label class="label"><span class="label-text font-medium">Station</span></label>
+              <%= select_tag :dialysis_station_id,
+                  options_for_select(DialysisStation.all.order(:name).map { |s| ["#{s.name} (#{s.station_type})", s.id] }, @session.dialysis_station_id),
+                  prompt: "Select station",
+                  class: "select select-bordered select-sm w-full" %>
+            </div>
+            <%= f.submit "Assign Resources", class: "btn btn-primary btn-sm w-full" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Complete Session Modal -->
+<% if @session.status == "in_progress" %>
+  <%= render "complete_form", session: @session %>
+<% end %>
+
+<!-- Assign Resources Modal (inline form already shown above but here's a modal approach too) -->
+<dialog id="assign-resources-modal" class="modal">
+  <div class="modal-box">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">X</button>
+    </form>
+    <h3 class="font-bold text-lg mb-4">Reassign Resources</h3>
+    <%= form_with url: assign_resources_staff_dialysis_session_path(@session), method: :patch, class: "space-y-3" do |f| %>
+      <div class="form-control">
+        <label class="label"><span class="label-text font-medium">Machine</span></label>
+        <%= select_tag :dialysis_machine_id,
+            options_for_select(DialysisMachine.active.order(:name).map { |m| ["#{m.name} (#{m.serial_number})", m.id] }, @session.dialysis_machine_id),
+            prompt: "Select machine",
+            class: "select select-bordered w-full" %>
+      </div>
+      <div class="form-control">
+        <label class="label"><span class="label-text font-medium">Station</span></label>
+        <%= select_tag :dialysis_station_id,
+            options_for_select(DialysisStation.all.order(:name).map { |s| ["#{s.name} (#{s.station_type})", s.id] }, @session.dialysis_station_id),
+            prompt: "Select station",
+            class: "select select-bordered w-full" %>
+      </div>
+      <div class="modal-action">
+        <button type="button" onclick="document.getElementById('assign-resources-modal').close()" class="btn btn-ghost btn-sm">Cancel</button>
+        <%= f.submit "Assign", class: "btn btn-primary btn-sm" %>
+      </div>
+    <% end %>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>

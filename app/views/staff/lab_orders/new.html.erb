@@ -1,0 +1,161 @@
+<% content_for(:title, "New Lab Order - #{@patient.full_name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li><a href="<%= staff_patients_path %>">Patients</a></li>
+    <li><a href="<%= chart_staff_patient_path(@patient) %>"><%= @patient.full_name %></a></li>
+    <li>New Lab Order</li>
+  </ul>
+</div>
+
+<h1 class="text-2xl font-extrabold mb-6">Order Lab Tests</h1>
+
+<%= form_with(model: @lab_order, url: staff_patient_lab_orders_path(@patient), data: { controller: "lab-order" }) do |f| %>
+  <% if @lab_order.errors.any? %>
+    <div class="alert alert-error mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <ul class="list-disc list-inside">
+          <% @lab_order.errors.full_messages.each do |m| %>
+            <li><%= m %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @visit %>
+    <%= f.hidden_field :visit_id, value: @visit.id %>
+    <div class="alert alert-info mb-6">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>Ordering labs for Visit #<%= @visit.id %> (<%= @visit.visit_date.strftime("%b %d, %Y") %>)</span>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left: Order Details + Lab Tests -->
+    <div class="lg:col-span-2 space-y-4">
+      <!-- Order Details Card -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-base">Order Details</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+            <div class="form-control w-full">
+              <%= f.label :priority, class: "label" do %>
+                <span class="label-text">Priority</span>
+              <% end %>
+              <%= f.select :priority, LabOrder.priorities.keys.map { |p| [p.humanize, p] }, {}, class: "select select-bordered w-full" %>
+            </div>
+
+            <!-- Category filter (handled by Stimulus) -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text">Filter by Category</span>
+              </label>
+              <select class="select select-bordered w-full" data-lab-order-target="category" data-action="change->lab-order#filterCategory">
+                <option value="">All Categories</option>
+                <% LabTest.categories.keys.each do |cat| %>
+                  <option value="<%= cat %>"><%= cat.humanize %></option>
+                <% end %>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-control w-full mt-2">
+            <%= f.label :clinical_notes, class: "label" do %>
+              <span class="label-text">Clinical Notes / Reason for Test</span>
+            <% end %>
+            <%= f.text_area :clinical_notes, class: "textarea textarea-bordered w-full h-20", placeholder: "Clinical indication, relevant history..." %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lab Test Groups -->
+      <% if @lab_tests.group_by(&:category).any? %>
+        <% @lab_tests.group_by(&:category).each do |category, tests| %>
+          <div class="card bg-base-100 shadow mb-2" data-lab-order-target="testGroup" data-category="<%= category %>">
+            <div class="card-body py-4">
+              <h3 class="font-bold text-sm uppercase tracking-wide text-base-content/70 mb-3">
+                <%= category.humanize %>
+                <span class="badge badge-ghost badge-sm ml-1"><%= tests.count %></span>
+              </h3>
+              <div class="space-y-1">
+                <% tests.each do |test| %>
+                  <label class="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-base-200 transition-colors">
+                    <input type="checkbox"
+                           name="lab_test_ids[]"
+                           value="<%= test.id %>"
+                           class="checkbox checkbox-primary checkbox-sm"
+                           data-action="change->lab-order#updateCount">
+                    <span class="flex-1 text-sm font-medium"><%= test.name %></span>
+                    <% if test.code.present? %>
+                      <span class="text-xs font-mono text-base-content/40"><%= test.code %></span>
+                    <% end %>
+                    <% if test.unit.present? %>
+                      <span class="text-xs text-base-content/50"><%= test.unit %></span>
+                    <% end %>
+                    <span class="text-xs font-semibold text-primary"><%= format_naira(test.price_cents) %></span>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="card bg-base-100 shadow">
+          <div class="card-body items-center text-center py-8">
+            <p class="text-base-content/60">No active lab tests available. Please contact the administrator.</p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Right: Sidebar Summary -->
+    <div class="space-y-4">
+      <!-- Patient Info -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h3 class="font-bold">Patient</h3>
+          <div class="flex items-center gap-3 mt-2">
+            <%= avatar_for(@patient, size: "w-10 h-10", text_size: "text-sm") %>
+            <div>
+              <p class="font-medium text-sm"><%= @patient.full_name %></p>
+              <p class="text-xs text-base-content/50 font-mono"><%= @patient.patient_profile&.medical_record_number %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selection Summary -->
+      <div class="card bg-base-100 shadow-xl sticky top-4">
+        <div class="card-body">
+          <h3 class="font-bold">Order Summary</h3>
+          <div class="mt-3 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-base-content/70">Tests selected</span>
+              <span class="badge badge-primary" data-lab-order-target="count">0 test(s) selected</span>
+            </div>
+
+            <div class="divider my-1"></div>
+
+            <p class="text-xs text-base-content/50">Select at least one test to place the order.</p>
+
+            <%= f.submit "Place Lab Order", class: "btn btn-primary btn-block mt-2" %>
+            <% if @visit %>
+              <%= link_to "Cancel", staff_patient_visit_path(@patient, @visit), class: "btn btn-ghost btn-block" %>
+            <% else %>
+              <%= link_to "Cancel", chart_staff_patient_path(@patient, tab: "labs"), class: "btn btn-ghost btn-block" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,65 @@
+<% content_for(:title, @service.name) %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_services_path %>">Services</a></li>
+    <li><%= @service.name %></li>
+  </ul>
+</div>
+
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold"><%= @service.name %></h1>
+  <div class="flex gap-2">
+    <%= link_to "Edit", edit_admin_service_path(@service), class: "btn btn-primary btn-sm" %>
+    <%= link_to "Back", admin_services_path, class: "btn btn-ghost btn-sm" %>
+  </div>
+</div>
+
+<div class="max-w-3xl">
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-base-content/60">Service Name</p>
+          <p class="font-medium"><%= @service.name %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Department</p>
+          <p class="font-medium"><%= @service.department&.name || "None" %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Type</p>
+          <p><span class="badge badge-outline"><%= @service.service_type&.humanize %></span></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Status</p>
+          <p>
+            <% if @service.active? %>
+              <span class="badge badge-success badge-sm">Active</span>
+            <% else %>
+              <span class="badge badge-ghost badge-sm">Inactive</span>
+            <% end %>
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Price</p>
+          <p class="font-medium text-lg font-mono"><%= format_naira(@service.price_cents) %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Duration</p>
+          <p class="font-medium"><%= @service.duration_minutes %> minutes</p>
+        </div>
+      </div>
+
+      <% if @service.description.present? %>
+        <div class="divider"></div>
+        <div>
+          <p class="text-sm text-base-content/60">Description</p>
+          <p class="mt-1"><%= @service.description %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

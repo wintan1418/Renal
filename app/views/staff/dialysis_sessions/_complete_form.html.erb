@@ -1,0 +1,78 @@
+<!-- Complete Session Modal -->
+<dialog id="complete-session-modal" class="modal">
+  <div class="modal-box max-w-2xl">
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">X</button>
+    </form>
+    <h3 class="font-bold text-lg mb-4">Complete Session</h3>
+
+    <%= form_with url: complete_staff_dialysis_session_path(session), method: :patch, class: "space-y-4" do |f| %>
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Post Vitals -->
+        <div class="col-span-2">
+          <h4 class="font-semibold text-sm text-base-content/70 uppercase tracking-wide mb-3">Post-Session Vitals</h4>
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text font-medium">Post Weight (kg)</span></label>
+          <%= f.number_field "dialysis_session[post_weight_kg]", step: 0.1, class: "input input-bordered input-sm w-full" %>
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text font-medium">Fluid Removed (mL)</span></label>
+          <%= f.number_field "dialysis_session[fluid_removed_ml]", class: "input input-bordered input-sm w-full" %>
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text font-medium">Post Systolic BP</span></label>
+          <%= f.number_field "dialysis_session[post_systolic_bp]", class: "input input-bordered input-sm w-full" %>
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text font-medium">Post Diastolic BP</span></label>
+          <%= f.number_field "dialysis_session[post_diastolic_bp]", class: "input input-bordered input-sm w-full" %>
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text font-medium">Post Heart Rate (bpm)</span></label>
+          <%= f.number_field "dialysis_session[post_heart_rate]", class: "input input-bordered input-sm w-full" %>
+        </div>
+
+        <div class="form-control">
+          <label class="label"><span class="label-text font-medium">Post Temperature (°C)</span></label>
+          <%= f.number_field "dialysis_session[post_temperature]", step: 0.1, class: "input input-bordered input-sm w-full" %>
+        </div>
+
+        <!-- Outcomes -->
+        <div class="col-span-2 mt-2">
+          <h4 class="font-semibold text-sm text-base-content/70 uppercase tracking-wide mb-3">Outcomes</h4>
+        </div>
+
+        <div class="form-control col-span-2">
+          <label class="label cursor-pointer justify-start gap-3">
+            <%= f.check_box "dialysis_session[patient_tolerated_well]", class: "checkbox checkbox-success" %>
+            <span class="label-text font-medium">Patient tolerated session well</span>
+          </label>
+        </div>
+
+        <div class="form-control col-span-2">
+          <label class="label"><span class="label-text font-medium">Complications</span></label>
+          <%= f.text_area "dialysis_session[complications]", rows: 3, placeholder: "Describe any complications, adverse events...", class: "textarea textarea-bordered w-full text-sm" %>
+        </div>
+
+        <div class="form-control col-span-2">
+          <label class="label"><span class="label-text font-medium">Nursing Notes</span></label>
+          <%= f.text_area "dialysis_session[nursing_notes]", rows: 3, placeholder: "Post-session nursing observations...", class: "textarea textarea-bordered w-full text-sm" %>
+        </div>
+      </div>
+
+      <div class="modal-action mt-4">
+        <button type="button" onclick="document.getElementById('complete-session-modal').close()" class="btn btn-ghost btn-sm">Cancel</button>
+        <%= f.submit "Complete Session", class: "btn btn-success btn-sm" %>
+      </div>
+    <% end %>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button>close</button>
+  </form>
+</dialog>

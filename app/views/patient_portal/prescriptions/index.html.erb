@@ -1,0 +1,86 @@
+<% content_for(:title, "My Prescriptions") %>
+
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= patient_portal_root_path %>">Dashboard</a></li>
+    <li>Prescriptions</li>
+  </ul>
+</div>
+
+<h1 class="text-2xl font-extrabold mb-6">My Prescriptions</h1>
+
+<% if @prescriptions.any? %>
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body p-0">
+      <div class="overflow-x-auto">
+        <table class="table table-zebra">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Prescribed By</th>
+              <th>Items</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @prescriptions.each do |prescription| %>
+              <tr class="hover">
+                <td class="font-medium">
+                  <%= prescription.created_at.strftime("%b %d, %Y") %>
+                </td>
+                <td>
+                  Dr. <%= prescription.prescribed_by.full_name %>
+                </td>
+                <td>
+                  <span class="badge badge-outline badge-sm">
+                    <%= prescription.item_count %> <%= "item".pluralize(prescription.item_count) %>
+                  </span>
+                </td>
+                <td>
+                  <% status_class = case prescription.status
+                       when "active" then "badge-success"
+                       when "dispensed" then "badge-info"
+                       when "partially_dispensed" then "badge-warning"
+                       when "cancelled" then "badge-error"
+                       else "badge-ghost"
+                     end %>
+                  <span class="badge <%= status_class %> badge-sm"><%= prescription.status.humanize %></span>
+                </td>
+                <td>
+                  <%= link_to patient_portal_prescription_path(prescription), class: "btn btn-ghost btn-xs" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                    View
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <% if @pagy.pages > 1 %>
+    <div class="flex justify-center mt-6">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  <% end %>
+
+<% else %>
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body items-center text-center py-16">
+      <div class="w-16 h-16 rounded-full bg-base-200 flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
+      </div>
+      <h3 class="font-bold text-lg mb-2">No Prescriptions Yet</h3>
+      <p class="text-base-content/60">Your prescription history will appear here after your doctor issues one.</p>
+    </div>
+  </div>
+<% end %>

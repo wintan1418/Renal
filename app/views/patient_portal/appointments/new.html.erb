@@ -1,0 +1,76 @@
+<% content_for(:title, "Book Appointment") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= patient_portal_root_path %>">Dashboard</a></li>
+    <li><a href="<%= patient_portal_appointments_path %>">Appointments</a></li>
+    <li>Book Appointment</li>
+  </ul>
+</div>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-extrabold">Book an Appointment</h1>
+  <p class="text-base-content/60 mt-1">Follow the steps below to schedule your appointment.</p>
+</div>
+
+<!-- Booking Wizard -->
+<div class="max-w-3xl">
+  <!-- Step 1: Select Department -->
+  <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold text-sm">1</div>
+      <h2 class="text-lg font-bold">Select Department</h2>
+    </div>
+
+    <% if @departments.any? %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <% @departments.each do |department| %>
+          <%= link_to doctors_for_department_patient_portal_appointments_path(department_id: department.id),
+                      data: { turbo_frame: "doctors_list" },
+                      class: "border-2 border-base-200 rounded-xl p-4 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer text-left block" do %>
+            <div class="font-bold"><%= department.name %></div>
+            <% if department.description.present? %>
+              <p class="text-sm text-base-content/60 mt-1 line-clamp-2"><%= department.description %></p>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-base-content/60">No departments available for booking at this time.</p>
+    <% end %>
+  </div>
+
+  <!-- Step 2: Select Doctor (Turbo Frame) -->
+  <%= turbo_frame_tag "doctors_list" do %>
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4 opacity-50">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-base-200 text-base-content/40 flex items-center justify-center font-bold text-sm">2</div>
+        <h2 class="text-lg font-bold text-base-content/40">Select Doctor</h2>
+      </div>
+      <p class="text-sm text-base-content/40 mt-2 ml-11">Please select a department first.</p>
+    </div>
+  <% end %>
+
+  <!-- Step 3: Select Date (Turbo Frame) -->
+  <%= turbo_frame_tag "date_picker" do %>
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4 opacity-50">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-base-200 text-base-content/40 flex items-center justify-center font-bold text-sm">3</div>
+        <h2 class="text-lg font-bold text-base-content/40">Select Date</h2>
+      </div>
+      <p class="text-sm text-base-content/40 mt-2 ml-11">Please select a doctor first.</p>
+    </div>
+  <% end %>
+
+  <!-- Step 4: Select Time & Confirm (Turbo Frame) -->
+  <%= turbo_frame_tag "time_slots" do %>
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4 opacity-50">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-base-200 text-base-content/40 flex items-center justify-center font-bold text-sm">4</div>
+        <h2 class="text-lg font-bold text-base-content/40">Select Time & Confirm</h2>
+      </div>
+      <p class="text-sm text-base-content/40 mt-2 ml-11">Please select a date first.</p>
+    </div>
+  <% end %>
+</div>

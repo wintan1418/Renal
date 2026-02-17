@@ -1,0 +1,58 @@
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-bold">Prescriptions</h2>
+  <%= link_to new_staff_patient_prescription_path(patient), class: "btn btn-primary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+    New Prescription
+  <% end %>
+</div>
+
+<% if prescriptions.any? %>
+  <div class="space-y-4">
+    <% prescriptions.each do |prescription| %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold">
+                Prescription #<%= prescription.id %>
+                <span class="badge badge-sm ml-2 <%= prescription.status_active? ? 'badge-success' : prescription.status_dispensed? ? 'badge-info' : 'badge-ghost' %>">
+                  <%= prescription.status.humanize %>
+                </span>
+              </h3>
+              <p class="text-sm text-base-content/60">
+                By Dr. <%= prescription.prescribed_by.last_name %> on <%= prescription.created_at.strftime("%b %d, %Y") %>
+                <% if prescription.prescription_items.any? %>
+                  &middot; <%= pluralize(prescription.prescription_items.count, "item") %>
+                <% end %>
+              </p>
+            </div>
+            <%= link_to "View", staff_patient_prescription_path(patient, prescription), class: "btn btn-ghost btn-sm" %>
+          </div>
+
+          <% if prescription.prescription_items.any? %>
+            <div class="mt-2">
+              <ul class="space-y-1">
+                <% prescription.prescription_items.each do |item| %>
+                  <li class="text-sm">
+                    <span class="font-medium"><%= item.medication_name %></span>
+                    <span class="text-base-content/60"><%= item.dosage %> - <%= item.frequency %></span>
+                    <% if item.duration.present? %>
+                      <span class="text-base-content/40">for <%= item.duration %></span>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body items-center text-center py-12">
+      <p class="text-base-content/60">No prescriptions yet.</p>
+      <%= link_to "Create Prescription", new_staff_patient_prescription_path(patient), class: "btn btn-primary btn-sm mt-2" %>
+    </div>
+  </div>
+<% end %>

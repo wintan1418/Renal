@@ -1,0 +1,18 @@
+<% content_for(:title, "Edit Invoice #{@invoice.invoice_number}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= receptionist_root_path %>">Dashboard</a></li>
+    <li><a href="<%= receptionist_invoices_path %>">Invoices</a></li>
+    <li><a href="<%= receptionist_invoice_path(@invoice) %>"><%= @invoice.invoice_number %></a></li>
+    <li>Edit</li>
+  </ul>
+</div>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-extrabold">Edit Invoice</h1>
+  <p class="text-base-content/60 text-sm mt-1"><%= @invoice.invoice_number %></p>
+</div>
+
+<%= render "form", invoice: @invoice %>

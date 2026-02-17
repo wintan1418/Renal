@@ -1,0 +1,115 @@
+<% content_for(:title, "Today's Appointments") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= receptionist_root_path %>">Dashboard</a></li>
+    <li><a href="<%= receptionist_appointments_path %>">Appointments</a></li>
+    <li>Today</li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-extrabold">Today's Appointments</h1>
+    <p class="text-base-content/60 mt-1"><%= Date.current.strftime("%A, %B %d, %Y") %> &middot; <%= @appointments.count %> appointment(s)</p>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to queue_receptionist_appointments_path, class: "btn btn-info btn-sm btn-outline" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+      </svg>
+      Live Queue
+    <% end %>
+    <%= link_to new_receptionist_appointment_path, class: "btn btn-primary btn-sm" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Walk-in
+    <% end %>
+  </div>
+</div>
+
+<!-- Status Summary -->
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
+  <% statuses = @appointments.group_by(&:status) %>
+  <% [ ["pending", "Pending", "bg-warning/10 text-warning"], ["confirmed", "Confirmed", "bg-info/10 text-info"], ["checked_in", "Checked In", "bg-accent/10 text-accent"], ["in_progress", "In Progress", "bg-primary/10 text-primary"], ["completed", "Completed", "bg-success/10 text-success"], ["cancelled", "Cancelled", "bg-error/10 text-error"] ].each do |status, label, color| %>
+    <div class="bg-white rounded-xl shadow p-3 text-center">
+      <p class="text-2xl font-bold <%= color.split.last %>"><%= statuses[status]&.count || 0 %></p>
+      <p class="text-xs text-base-content/60"><%= label %></p>
+    </div>
+  <% end %>
+</div>
+
+<!-- Appointments by Doctor -->
+<% @appointments.group_by(&:doctor).each do |doctor, appointments| %>
+  <div class="bg-white rounded-2xl shadow-lg mb-6 overflow-hidden">
+    <div class="bg-primary/5 px-6 py-3 border-b border-base-200">
+      <div class="flex items-center gap-3">
+        <%= avatar_for(doctor, size: "w-8 h-8", text_size: "text-xs") %>
+        <div>
+          <h3 class="font-bold">Dr. <%= doctor.full_name %></h3>
+          <p class="text-xs text-base-content/60"><%= doctor.staff_profile&.department&.name %> &middot; <%= appointments.count %> appointments</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Queue</th>
+            <th>Time</th>
+            <th>Patient</th>
+            <th>Service</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% appointments.sort_by { |a| [a.queue_number || 0, a.start_time] }.each do |appointment| %>
+            <tr class="hover">
+              <td>
+                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-sm text-primary">
+                  <%= appointment.queue_number %>
+                </div>
+              </td>
+              <td class="font-medium"><%= appointment.start_time.strftime("%I:%M %p") %></td>
+              <td>
+                <div class="flex items-center gap-2">
+                  <%= avatar_for(appointment.patient, size: "w-7 h-7", text_size: "text-xs") %>
+                  <div>
+                    <div class="font-medium text-sm"><%= appointment.patient.full_name %></div>
+                    <div class="text-xs text-base-content/50"><%= appointment.patient.patient_profile&.medical_record_number %></div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-sm"><%= appointment.service.name %></td>
+              <td><%= status_badge(appointment.status, type: :appointment) %></td>
+              <td>
+                <div class="flex gap-1">
+                  <%= link_to "View", receptionist_appointment_path(appointment), class: "btn btn-ghost btn-xs" %>
+                  <% if appointment.pending? || appointment.confirmed? %>
+                    <%= button_to "Check In", check_in_receptionist_appointment_path(appointment), method: :patch, class: "btn btn-accent btn-xs" %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>
+
+<% if @appointments.empty? %>
+  <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+    <div class="w-16 h-16 rounded-full bg-base-200 flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    </div>
+    <h3 class="font-bold text-lg mb-2">No appointments today</h3>
+    <p class="text-base-content/60">There are no appointments scheduled for today.</p>
+  </div>
+<% end %>

@@ -1,0 +1,87 @@
+<% content_for(:title, @blog_post.title) %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_blog_posts_path %>">Blog Posts</a></li>
+    <li><%= @blog_post.title %></li>
+  </ul>
+</div>
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-2xl font-bold"><%= @blog_post.title %></h1>
+    <div class="flex items-center gap-3 mt-2">
+      <% case @blog_post.status %>
+      <% when "draft" %>
+        <span class="badge badge-ghost">Draft</span>
+      <% when "published" %>
+        <span class="badge badge-success">Published</span>
+      <% when "archived" %>
+        <span class="badge badge-warning">Archived</span>
+      <% end %>
+      <span class="badge badge-outline"><%= @blog_post.category&.humanize %></span>
+      <span class="text-sm text-base-content/60"><%= @blog_post.views_count %> views</span>
+    </div>
+  </div>
+  <div class="flex gap-2">
+    <%= link_to "Edit", edit_admin_blog_post_path(@blog_post), class: "btn btn-primary btn-sm" %>
+    <%= link_to "Back", admin_blog_posts_path, class: "btn btn-ghost btn-sm" %>
+  </div>
+</div>
+
+<div class="max-w-4xl">
+  <!-- Meta Info -->
+  <div class="card bg-base-100 shadow mb-6">
+    <div class="card-body">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+        <div>
+          <p class="text-base-content/60">Author</p>
+          <div class="flex items-center gap-2 mt-1">
+            <%= avatar_for(@blog_post.author, size: "w-6 h-6", text_size: "text-xs") %>
+            <span class="font-medium"><%= @blog_post.author.full_name %></span>
+          </div>
+        </div>
+        <div>
+          <p class="text-base-content/60">Slug</p>
+          <p class="font-mono mt-1">/blog/<%= @blog_post.slug %></p>
+        </div>
+        <div>
+          <p class="text-base-content/60">Published</p>
+          <p class="mt-1"><%= @blog_post.published_at&.strftime("%B %d, %Y at %H:%M") || "Not published" %></p>
+        </div>
+        <div>
+          <p class="text-base-content/60">Reading Time</p>
+          <p class="mt-1"><%= @blog_post.reading_time %> min read</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured Image -->
+  <% if @blog_post.featured_image.attached? %>
+    <div class="card bg-base-100 shadow mb-6">
+      <figure>
+        <%= image_tag @blog_post.featured_image.variant(resize_to_limit: [800, 400]), class: "w-full max-h-80 object-cover" %>
+      </figure>
+    </div>
+  <% end %>
+
+  <!-- Excerpt -->
+  <% if @blog_post.excerpt.present? %>
+    <div class="card bg-base-100 shadow mb-6">
+      <div class="card-body">
+        <h3 class="card-title text-sm text-base-content/60">Excerpt</h3>
+        <p class="italic"><%= @blog_post.excerpt %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Content -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body prose max-w-none">
+      <%= @blog_post.rich_body %>
+    </div>
+  </div>
+</div>

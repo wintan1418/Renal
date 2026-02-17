@@ -1,0 +1,182 @@
+<!-- Diagnoses Section -->
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-bold">Diagnoses</h2>
+  <%= link_to new_staff_patient_diagnosis_path(patient), class: "btn btn-primary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+    Add Diagnosis
+  <% end %>
+</div>
+
+<% if diagnoses.any? %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>ICD Code</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Onset Date</th>
+            <th>Diagnosed By</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% diagnoses.each do |dx| %>
+            <tr>
+              <td class="font-medium"><%= dx.description %></td>
+              <td><span class="font-mono text-sm"><%= dx.icd_code || "--" %></span></td>
+              <td><span class="badge badge-ghost badge-sm"><%= dx.diagnosis_type.humanize %></span></td>
+              <td>
+                <% case dx.status %>
+                <% when "active" %>
+                  <span class="badge badge-success badge-sm">Active</span>
+                <% when "resolved" %>
+                  <span class="badge badge-ghost badge-sm">Resolved</span>
+                <% when "chronic" %>
+                  <span class="badge badge-warning badge-sm">Chronic</span>
+                <% end %>
+              </td>
+              <td><%= dx.onset_date&.strftime("%b %d, %Y") || "--" %></td>
+              <td><%= dx.diagnosed_by&.full_name || "--" %></td>
+              <td>
+                <%= link_to "Edit", edit_staff_patient_diagnosis_path(patient, dx), class: "btn btn-ghost btn-xs" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body items-center text-center py-8">
+      <p class="text-base-content/60">No diagnoses recorded.</p>
+    </div>
+  </div>
+<% end %>
+
+<!-- Allergies Section -->
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-bold">Allergies</h2>
+  <%= link_to new_staff_patient_allergy_path(patient), class: "btn btn-primary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+    Add Allergy
+  <% end %>
+</div>
+
+<% if allergies.any? %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>Allergen</th>
+            <th>Reaction</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% allergies.each do |allergy| %>
+            <tr>
+              <td class="font-medium"><%= allergy.allergen %></td>
+              <td><%= allergy.reaction || "--" %></td>
+              <td>
+                <% case allergy.severity %>
+                <% when "mild" %>
+                  <span class="badge badge-info badge-sm">Mild</span>
+                <% when "moderate" %>
+                  <span class="badge badge-warning badge-sm">Moderate</span>
+                <% when "severe" %>
+                  <span class="badge badge-error badge-sm">Severe</span>
+                <% when "life_threatening" %>
+                  <span class="badge badge-error badge-sm">Life Threatening</span>
+                <% end %>
+              </td>
+              <td>
+                <% if allergy.active? %>
+                  <span class="badge badge-success badge-sm">Active</span>
+                <% else %>
+                  <span class="badge badge-ghost badge-sm">Inactive</span>
+                <% end %>
+              </td>
+              <td>
+                <div class="flex gap-1">
+                  <%= link_to "Edit", edit_staff_patient_allergy_path(patient, allergy), class: "btn btn-ghost btn-xs" %>
+                  <%= button_to "Remove", staff_patient_allergy_path(patient, allergy), method: :delete,
+                    data: { turbo_confirm: "Are you sure you want to remove this allergy?" },
+                    class: "btn btn-ghost btn-xs text-error" %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body items-center text-center py-8">
+      <p class="text-base-content/60">No allergies recorded.</p>
+    </div>
+  </div>
+<% end %>
+
+<!-- Current Medications Section -->
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-bold">Current Medications</h2>
+  <%= link_to new_staff_patient_medication_path(patient), class: "btn btn-primary btn-sm" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+    Add Medication
+  <% end %>
+</div>
+
+<% if medications.any? %>
+  <div class="card bg-base-100 shadow-xl">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th>Medication</th>
+            <th>Dosage</th>
+            <th>Frequency</th>
+            <th>Route</th>
+            <th>Start Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% medications.each do |med| %>
+            <tr>
+              <td class="font-medium"><%= med.name %></td>
+              <td><%= med.dosage || "--" %></td>
+              <td><%= med.frequency || "--" %></td>
+              <td><%= med.route || "--" %></td>
+              <td><%= med.start_date&.strftime("%b %d, %Y") || "--" %></td>
+              <td>
+                <% if med.active? %>
+                  <span class="badge badge-success badge-sm">Active</span>
+                <% else %>
+                  <span class="badge badge-ghost badge-sm">Discontinued</span>
+                <% end %>
+              </td>
+              <td>
+                <%= link_to "Edit", edit_staff_patient_medication_path(patient, med), class: "btn btn-ghost btn-xs" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body items-center text-center py-8">
+      <p class="text-base-content/60">No medications recorded.</p>
+    </div>
+  </div>
+<% end %>

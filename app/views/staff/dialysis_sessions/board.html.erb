@@ -1,0 +1,186 @@
+<% content_for(:title, "Dialysis Unit Board") %>
+
+<div data-controller="dialysis-board">
+  <div class="breadcrumbs text-sm mb-6">
+    <ul>
+      <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+      <li><a href="<%= staff_dialysis_sessions_path %>">Dialysis Sessions</a></li>
+      <li>Unit Board</li>
+    </ul>
+  </div>
+
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-extrabold">Dialysis Unit Board</h1>
+      <p class="text-sm text-base-content/60">Live view of today's sessions &mdash; auto-refreshes every 60 seconds</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="badge badge-success badge-sm gap-1">
+        <span class="w-2 h-2 rounded-full bg-success animate-pulse inline-block"></span>
+        Live
+      </span>
+      <%= link_to new_staff_dialysis_session_path, class: "btn btn-primary btn-sm" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Schedule Session
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Summary Stats -->
+  <%
+    total_today = @today_sessions.count
+    in_progress = @today_sessions.select { |s| s.status == "in_progress" }.count
+    completed_today = @today_sessions.select { |s| s.status == "completed" }.count
+    scheduled_today = @today_sessions.select { |s| s.status == "scheduled" }.count
+  %>
+  <div class="stats stats-horizontal shadow-xl bg-base-100 w-full mb-6">
+    <div class="stat">
+      <div class="stat-title">Total Today</div>
+      <div class="stat-value text-primary"><%= total_today %></div>
+      <div class="stat-desc"><%= Date.current.strftime("%A, %b %d") %></div>
+    </div>
+    <div class="stat">
+      <div class="stat-title">In Progress</div>
+      <div class="stat-value text-warning"><%= in_progress %></div>
+      <div class="stat-desc">Active sessions</div>
+    </div>
+    <div class="stat">
+      <div class="stat-title">Completed</div>
+      <div class="stat-value text-success"><%= completed_today %></div>
+      <div class="stat-desc">Finished today</div>
+    </div>
+    <div class="stat">
+      <div class="stat-title">Scheduled</div>
+      <div class="stat-value text-info"><%= scheduled_today %></div>
+      <div class="stat-desc">Upcoming</div>
+    </div>
+  </div>
+
+  <!-- Station Grid -->
+  <h2 class="text-lg font-bold mb-4">Stations</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
+    <% @stations.each do |station| %>
+      <%
+        station_session = @today_sessions.find { |s| s.dialysis_station_id == station.id }
+        card_class = case
+        when station_session&.status == "in_progress" then "border-warning"
+        when station_session&.status == "scheduled" then "border-info"
+        when station_session&.status == "completed" then "border-success"
+        else "border-base-200"
+        end
+      %>
+      <div class="card bg-base-100 shadow-xl border-2 <%= card_class %>">
+        <div class="card-body p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-bold text-base"><%= station.name %></h3>
+            <% type_badge = station.station_type == "bed" ? "badge-secondary" : "badge-ghost" %>
+            <span class="badge <%= type_badge %> badge-xs"><%= station.station_type&.capitalize %></span>
+          </div>
+
+          <% if station_session %>
+            <%
+              status_class = case station_session.status
+              when "in_progress" then "badge-warning"
+              when "scheduled" then "badge-info"
+              when "completed" then "badge-success"
+              else "badge-ghost"
+              end
+            %>
+            <span class="badge <%= status_class %> badge-sm mb-2"><%= station_session.status&.humanize %></span>
+
+            <div class="text-sm space-y-1">
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-base-content/50 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span class="font-medium truncate"><%= station_session.patient&.full_name || "Unknown" %></span>
+              </div>
+              <div class="flex items-center gap-2 text-base-content/60">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span><%= station_session.start_time&.strftime("%H:%M") || "TBD" %></span>
+              </div>
+              <% if station_session.dialysis_machine %>
+                <div class="flex items-center gap-2 text-base-content/60">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
+                  </svg>
+                  <span class="truncate"><%= station_session.dialysis_machine.name %></span>
+                </div>
+              <% end %>
+            </div>
+
+            <% if station_session.status == "in_progress" && station_session.start_time %>
+              <div class="mt-2 pt-2 border-t border-base-200">
+                <div class="text-xs text-base-content/50 mb-1">Elapsed</div>
+                <div class="font-mono text-sm font-bold"
+                     data-controller="dialysis-timer"
+                     data-dialysis-timer-start-time-value="<%= station_session.start_time.iso8601 %>">
+                  <span data-dialysis-timer-target="display">--:--:--</span>
+                </div>
+              </div>
+            <% end %>
+
+            <div class="mt-3">
+              <%= link_to staff_dialysis_session_path(station_session), class: "btn btn-xs btn-outline btn-block" do %>
+                View Session
+              <% end %>
+            </div>
+          <% else %>
+            <div class="flex flex-col items-center justify-center py-4 text-base-content/30">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 12H4" />
+              </svg>
+              <span class="text-sm">Available</span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @stations.empty? %>
+      <div class="col-span-full">
+        <div class="card bg-base-100 shadow-xl">
+          <div class="card-body items-center text-center py-12">
+            <p class="text-base-content/60">No stations configured. <a href="<%= admin_dialysis_stations_path %>" class="link link-primary">Add stations in Admin</a>.</p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Sessions Without Stations -->
+  <% unassigned = @today_sessions.select { |s| s.dialysis_station_id.nil? } %>
+  <% if unassigned.any? %>
+    <h2 class="text-lg font-bold mb-4">Unassigned Sessions (<%= unassigned.count %>)</h2>
+    <div class="card bg-base-100 shadow-xl mb-6">
+      <div class="overflow-x-auto">
+        <table class="table table-sm">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Doctor</th>
+              <th>Start Time</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% unassigned.each do |s| %>
+              <tr class="hover">
+                <td class="font-medium"><%= s.patient&.full_name %></td>
+                <td class="text-sm text-base-content/70">Dr. <%= s.doctor&.last_name %></td>
+                <td class="text-sm"><%= s.start_time&.strftime("%H:%M") || "TBD" %></td>
+                <td><span class="badge badge-info badge-sm"><%= s.status&.humanize %></span></td>
+                <td><%= link_to "Assign", staff_dialysis_session_path(s), class: "btn btn-xs btn-primary" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+</div>

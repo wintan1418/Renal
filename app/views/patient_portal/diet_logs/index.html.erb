@@ -1,0 +1,142 @@
+<% content_for :title, "Diet & Fluid Tracker" %>
+<% content_for :head do %>
+  <%= javascript_include_tag "chartkick" %>
+  <%= javascript_include_tag "Chart.bundle" %>
+<% end %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">Diet & Fluid Tracker</h1>
+      <p class="text-base-content/60 text-sm">Monitor your daily nutrition and fluid intake</p>
+    </div>
+    <%= link_to new_patient_portal_diet_log_path, class: "btn btn-primary btn-sm" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+      Log a Meal
+    <% end %>
+  </div>
+
+  <!-- Date Navigation -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body py-4">
+      <div class="flex items-center justify-between">
+        <%= link_to patient_portal_diet_logs_path(date: (@date - 1.day).to_s), class: "btn btn-ghost btn-sm" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+          Previous
+        <% end %>
+        <div class="text-center">
+          <div class="font-bold text-lg"><%= @date.strftime("%A, %d %B %Y") %></div>
+          <% if @date == Date.current %>
+            <span class="badge badge-primary badge-sm">Today</span>
+          <% end %>
+        </div>
+        <% if @date < Date.current %>
+          <%= link_to patient_portal_diet_logs_path(date: (@date + 1.day).to_s), class: "btn btn-ghost btn-sm" do %>
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+          <% end %>
+        <% else %>
+          <div class="btn btn-ghost btn-sm btn-disabled opacity-0">Next</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fluid Intake Progress -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base">Daily Fluid Intake</h2>
+      <% fluid_goal = 1500 %>
+      <% fluid_percent = [(@daily_fluid.to_f / fluid_goal * 100).round, 100].min %>
+      <div class="flex items-center gap-4">
+        <div class="flex-1">
+          <div class="flex justify-between text-sm mb-1">
+            <span><%= @daily_fluid %>ml consumed</span>
+            <span class="text-base-content/60">Goal: <%= fluid_goal %>ml</span>
+          </div>
+          <progress class="progress <%= fluid_percent >= 100 ? 'progress-success' : fluid_percent >= 75 ? 'progress-warning' : 'progress-primary' %> w-full" value="<%= fluid_percent %>" max="100"></progress>
+        </div>
+        <div class="text-2xl font-bold <%= fluid_percent >= 100 ? 'text-success' : 'text-primary' %>">
+          <%= fluid_percent %>%
+        </div>
+      </div>
+      <% if @daily_fluid > fluid_goal %>
+        <div class="alert alert-warning py-2 text-sm">
+          Fluid intake exceeds daily limit for dialysis patients. Please consult your care team.
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Today's Meals -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base">Meals for <%= @date == Date.current ? "Today" : @date.strftime("%d %b") %></h2>
+      <% if @logs.any? %>
+        <div class="overflow-x-auto">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Meal</th>
+                <th>Fluid (ml)</th>
+                <th>Sodium (mg)</th>
+                <th>Potassium (mg)</th>
+                <th>Phosphorus (mg)</th>
+                <th>Protein (g)</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @logs.each do |log| %>
+                <tr>
+                  <td>
+                    <span class="badge badge-outline capitalize"><%= log.meal_type %></span>
+                  </td>
+                  <td><%= log.fluid_intake_ml || "-" %></td>
+                  <td><%= log.sodium_mg || "-" %></td>
+                  <td><%= log.potassium_mg || "-" %></td>
+                  <td><%= log.phosphorus_mg || "-" %></td>
+                  <td><%= log.protein_g || "-" %></td>
+                  <td class="text-sm text-base-content/60 max-w-xs truncate"><%= log.notes %></td>
+                  <td>
+                    <div class="flex gap-1">
+                      <%= link_to edit_patient_portal_diet_log_path(log), class: "btn btn-ghost btn-xs" do %>
+                        Edit
+                      <% end %>
+                      <%= link_to patient_portal_diet_log_path(log), data: { turbo_method: :delete, turbo_confirm: "Remove this entry?" }, class: "btn btn-ghost btn-xs text-error" do %>
+                        Delete
+                      <% end %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="text-center py-8 text-base-content/40">
+          <p>No meals logged for this day.</p>
+          <%= link_to new_patient_portal_diet_log_path, class: "btn btn-primary btn-sm mt-3" do %>
+            Log a Meal
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- 7-day Fluid Chart -->
+  <% if @week_logs.any? %>
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">7-Day Fluid Intake Trend</h2>
+        <%
+          week_data = @week_logs.group_by(&:log_date).transform_values { |logs| logs.sum { |l| l.fluid_intake_ml.to_i } }
+          chart_data = week_data.transform_keys { |date| date.strftime("%a %d %b") }
+        %>
+        <%= line_chart chart_data, height: "200px", colors: ["#3b82f6"], legend: false, library: { scales: { y: { beginAtZero: true } } } %>
+        <p class="text-xs text-base-content/40 text-center">Daily fluid intake in ml (goal: 1,500ml)</p>
+      </div>
+    </div>
+  <% end %>
+</div>

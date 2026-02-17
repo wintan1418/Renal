@@ -1,0 +1,79 @@
+<% content_for(:title, "Edit Allergy - #{@patient.full_name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li><a href="<%= staff_patients_path %>">Patients</a></li>
+    <li><a href="<%= chart_staff_patient_path(@patient) %>"><%= @patient.full_name %></a></li>
+    <li>Edit Allergy</li>
+  </ul>
+</div>
+
+<h1 class="text-2xl font-extrabold mb-6">Edit Allergy</h1>
+
+<div class="card bg-base-100 shadow-xl max-w-2xl">
+  <div class="card-body">
+    <%= form_with(model: @allergy, url: staff_patient_allergy_path(@patient, @allergy), method: :patch, class: "space-y-6") do |f| %>
+      <% if @allergy.errors.any? %>
+        <div class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <ul class="list-disc list-inside">
+              <% @allergy.errors.full_messages.each do |m| %>
+                <li><%= m %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="form-control w-full">
+        <%= f.label :allergen, class: "label" do %>
+          <span class="label-text">Allergen <span class="text-error">*</span></span>
+        <% end %>
+        <%= f.text_field :allergen, class: "input input-bordered w-full", required: true %>
+      </div>
+
+      <div class="form-control w-full">
+        <%= f.label :reaction, class: "label" do %>
+          <span class="label-text">Reaction</span>
+        <% end %>
+        <%= f.text_field :reaction, class: "input input-bordered w-full" %>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-control w-full">
+          <%= f.label :severity, class: "label" do %>
+            <span class="label-text">Severity</span>
+          <% end %>
+          <%= f.select :severity, Allergy.severities.keys.map { |s| [s.humanize, s] }, {}, class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control w-full">
+          <%= f.label :active, class: "label" do %>
+            <span class="label-text">Status</span>
+          <% end %>
+          <label class="label cursor-pointer justify-start gap-4 mt-2">
+            <%= f.check_box :active, class: "toggle toggle-success" %>
+            <span class="label-text">Active allergy</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-control w-full">
+        <%= f.label :notes, class: "label" do %>
+          <span class="label-text">Notes</span>
+        <% end %>
+        <%= f.text_area :notes, class: "textarea textarea-bordered w-full h-24" %>
+      </div>
+
+      <div class="flex items-center gap-3 pt-4">
+        <%= f.submit "Update Allergy", class: "btn btn-primary" %>
+        <%= link_to "Cancel", chart_staff_patient_path(@patient, tab: "diagnoses"), class: "btn btn-ghost" %>
+      </div>
+    <% end %>
+  </div>
+</div>

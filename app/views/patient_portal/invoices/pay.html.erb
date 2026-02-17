@@ -1,0 +1,78 @@
+<% content_for(:title, "Pay Invoice #{@invoice.invoice_number}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= patient_portal_root_path %>">Dashboard</a></li>
+    <li><a href="<%= patient_portal_invoices_path %>">Invoices</a></li>
+    <li><a href="<%= patient_portal_invoice_path(@invoice) %>"><%= @invoice.invoice_number %></a></li>
+    <li>Pay</li>
+  </ul>
+</div>
+
+<div class="max-w-md mx-auto">
+  <div class="text-center mb-8">
+    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-primary">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+      </svg>
+    </div>
+    <h1 class="text-2xl font-extrabold">Complete Payment</h1>
+    <p class="text-base-content/60 text-sm mt-1">Invoice <%= @invoice.invoice_number %></p>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+    <!-- Amount Due -->
+    <div class="text-center mb-6">
+      <p class="text-base-content/50 text-sm mb-1">Balance Due</p>
+      <p class="text-4xl font-extrabold text-error">₦<%= number_with_delimiter(@invoice.balance_due_cents / 100) %></p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Invoice Summary -->
+    <div class="space-y-2 text-sm mb-6">
+      <% @invoice.invoice_items.each do |item| %>
+        <div class="flex justify-between">
+          <span class="text-base-content/70"><%= item.description || item.service&.name %> &times; <%= item.quantity %></span>
+          <span>₦<%= number_with_delimiter(item.total_cents / 100) %></span>
+        </div>
+      <% end %>
+      <div class="flex justify-between font-semibold pt-2 border-t border-base-200">
+        <span>Total</span>
+        <span>₦<%= number_with_delimiter(@invoice.total_cents / 100) %></span>
+      </div>
+      <% if @invoice.amount_paid_cents > 0 %>
+        <div class="flex justify-between text-success">
+          <span>Previously Paid</span>
+          <span>-₦<%= number_with_delimiter(@invoice.amount_paid_cents / 100) %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Paystack Payment Button -->
+    <%= form_with url: initiate_payment_patient_portal_invoice_path(@invoice), method: :post do |f| %>
+      <div class="space-y-3">
+        <p class="text-xs text-base-content/50 text-center">
+          You will be redirected to Paystack to complete payment securely.
+        </p>
+        <%= f.submit "Pay ₦#{number_with_delimiter(@invoice.balance_due_cents / 100)} with Paystack",
+          class: "btn btn-primary btn-block btn-lg" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="text-center">
+    <%= link_to patient_portal_invoice_path(@invoice), class: "btn btn-ghost btn-sm" do %>
+      Back to Invoice
+    <% end %>
+  </div>
+
+  <!-- Security Note -->
+  <div class="flex items-center justify-center gap-2 mt-4 text-xs text-base-content/40">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+    </svg>
+    <span>Payments are secured and processed by Paystack</span>
+  </div>
+</div>

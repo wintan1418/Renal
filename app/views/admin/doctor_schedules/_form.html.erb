@@ -1,0 +1,73 @@
+<%= form_with(model: [:admin, doctor_schedule], class: "space-y-6") do |f| %>
+  <% if doctor_schedule.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold"><%= pluralize(doctor_schedule.errors.count, "error") %> prevented this schedule from being saved:</h3>
+        <ul class="list-disc list-inside mt-1">
+          <% doctor_schedule.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="form-control w-full">
+    <%= f.label :doctor_id, class: "label" do %>
+      <span class="label-text">Doctor <span class="text-error">*</span></span>
+    <% end %>
+    <%= f.select :doctor_id, @doctors.map { |d| ["Dr. #{d.full_name} (#{d.staff_profile&.department&.name || 'No Dept'})", d.id] }, { prompt: "Select doctor" }, class: "select select-bordered w-full", required: true %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :day_of_week, class: "label" do %>
+      <span class="label-text">Day of Week <span class="text-error">*</span></span>
+    <% end %>
+    <%= f.select :day_of_week, DoctorSchedule::DAY_NAMES.map { |k, v| [v, k] }, { prompt: "Select day" }, class: "select select-bordered w-full", required: true %>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="form-control w-full">
+      <%= f.label :start_time, class: "label" do %>
+        <span class="label-text">Start Time <span class="text-error">*</span></span>
+      <% end %>
+      <%= f.time_field :start_time, class: "input input-bordered w-full", required: true %>
+    </div>
+    <div class="form-control w-full">
+      <%= f.label :end_time, class: "label" do %>
+        <span class="label-text">End Time <span class="text-error">*</span></span>
+      <% end %>
+      <%= f.time_field :end_time, class: "input input-bordered w-full", required: true %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="form-control w-full">
+      <%= f.label :slot_duration_minutes, class: "label" do %>
+        <span class="label-text">Slot Duration (minutes)</span>
+      <% end %>
+      <%= f.number_field :slot_duration_minutes, class: "input input-bordered w-full", value: doctor_schedule.slot_duration_minutes || 30, min: 5, step: 5 %>
+    </div>
+    <div class="form-control w-full">
+      <%= f.label :max_patients, class: "label" do %>
+        <span class="label-text">Max Patients per Slot</span>
+      <% end %>
+      <%= f.number_field :max_patients, class: "input input-bordered w-full", value: doctor_schedule.max_patients || 1, min: 1 %>
+    </div>
+  </div>
+
+  <div class="form-control w-full">
+    <label class="label cursor-pointer justify-start gap-3">
+      <%= f.check_box :active, class: "toggle toggle-primary", checked: doctor_schedule.new_record? ? true : doctor_schedule.active? %>
+      <span class="label-text">Active</span>
+    </label>
+  </div>
+
+  <div class="flex items-center gap-3 pt-4">
+    <%= f.submit doctor_schedule.new_record? ? "Create Schedule" : "Update Schedule", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_doctor_schedules_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

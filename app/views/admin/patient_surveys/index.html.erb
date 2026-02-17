@@ -1,0 +1,117 @@
+<% content_for :title, "Patient Surveys" %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">Patient Surveys</h1>
+      <p class="text-base-content/60 text-sm">Patient satisfaction feedback</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="text-center">
+        <div class="text-sm text-base-content/60">Average Rating</div>
+        <div class="flex items-center gap-1">
+          <span class="text-2xl font-bold text-warning"><%= @average_rating %></span>
+          <span class="text-warning text-lg">&#9733;</span>
+          <span class="text-sm text-base-content/60">/ 5</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body p-0">
+      <div class="overflow-x-auto">
+        <table class="table table-zebra">
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Overall Rating</th>
+              <th>Doctor Rating</th>
+              <th>Staff Rating</th>
+              <th>Visit</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @surveys.each do |survey| %>
+              <tr>
+                <td>
+                  <div class="font-medium"><%= survey.patient.full_name %></div>
+                </td>
+                <td>
+                  <div class="flex items-center gap-1">
+                    <% survey.overall_rating.times do %>
+                      <span class="text-warning">&#9733;</span>
+                    <% end %>
+                    <% (5 - survey.overall_rating).times do %>
+                      <span class="text-base-content/20">&#9733;</span>
+                    <% end %>
+                    <span class="text-xs text-base-content/60 ml-1">(<%= survey.overall_rating %>)</span>
+                  </div>
+                </td>
+                <td>
+                  <% if survey.doctor_rating.present? %>
+                    <div class="flex items-center gap-0.5">
+                      <% survey.doctor_rating.times do %>
+                        <span class="text-warning text-xs">&#9733;</span>
+                      <% end %>
+                      <% (5 - survey.doctor_rating).times do %>
+                        <span class="text-base-content/20 text-xs">&#9733;</span>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <span class="text-base-content/40 text-xs">N/A</span>
+                  <% end %>
+                </td>
+                <td>
+                  <% if survey.staff_rating.present? %>
+                    <div class="flex items-center gap-0.5">
+                      <% survey.staff_rating.times do %>
+                        <span class="text-warning text-xs">&#9733;</span>
+                      <% end %>
+                      <% (5 - survey.staff_rating).times do %>
+                        <span class="text-base-content/20 text-xs">&#9733;</span>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <span class="text-base-content/40 text-xs">N/A</span>
+                  <% end %>
+                </td>
+                <td>
+                  <% if survey.visit.present? %>
+                    <span class="text-xs text-base-content/60"><%= survey.visit.visit_date.strftime("%d %b %Y") rescue "Visit" %></span>
+                  <% else %>
+                    <span class="text-base-content/40 text-xs">No visit</span>
+                  <% end %>
+                </td>
+                <td class="text-sm text-base-content/60"><%= survey.created_at.strftime("%d %b %Y") %></td>
+                <td>
+                  <div class="flex gap-1">
+                    <%= link_to admin_patient_survey_path(survey), class: "btn btn-ghost btn-xs" do %>
+                      View
+                    <% end %>
+                    <%= link_to admin_patient_survey_path(survey), data: { turbo_method: :delete, turbo_confirm: "Delete this survey?" }, class: "btn btn-ghost btn-xs text-error" do %>
+                      Delete
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+            <% if @surveys.empty? %>
+              <tr>
+                <td colspan="7" class="text-center text-base-content/40 py-8">No surveys submitted yet.</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <% if @pagy && @pagy.pages > 1 %>
+    <div class="flex justify-center">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  <% end %>
+</div>

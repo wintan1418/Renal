@@ -1,0 +1,44 @@
+<%= form_with model: [:patient_portal, contact], local: true, class: "space-y-4" do |f| %>
+  <% if contact.errors.any? %>
+    <div class="alert alert-error">
+      <ul class="list-disc list-inside">
+        <% contact.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="form-control">
+      <%= f.label :name, "Full Name", class: "label label-text font-medium" %>
+      <%= f.text_field :name, class: "input input-bordered w-full", placeholder: "Contact's full name" %>
+    </div>
+
+    <div class="form-control">
+      <%= f.label :phone, "Phone Number", class: "label label-text font-medium" %>
+      <%= f.tel_field :phone, class: "input input-bordered w-full", placeholder: "+234 800 000 0000" %>
+    </div>
+
+    <div class="form-control md:col-span-2">
+      <%= f.label :relationship, "Relationship", class: "label label-text font-medium" %>
+      <%= f.select :relationship,
+            [["Spouse", "Spouse"], ["Parent", "Parent"], ["Child", "Child"], ["Sibling", "Sibling"], ["Friend", "Friend"], ["Guardian", "Guardian"], ["Other", "Other"]],
+            { include_blank: "-- Select Relationship --" },
+            class: "select select-bordered w-full" %>
+    </div>
+
+    <div class="form-control md:col-span-2">
+      <label class="label cursor-pointer justify-start gap-3">
+        <%= f.check_box :is_primary, class: "checkbox checkbox-primary" %>
+        <span class="label-text font-medium">Set as primary emergency contact</span>
+      </label>
+      <p class="text-xs text-base-content/60 ml-10">Only one contact can be primary. Setting this will unset the current primary contact.</p>
+    </div>
+  </div>
+
+  <div class="flex gap-3 pt-2">
+    <%= f.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", patient_portal_emergency_contacts_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

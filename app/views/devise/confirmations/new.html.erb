@@ -1,0 +1,29 @@
+<% content_for(:title, "Resend Confirmation") %>
+
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 px-4">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <a href="<%= root_path %>" class="text-3xl font-bold text-primary">Healthroom</a>
+      <p class="text-base-content/60 mt-2">Resend confirmation instructions</p>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, class: "space-y-4" }) do |f| %>
+          <div class="form-control">
+            <%= f.label :email, class: "label" do %>
+              <span class="label-text font-medium">Email</span>
+            <% end %>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "you@example.com", class: "input input-bordered w-full" %>
+          </div>
+
+          <div class="form-control mt-6">
+            <%= f.submit "Resend Confirmation", class: "btn btn-primary w-full" %>
+          </div>
+        <% end %>
+
+        <%= render "devise/shared/links" %>
+      </div>
+    </div>
+  </div>
+</div>

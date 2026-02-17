@@ -1,0 +1,13 @@
+<% content_for(:title, "Add Dialysis Machine") %>
+
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Dashboard</a></li>
+    <li><a href="<%= admin_dialysis_machines_path %>">Dialysis Machines</a></li>
+    <li>Add Machine</li>
+  </ul>
+</div>
+
+<h1 class="text-2xl font-extrabold mb-6">Add Dialysis Machine</h1>
+
+<%= render "form", machine: @machine %>

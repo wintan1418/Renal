@@ -1,0 +1,53 @@
+<%= form_with(model: [:admin, department], class: "space-y-6") do |f| %>
+  <% if department.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold"><%= pluralize(department.errors.count, "error") %> prevented this department from being saved:</h3>
+        <ul class="list-disc list-inside mt-1">
+          <% department.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="form-control w-full">
+    <%= f.label :name, class: "label" do %>
+      <span class="label-text">Department Name <span class="text-error">*</span></span>
+    <% end %>
+    <%= f.text_field :name, class: "input input-bordered w-full", placeholder: "e.g. Nephrology", required: true %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :description, class: "label" do %>
+      <span class="label-text">Description</span>
+    <% end %>
+    <%= f.text_area :description, class: "textarea textarea-bordered w-full h-24", placeholder: "Brief description of this department..." %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :head_of_department_id, class: "label" do %>
+      <span class="label-text">Head of Department</span>
+    <% end %>
+    <%= f.select :head_of_department_id, User.staff.active.order(:first_name).map { |u| [u.full_name, u.id] }, { prompt: "Select Head of Department", include_blank: "None" }, class: "select select-bordered w-full" %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= f.label :active, class: "label" do %>
+      <span class="label-text">Status</span>
+    <% end %>
+    <label class="label cursor-pointer justify-start gap-3">
+      <%= f.check_box :active, class: "toggle toggle-primary" %>
+      <span class="label-text">Active</span>
+    </label>
+  </div>
+
+  <div class="flex items-center gap-3 pt-4">
+    <%= f.submit department.new_record? ? "Create Department" : "Update Department", class: "btn btn-primary" %>
+    <%= link_to "Cancel", admin_departments_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>

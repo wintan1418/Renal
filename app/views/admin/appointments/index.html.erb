@@ -1,0 +1,97 @@
+<% content_for(:title, "All Appointments") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li>Appointments</li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <h1 class="text-2xl font-extrabold">All Appointments</h1>
+</div>
+
+<!-- Filters -->
+<div class="bg-white rounded-2xl shadow-lg p-4 mb-6">
+  <%= form_with url: admin_appointments_path, method: :get, class: "flex flex-col sm:flex-row gap-3" do |f| %>
+    <div class="form-control">
+      <%= f.date_field :date, value: params[:date], class: "input input-bordered input-sm", placeholder: "Date" %>
+    </div>
+    <div class="form-control flex-1">
+      <%= f.select :doctor_id, @doctors.map { |d| ["Dr. #{d.full_name}", d.id] }, { prompt: "All Doctors" }, class: "select select-bordered select-sm w-full" %>
+    </div>
+    <div class="form-control">
+      <%= f.select :status, Appointment.statuses.keys.map { |s| [s.humanize, s] }, { prompt: "All Statuses" }, class: "select select-bordered select-sm" %>
+    </div>
+    <%= f.submit "Filter", class: "btn btn-primary btn-sm" %>
+    <% if params[:date].present? || params[:doctor_id].present? || params[:status].present? %>
+      <%= link_to "Clear", admin_appointments_path, class: "btn btn-ghost btn-sm" %>
+    <% end %>
+  <% end %>
+</div>
+
+<!-- Appointments Table -->
+<div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Patient</th>
+          <th>Doctor</th>
+          <th>Service</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @appointments.each do |appointment| %>
+          <tr class="hover">
+            <td class="text-sm text-base-content/60">#<%= appointment.id %></td>
+            <td class="font-medium"><%= appointment.scheduled_date.strftime("%b %d, %Y") %></td>
+            <td><%= appointment.start_time.strftime("%I:%M %p") %></td>
+            <td>
+              <div class="flex items-center gap-2">
+                <%= avatar_for(appointment.patient, size: "w-7 h-7", text_size: "text-xs") %>
+                <div>
+                  <div class="font-medium text-sm"><%= appointment.patient.full_name %></div>
+                  <div class="text-xs text-base-content/50"><%= appointment.patient.patient_profile&.medical_record_number %></div>
+                </div>
+              </div>
+            </td>
+            <td class="text-sm">Dr. <%= appointment.doctor.full_name %></td>
+            <td class="text-sm"><%= appointment.service.name %></td>
+            <td><span class="badge badge-outline badge-xs"><%= appointment.appointment_type.humanize %></span></td>
+            <td><%= status_badge(appointment.status, type: :appointment) %></td>
+            <td>
+              <%= link_to admin_appointment_path(appointment), class: "btn btn-ghost btn-xs" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                </svg>
+                View
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @appointments.empty? %>
+          <tr>
+            <td colspan="9" class="text-center py-8 text-base-content/60">No appointments found.</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <div class="flex justify-center mt-6">
+    <div class="join">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  </div>
+<% end %>

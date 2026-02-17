@@ -1,0 +1,28 @@
+<%= turbo_frame_tag "date_picker" do %>
+  <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold text-sm">3</div>
+      <h2 class="text-lg font-bold">Select Date</h2>
+      <span class="badge badge-primary badge-sm">Dr. <%= doctor.full_name %></span>
+    </div>
+
+    <% if available_dates.any? %>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+        <% available_dates.each do |date| %>
+          <%= link_to available_slots_patient_portal_appointments_path(doctor_id: doctor.id, date: date.to_s),
+                      data: { turbo_frame: "time_slots" },
+                      class: "border-2 border-base-200 rounded-xl p-3 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer text-center block" do %>
+            <div class="text-xs text-base-content/60 uppercase"><%= date.strftime("%a") %></div>
+            <div class="text-lg font-bold"><%= date.strftime("%d") %></div>
+            <div class="text-xs text-base-content/60"><%= date.strftime("%b %Y") %></div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-6">
+        <p class="text-base-content/60">No available dates for this doctor in the next 30 days.</p>
+        <p class="text-sm text-base-content/40 mt-1">Please try a different doctor.</p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

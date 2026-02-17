@@ -1,0 +1,185 @@
+<% content_for(:title, "Appointment ##{@appointment.id}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= admin_root_path %>">Admin</a></li>
+    <li><a href="<%= admin_appointments_path %>">Appointments</a></li>
+    <li>Appointment #<%= @appointment.id %></li>
+  </ul>
+</div>
+
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+  <h1 class="text-2xl font-extrabold">Appointment #<%= @appointment.id %></h1>
+  <%= link_to "Back to Appointments", admin_appointments_path, class: "btn btn-ghost btn-sm" %>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Main Content -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Patient Information -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h2 class="text-lg font-bold mb-4">Patient Information</h2>
+      <div class="divider mt-0"></div>
+
+      <div class="flex items-center gap-4 mb-4">
+        <%= avatar_for(@appointment.patient, size: "w-14 h-14", text_size: "text-lg") %>
+        <div>
+          <p class="text-lg font-bold"><%= @appointment.patient.full_name %></p>
+          <p class="text-sm text-base-content/60">MRN: <%= @appointment.patient.patient_profile&.medical_record_number || "N/A" %></p>
+          <p class="text-sm text-base-content/60"><%= @appointment.patient.email %></p>
+          <p class="text-sm text-base-content/60"><%= @appointment.patient.phone %></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div>
+          <p class="text-xs text-base-content/50">Age</p>
+          <p class="font-medium"><%= @appointment.patient.patient_profile&.age || "N/A" %></p>
+        </div>
+        <div>
+          <p class="text-xs text-base-content/50">Gender</p>
+          <p class="font-medium"><%= @appointment.patient.patient_profile&.gender&.humanize || "N/A" %></p>
+        </div>
+        <div>
+          <p class="text-xs text-base-content/50">Blood Group</p>
+          <p class="font-medium"><%= @appointment.patient.patient_profile&.blood_group_display || "N/A" %></p>
+        </div>
+        <div>
+          <p class="text-xs text-base-content/50">Genotype</p>
+          <p class="font-medium"><%= @appointment.patient.patient_profile&.genotype_display || "N/A" %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointment Details -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h2 class="text-lg font-bold mb-4">Appointment Details</h2>
+      <div class="divider mt-0"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-base-content/60">Date</p>
+          <p class="font-bold"><%= @appointment.scheduled_date.strftime("%A, %B %d, %Y") %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Time</p>
+          <p class="font-bold"><%= @appointment.start_time.strftime("%I:%M %p") %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Doctor</p>
+          <div class="flex items-center gap-2 mt-1">
+            <%= avatar_for(@appointment.doctor, size: "w-8 h-8", text_size: "text-xs") %>
+            <span class="font-medium">Dr. <%= @appointment.doctor.full_name %></span>
+          </div>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Service</p>
+          <p class="font-medium"><%= @appointment.service.name %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Department</p>
+          <p class="font-medium"><%= @appointment.department&.name || "N/A" %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Duration</p>
+          <p class="font-medium"><%= @appointment.duration_minutes %> minutes</p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Type</p>
+          <p class="font-medium"><%= @appointment.appointment_type.humanize %></p>
+        </div>
+        <div>
+          <p class="text-sm text-base-content/60">Queue Number</p>
+          <p class="font-bold text-primary">#<%= @appointment.queue_number %></p>
+        </div>
+      </div>
+
+      <% if @appointment.reason.present? %>
+        <div class="mt-4">
+          <p class="text-sm text-base-content/60">Reason for Visit</p>
+          <p class="mt-1"><%= @appointment.reason %></p>
+        </div>
+      <% end %>
+
+      <% if @appointment.notes.present? %>
+        <div class="mt-4">
+          <p class="text-sm text-base-content/60">Notes</p>
+          <p class="mt-1"><%= @appointment.notes %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="space-y-6">
+    <!-- Status -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h3 class="font-bold mb-3">Status</h3>
+      <div class="mb-4">
+        <%= status_badge(@appointment.status, type: :appointment) %>
+      </div>
+
+      <ul class="steps steps-vertical text-sm">
+        <li class="step <%= 'step-primary' if %w[pending confirmed checked_in in_progress completed].include?(@appointment.status) %>">
+          <div class="text-left">
+            <p class="font-medium">Booked</p>
+            <p class="text-xs text-base-content/50"><%= @appointment.created_at.strftime("%b %d, %I:%M %p") %></p>
+          </div>
+        </li>
+        <li class="step <%= 'step-primary' if %w[confirmed checked_in in_progress completed].include?(@appointment.status) %>">
+          <div class="text-left"><p class="font-medium">Confirmed</p></div>
+        </li>
+        <li class="step <%= 'step-primary' if %w[checked_in in_progress completed].include?(@appointment.status) %>">
+          <div class="text-left">
+            <p class="font-medium">Checked In</p>
+            <% if @appointment.checked_in_at.present? %>
+              <p class="text-xs text-base-content/50"><%= @appointment.checked_in_at.strftime("%b %d, %I:%M %p") %></p>
+              <% if @appointment.checked_in_by.present? %>
+                <p class="text-xs text-base-content/50">by <%= @appointment.checked_in_by.full_name %></p>
+              <% end %>
+            <% end %>
+          </div>
+        </li>
+        <li class="step <%= 'step-primary' if %w[in_progress completed].include?(@appointment.status) %>">
+          <div class="text-left"><p class="font-medium">In Progress</p></div>
+        </li>
+        <li class="step <%= 'step-primary' if @appointment.completed? %>">
+          <div class="text-left"><p class="font-medium">Completed</p></div>
+        </li>
+        <% if @appointment.cancelled? %>
+          <li class="step step-error">
+            <div class="text-left"><p class="font-medium text-error">Cancelled</p></div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <!-- Metadata -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+      <h3 class="font-bold mb-3">Metadata</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Created</span>
+          <span><%= @appointment.created_at.strftime("%b %d, %Y %I:%M %p") %></span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-base-content/60">Updated</span>
+          <span><%= @appointment.updated_at.strftime("%b %d, %Y %I:%M %p") %></span>
+        </div>
+        <% if @appointment.checked_in_at.present? %>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Checked In</span>
+            <span><%= @appointment.checked_in_at.strftime("%I:%M %p") %></span>
+          </div>
+        <% end %>
+        <% if @appointment.checked_in_by.present? %>
+          <div class="flex justify-between">
+            <span class="text-base-content/60">Checked In By</span>
+            <span><%= @appointment.checked_in_by.full_name %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,140 @@
+<% content_for(:title, "Record Vitals - #{@patient.full_name}") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= staff_root_path %>">Dashboard</a></li>
+    <li><a href="<%= staff_patients_path %>">Patients</a></li>
+    <li><a href="<%= chart_staff_patient_path(@patient) %>"><%= @patient.full_name %></a></li>
+    <li>Record Vitals</li>
+  </ul>
+</div>
+
+<h1 class="text-2xl font-extrabold mb-6">Record Vital Signs</h1>
+
+<div class="card bg-base-100 shadow-xl max-w-3xl">
+  <div class="card-body">
+    <%= form_with(model: @vital_sign, url: staff_patient_vital_signs_path(@patient), class: "space-y-6") do |f| %>
+      <% if @vital_sign.errors.any? %>
+        <div class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h3 class="font-bold"><%= pluralize(@vital_sign.errors.count, "error") %> occurred:</h3>
+            <ul class="list-disc list-inside mt-1">
+              <% @vital_sign.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @visit %>
+        <%= f.hidden_field :visit_id, value: @visit.id %>
+        <div class="alert alert-info">
+          <span>Recording vitals for Visit #<%= @visit.id %> (<%= @visit.visit_date.strftime("%b %d, %Y") %>)</span>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-control w-full">
+          <%= f.label :measurement_type, class: "label" do %>
+            <span class="label-text">Measurement Type</span>
+          <% end %>
+          <%= f.select :measurement_type, VitalSign.measurement_types.keys.map { |t| [t.humanize, t] }, {}, class: "select select-bordered w-full" %>
+        </div>
+
+        <div class="form-control w-full">
+          <%= f.label :recorded_at, class: "label" do %>
+            <span class="label-text">Recorded At</span>
+          <% end %>
+          <%= f.datetime_local_field :recorded_at, class: "input input-bordered w-full", value: Time.current.strftime("%Y-%m-%dT%H:%M") %>
+        </div>
+      </div>
+
+      <div class="divider">Blood Pressure</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-control w-full">
+          <%= f.label :systolic_bp, class: "label" do %>
+            <span class="label-text">Systolic BP (mmHg)</span>
+          <% end %>
+          <%= f.number_field :systolic_bp, class: "input input-bordered w-full", placeholder: "120", min: 1, max: 300 %>
+        </div>
+
+        <div class="form-control w-full">
+          <%= f.label :diastolic_bp, class: "label" do %>
+            <span class="label-text">Diastolic BP (mmHg)</span>
+          <% end %>
+          <%= f.number_field :diastolic_bp, class: "input input-bordered w-full", placeholder: "80", min: 1, max: 200 %>
+        </div>
+      </div>
+
+      <div class="divider">Other Measurements</div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="form-control w-full">
+          <%= f.label :heart_rate, class: "label" do %>
+            <span class="label-text">Heart Rate (bpm)</span>
+          <% end %>
+          <%= f.number_field :heart_rate, class: "input input-bordered w-full", placeholder: "72", min: 1, max: 300 %>
+        </div>
+
+        <div class="form-control w-full">
+          <%= f.label :temperature, class: "label" do %>
+            <span class="label-text">Temperature (°C)</span>
+          <% end %>
+          <%= f.number_field :temperature, class: "input input-bordered w-full", placeholder: "36.5", step: 0.1, min: 30, max: 45 %>
+        </div>
+
+        <div class="form-control w-full">
+          <%= f.label :respiratory_rate, class: "label" do %>
+            <span class="label-text">Respiratory Rate (/min)</span>
+          <% end %>
+          <%= f.number_field :respiratory_rate, class: "input input-bordered w-full", placeholder: "18", min: 1, max: 60 %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="form-control w-full">
+          <%= f.label :oxygen_saturation, class: "label" do %>
+            <span class="label-text">O2 Saturation (%)</span>
+          <% end %>
+          <%= f.number_field :oxygen_saturation, class: "input input-bordered w-full", placeholder: "98", min: 1, max: 100 %>
+        </div>
+
+        <div class="form-control w-full">
+          <%= f.label :weight_kg, class: "label" do %>
+            <span class="label-text">Weight (kg)</span>
+          <% end %>
+          <%= f.number_field :weight_kg, class: "input input-bordered w-full", placeholder: "70.0", step: 0.1, min: 0, max: 500 %>
+        </div>
+
+        <div class="form-control w-full">
+          <%= f.label :height_cm, class: "label" do %>
+            <span class="label-text">Height (cm)</span>
+          <% end %>
+          <%= f.number_field :height_cm, class: "input input-bordered w-full", placeholder: "170.0", step: 0.1, min: 0, max: 300 %>
+        </div>
+      </div>
+
+      <div class="form-control w-full">
+        <%= f.label :blood_sugar, class: "label" do %>
+          <span class="label-text">Blood Sugar (mg/dL)</span>
+        <% end %>
+        <%= f.number_field :blood_sugar, class: "input input-bordered w-full max-w-xs", placeholder: "100", step: 0.1 %>
+      </div>
+
+      <div class="flex items-center gap-3 pt-4">
+        <%= f.submit "Save Vitals", class: "btn btn-primary" %>
+        <% if @visit %>
+          <%= link_to "Cancel", staff_patient_visit_path(@patient, @visit), class: "btn btn-ghost" %>
+        <% else %>
+          <%= link_to "Cancel", chart_staff_patient_path(@patient, tab: "vitals"), class: "btn btn-ghost" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

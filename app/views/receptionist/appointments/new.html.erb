@@ -1,0 +1,108 @@
+<% content_for(:title, "New Walk-in Appointment") %>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm mb-6">
+  <ul>
+    <li><a href="<%= receptionist_root_path %>">Dashboard</a></li>
+    <li><a href="<%= receptionist_appointments_path %>">Appointments</a></li>
+    <li>New Walk-in</li>
+  </ul>
+</div>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-extrabold">New Walk-in Appointment</h1>
+  <p class="text-base-content/60 mt-1">Register a walk-in patient appointment.</p>
+</div>
+
+<div class="max-w-2xl">
+  <div class="bg-white rounded-2xl shadow-lg p-6">
+    <%= form_with model: [:receptionist, @appointment], class: "space-y-6" do |f| %>
+      <% if @appointment.errors.any? %>
+        <div class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h3 class="font-bold"><%= pluralize(@appointment.errors.count, "error") %> prevented this appointment from being saved:</h3>
+            <ul class="list-disc list-inside mt-1">
+              <% @appointment.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Patient Selection -->
+      <div class="form-control w-full">
+        <%= f.label :patient_id, class: "label" do %>
+          <span class="label-text">Patient <span class="text-error">*</span></span>
+        <% end %>
+        <%= f.select :patient_id, @patients.map { |p| ["#{p.full_name} (#{p.patient_profile&.medical_record_number || p.email})", p.id] }, { prompt: "Search and select patient..." }, class: "select select-bordered w-full", required: true %>
+      </div>
+
+      <!-- Doctor Selection -->
+      <div class="form-control w-full">
+        <%= f.label :doctor_id, class: "label" do %>
+          <span class="label-text">Doctor <span class="text-error">*</span></span>
+        <% end %>
+        <%= f.select :doctor_id, @doctors.map { |d| ["Dr. #{d.full_name} (#{d.staff_profile&.department&.name || 'No Dept'})", d.id] }, { prompt: "Select doctor" }, class: "select select-bordered w-full", required: true %>
+      </div>
+
+      <!-- Service Selection -->
+      <div class="form-control w-full">
+        <%= f.label :service_id, class: "label" do %>
+          <span class="label-text">Service <span class="text-error">*</span></span>
+        <% end %>
+        <%= f.select :service_id, @services.map { |s| ["#{s.name} - #{format_naira(s.price_cents)} (#{s.duration_minutes} min)", s.id] }, { prompt: "Select service" }, class: "select select-bordered w-full", required: true %>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Date -->
+        <div class="form-control w-full">
+          <%= f.label :scheduled_date, class: "label" do %>
+            <span class="label-text">Date <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.date_field :scheduled_date, class: "input input-bordered w-full", value: @appointment.scheduled_date || Date.current, required: true %>
+        </div>
+
+        <!-- Time -->
+        <div class="form-control w-full">
+          <%= f.label :start_time, class: "label" do %>
+            <span class="label-text">Time <span class="text-error">*</span></span>
+          <% end %>
+          <%= f.time_field :start_time, class: "input input-bordered w-full", value: @appointment.start_time || Time.current.strftime("%H:%M"), required: true %>
+        </div>
+      </div>
+
+      <!-- Appointment Type -->
+      <div class="form-control w-full">
+        <%= f.label :appointment_type, class: "label" do %>
+          <span class="label-text">Appointment Type</span>
+        <% end %>
+        <%= f.select :appointment_type, Appointment.appointment_types.keys.map { |t| [t.humanize, t] }, {}, class: "select select-bordered w-full" %>
+      </div>
+
+      <!-- Reason -->
+      <div class="form-control w-full">
+        <%= f.label :reason, class: "label" do %>
+          <span class="label-text">Reason for Visit</span>
+        <% end %>
+        <%= f.text_area :reason, class: "textarea textarea-bordered w-full h-20", placeholder: "Brief description of the reason for visit..." %>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-control w-full">
+        <%= f.label :notes, class: "label" do %>
+          <span class="label-text">Notes</span>
+        <% end %>
+        <%= f.text_area :notes, class: "textarea textarea-bordered w-full h-20", placeholder: "Any additional notes..." %>
+      </div>
+
+      <div class="flex items-center gap-3 pt-4">
+        <%= f.submit "Create Appointment", class: "btn btn-primary" %>
+        <%= link_to "Cancel", receptionist_appointments_path, class: "btn btn-ghost" %>
+      </div>
+    <% end %>
+  </div>
+</div>

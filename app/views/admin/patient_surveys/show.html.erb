@@ -1,0 +1,100 @@
+<% content_for :title, "Patient Survey" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold">Patient Survey</h1>
+      <p class="text-base-content/60 text-sm"><%= @survey.patient.full_name %> &mdash; <%= @survey.created_at.strftime("%d %B %Y") %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to admin_patient_surveys_path, class: "btn btn-sm btn-ghost" do %>
+        Back to List
+      <% end %>
+      <%= link_to admin_patient_survey_path(@survey), data: { turbo_method: :delete, turbo_confirm: "Delete this survey?" }, class: "btn btn-sm btn-error btn-outline" do %>
+        Delete
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+        <div class="bg-base-200 rounded-xl p-4">
+          <p class="text-sm text-base-content/60 mb-2">Overall Rating</p>
+          <div class="text-3xl font-bold text-warning"><%= @survey.overall_rating %>/5</div>
+          <div class="flex justify-center gap-0.5 mt-1">
+            <% @survey.overall_rating.times do %>
+              <span class="text-warning text-lg">&#9733;</span>
+            <% end %>
+            <% (5 - @survey.overall_rating).times do %>
+              <span class="text-base-content/20 text-lg">&#9733;</span>
+            <% end %>
+          </div>
+        </div>
+        <div class="bg-base-200 rounded-xl p-4">
+          <p class="text-sm text-base-content/60 mb-2">Doctor Rating</p>
+          <% if @survey.doctor_rating.present? %>
+            <div class="text-3xl font-bold text-info"><%= @survey.doctor_rating %>/5</div>
+            <div class="flex justify-center gap-0.5 mt-1">
+              <% @survey.doctor_rating.times do %>
+                <span class="text-warning text-lg">&#9733;</span>
+              <% end %>
+              <% (5 - @survey.doctor_rating).times do %>
+                <span class="text-base-content/20 text-lg">&#9733;</span>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-base-content/40 text-sm mt-2">Not rated</div>
+          <% end %>
+        </div>
+        <div class="bg-base-200 rounded-xl p-4">
+          <p class="text-sm text-base-content/60 mb-2">Staff Rating</p>
+          <% if @survey.staff_rating.present? %>
+            <div class="text-3xl font-bold text-success"><%= @survey.staff_rating %>/5</div>
+            <div class="flex justify-center gap-0.5 mt-1">
+              <% @survey.staff_rating.times do %>
+                <span class="text-warning text-lg">&#9733;</span>
+              <% end %>
+              <% (5 - @survey.staff_rating).times do %>
+                <span class="text-base-content/20 text-lg">&#9733;</span>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-base-content/40 text-sm mt-2">Not rated</div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-base-content/60">Patient</p>
+          <p class="font-semibold"><%= @survey.patient.full_name %></p>
+          <p class="text-sm text-base-content/60"><%= @survey.patient.email %></p>
+        </div>
+        <% if @survey.visit.present? %>
+          <div>
+            <p class="text-sm text-base-content/60">Related Visit</p>
+            <p class="font-semibold"><%= @survey.visit.visit_date.strftime("%d %B %Y") rescue "Visit" %></p>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @survey.comments.present? %>
+        <div class="divider"></div>
+        <div>
+          <p class="text-sm text-base-content/60 mb-2">Comments</p>
+          <div class="bg-base-200 rounded-lg p-4 text-sm italic">
+            "<%= @survey.comments %>"
+          </div>
+        </div>
+      <% end %>
+
+      <div class="divider"></div>
+      <div class="text-xs text-base-content/40">
+        Submitted: <%= @survey.created_at.strftime("%d %b %Y at %H:%M") %>
+      </div>
+    </div>
+  </div>
+</div>

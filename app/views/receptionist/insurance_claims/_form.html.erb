@@ -1,0 +1,63 @@
+<%= form_with model: [:receptionist, claim], class: "space-y-4" do |f| %>
+  <% if claim.errors.any? %>
+    <div class="alert alert-error">
+      <ul class="list-disc list-inside">
+        <% claim.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-control">
+    <%= f.label :invoice_id, "Invoice", class: "label label-text font-medium" %>
+    <%= f.select :invoice_id,
+      @invoices.map { |inv| ["#{inv.invoice_number} — #{inv.patient&.full_name} (₦#{number_with_delimiter(inv.total_cents / 100)})", inv.id] },
+      { prompt: "Select invoice..." },
+      class: "select select-bordered w-full" %>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="form-control">
+      <%= f.label :provider_name, "Insurance Provider", class: "label label-text font-medium" %>
+      <%= f.text_field :provider_name, class: "input input-bordered w-full", placeholder: "e.g. NHIS, Hygeia HMO" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :policy_number, "Policy Number", class: "label label-text font-medium" %>
+      <%= f.text_field :policy_number, class: "input input-bordered w-full" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :member_id, "Member ID", class: "label label-text font-medium" %>
+      <%= f.text_field :member_id, class: "input input-bordered w-full" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :claim_amount_cents, "Claim Amount (kobo)", class: "label label-text font-medium" %>
+      <%= f.number_field :claim_amount_cents, min: 0, step: 100, class: "input input-bordered w-full", placeholder: "0" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :approved_amount_cents, "Approved Amount (kobo)", class: "label label-text font-medium" %>
+      <%= f.number_field :approved_amount_cents, min: 0, step: 100, class: "input input-bordered w-full", placeholder: "0" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :status, "Status", class: "label label-text font-medium" %>
+      <%= f.select :status,
+        [["Submitted", "submitted"], ["Pending", "pending"], ["Approved", "approved"], ["Partially Approved", "partially_approved"], ["Rejected", "rejected"]],
+        { selected: claim.status || "submitted" },
+        class: "select select-bordered w-full" %>
+    </div>
+    <div class="form-control">
+      <%= f.label :responded_at, "Response Date", class: "label label-text font-medium" %>
+      <%= f.date_field :responded_at, class: "input input-bordered w-full" %>
+    </div>
+  </div>
+
+  <div class="form-control">
+    <%= f.label :notes, "Notes", class: "label label-text font-medium" %>
+    <%= f.text_area :notes, rows: 3, class: "textarea textarea-bordered w-full", placeholder: "Additional notes..." %>
+  </div>
+
+  <div class="flex gap-3 justify-end">
+    <%= link_to "Cancel", receptionist_insurance_claims_path, class: "btn btn-ghost" %>
+    <%= f.submit claim.new_record? ? "Submit Claim" : "Update Claim", class: "btn btn-primary" %>
+  </div>
+<% end %>

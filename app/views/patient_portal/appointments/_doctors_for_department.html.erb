@@ -1,0 +1,31 @@
+<%= turbo_frame_tag "doctors_list" do %>
+  <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center font-bold text-sm">2</div>
+      <h2 class="text-lg font-bold">Select Doctor</h2>
+      <span class="badge badge-primary badge-sm"><%= department.name %></span>
+    </div>
+
+    <% if doctors.any? %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <% doctors.each do |doctor| %>
+          <%= link_to available_dates_patient_portal_appointments_path(doctor_id: doctor.id),
+                      data: { turbo_frame: "date_picker" },
+                      class: "border-2 border-base-200 rounded-xl p-4 hover:border-primary hover:bg-primary/5 transition-all cursor-pointer text-left block" do %>
+            <div class="flex items-center gap-3">
+              <%= avatar_for(doctor, size: "w-10 h-10", text_size: "text-sm") %>
+              <div>
+                <div class="font-bold">Dr. <%= doctor.full_name %></div>
+                <% if doctor.staff_profile&.specialization.present? %>
+                  <p class="text-sm text-base-content/60"><%= doctor.staff_profile.specialization %></p>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-base-content/60">No doctors available in this department.</p>
+    <% end %>
+  </div>
+<% end %>
