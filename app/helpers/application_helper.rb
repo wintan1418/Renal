@@ -22,6 +22,24 @@ module ApplicationHelper
     end
   end
 
+  # Sidebar navigation link with automatic active-state detection.
+  # Pass the icon as a block (an inline SVG). `match:` overrides the path
+  # prefix used to decide the active state (defaults to the link path).
+  def sidebar_link(path, label, match: nil, &block)
+    match = (match || path).to_s
+    active = request.path == path || (match.length > 1 && request.path.start_with?(match))
+    classes = class_names(
+      "relative group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-150",
+      "bg-white/10 text-white before:absolute before:left-0 before:top-1/2 before:h-5 before:w-1 before:-translate-y-1/2 before:rounded-r-full before:bg-orange" => active,
+      "text-white/60 hover:bg-white/[0.06] hover:text-white" => !active
+    )
+    content_tag :li, class: "list-none" do
+      link_to path, class: classes do
+        safe_join([ capture(&block), content_tag(:span, label, class: "truncate") ])
+      end
+    end
+  end
+
   def role_badge(role)
     colors = {
       "admin" => "badge-error",
@@ -31,6 +49,15 @@ module ApplicationHelper
       "patient" => "badge-info"
     }
     content_tag :span, role.capitalize, class: "badge #{colors[role]} badge-sm"
+  end
+
+  def lab_flag_badge(flag)
+    {
+      "normal" => "badge-success",
+      "low" => "badge-warning",
+      "high" => "badge-warning",
+      "critical" => "badge-error"
+    }.fetch(flag.to_s, "badge-ghost")
   end
 
   def status_badge(status, type: :default)

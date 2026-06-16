@@ -1,51 +1,136 @@
-<% content_for(:title, "Patient Dashboard") %>
+<% content_for(:title, "Dashboard") %>
 
 <div class="space-y-6">
-  <div>
-    <h1 class="text-2xl font-bold">Welcome, <%= current_user.first_name %></h1>
-    <p class="text-base-content/60">Here's an overview of your health journey</p>
-  </div>
+  <!-- Hero greeting -->
+  <section class="bg-navy-gradient text-white overflow-hidden relative rounded-2xl shadow-card">
+    <div class="absolute -right-10 -top-10 h-48 w-48 rounded-full bg-white/5"></div>
+    <div class="absolute -right-20 bottom-0 h-40 w-40 rounded-full bg-accent/20 blur-2xl"></div>
+    <div class="relative px-6 py-7 sm:px-8 sm:py-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
+      <div>
+        <p class="text-sm font-medium text-white/60"><%= Date.current.strftime("%A, %B %-d, %Y") %></p>
+        <h1 class="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight">
+          Welcome back, <%= current_user.first_name %>
+        </h1>
+        <p class="mt-1.5 text-white/70 max-w-md">Here's a snapshot of your care — appointments, results, and anything that needs your attention.</p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <%= link_to new_patient_portal_appointment_path, class: "btn btn-accent shadow-pop" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+          Book appointment
+        <% end %>
+        <%= link_to patient_portal_conversations_path, class: "btn bg-white/10 text-white border-0 hover:bg-white/20" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+          Message care team
+        <% end %>
+      </div>
+    </div>
+  </section>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="stat bg-base-100 rounded-box shadow">
-      <div class="stat-title">Upcoming Appointments</div>
-      <div class="stat-value text-primary">0</div>
-      <div class="stat-desc">Next appointment: --</div>
-    </div>
-    <div class="stat bg-base-100 rounded-box shadow">
-      <div class="stat-title">Lab Results</div>
-      <div class="stat-value text-secondary">0</div>
-      <div class="stat-desc">Pending results</div>
-    </div>
-    <div class="stat bg-base-100 rounded-box shadow">
-      <div class="stat-title">Prescriptions</div>
-      <div class="stat-value text-accent">0</div>
-      <div class="stat-desc">Active prescriptions</div>
-    </div>
-    <div class="stat bg-base-100 rounded-box shadow">
-      <div class="stat-title">Outstanding Balance</div>
-      <div class="stat-value text-error">₦0</div>
-      <div class="stat-desc">Unpaid invoices</div>
-    </div>
-  </div>
+  <!-- Stat cards -->
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <%= render "shared/stat_card",
+        label: "Upcoming Appointments",
+        value: @stats[:upcoming],
+        desc: @next_appointment ? "Next: #{@next_appointment.scheduled_date.strftime('%b %-d')}" : "None scheduled",
+        href: patient_portal_appointments_path,
+        tone: "primary",
+        icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" %>
 
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <div class="card bg-base-100 shadow">
+    <%= render "shared/stat_card",
+        label: "Recent Lab Results",
+        value: @stats[:pending_labs],
+        desc: "Latest reports",
+        href: patient_portal_lab_results_path,
+        tone: "secondary",
+        icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" %>
+
+    <%= render "shared/stat_card",
+        label: "Active Prescriptions",
+        value: @stats[:active_prescriptions],
+        desc: "Current medications",
+        href: patient_portal_prescriptions_path,
+        tone: "accent",
+        icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" %>
+
+    <%= render "shared/stat_card",
+        label: "Outstanding Balance",
+        value: format_naira(@stats[:outstanding_cents]),
+        desc: @unpaid_invoices.any? ? "#{@unpaid_invoices.size} unpaid invoice#{'s' if @unpaid_invoices.size != 1}" : "All settled",
+        href: patient_portal_invoices_path,
+        tone: @stats[:outstanding_cents].to_i.positive? ? "error" : "success",
+        icon: "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" %>
+  </section>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Upcoming appointments -->
+    <div class="lg:col-span-2 card">
       <div class="card-body">
-        <h2 class="card-title">Upcoming Appointments</h2>
-        <div class="text-center py-8 text-base-content/40">
-          <p>No upcoming appointments</p>
-          <a href="#" class="btn btn-primary btn-sm mt-4">Book Appointment</a>
+        <div class="flex items-center justify-between">
+          <h2 class="card-title">Upcoming appointments</h2>
+          <%= link_to "View all", patient_portal_appointments_path, class: "text-sm font-semibold text-secondary hover:underline" %>
         </div>
+
+        <% if @upcoming_appointments.any? %>
+          <ul class="mt-2 divide-y divide-base-200">
+            <% @upcoming_appointments.each do |appt| %>
+              <li>
+                <%= link_to patient_portal_appointment_path(appt), class: "flex items-center gap-4 py-3.5 group" do %>
+                  <div class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-primary/5 text-primary shrink-0">
+                    <span class="text-[0.65rem] font-bold uppercase tracking-wide"><%= appt.scheduled_date.strftime("%b") %></span>
+                    <span class="text-xl font-extrabold leading-none"><%= appt.scheduled_date.strftime("%-d") %></span>
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <p class="font-semibold truncate">Dr. <%= appt.doctor.full_name %></p>
+                    <p class="text-sm text-base-content/60 truncate">
+                      <%= appt.service&.name || appt.department&.name || "Consultation" %>
+                      &middot; <%= appt.start_time.strftime("%-I:%M %p") %>
+                    </p>
+                  </div>
+                  <%= status_badge(appt.status, type: :appointment) %>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-base-content/30 group-hover:text-base-content/60 transition-colors"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <%= render "shared/empty",
+              icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+              title: "No upcoming appointments",
+              body: "Book a visit with one of our specialists.",
+              cta_label: "Book appointment",
+              cta_href: new_patient_portal_appointment_path %>
+        <% end %>
       </div>
     </div>
 
-    <div class="card bg-base-100 shadow">
+    <!-- Recent lab results -->
+    <div class="card">
       <div class="card-body">
-        <h2 class="card-title">Recent Lab Results</h2>
-        <div class="text-center py-8 text-base-content/40">
-          <p>No lab results yet</p>
+        <div class="flex items-center justify-between">
+          <h2 class="card-title">Recent results</h2>
+          <%= link_to "View all", patient_portal_lab_results_path, class: "text-sm font-semibold text-secondary hover:underline" %>
         </div>
+
+        <% if @recent_lab_results.any? %>
+          <ul class="mt-2 space-y-3">
+            <% @recent_lab_results.each do |result| %>
+              <li>
+                <%= link_to patient_portal_lab_result_path(result), class: "flex items-center justify-between gap-3 group" do %>
+                  <div class="min-w-0">
+                    <p class="font-medium text-sm truncate group-hover:text-secondary transition-colors"><%= result.lab_test&.name || "Lab test" %></p>
+                    <p class="text-xs text-base-content/50"><%= result.result_date&.strftime("%b %-d, %Y") %></p>
+                  </div>
+                  <span class="badge <%= lab_flag_badge(result.flag) %> badge-sm shrink-0"><%= result.flag.to_s.humanize %></span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <%= render "shared/empty",
+              icon: "M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z",
+              title: "No results yet",
+              body: "Your lab reports will appear here once available." %>
+        <% end %>
       </div>
     </div>
   </div>

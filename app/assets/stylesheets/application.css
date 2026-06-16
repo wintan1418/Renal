@@ -9,19 +9,7 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
-/* ═══════════════════════════════════════════════════════════════
-   GOOGLE FONTS
-   ═══════════════════════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
-/* ═══════════════════════════════════════════════════════════════
-   DAISY UI THEME OVERRIDES
-   ═══════════════════════════════════════════════════════════════ */
-[data-theme="corporate"] {
-  --su: 72.2% 0.198 149.58;
-  --er: 63.29% 0.2172 25.33;
-  --wa: 79.86% 0.1624 81.8;
-}
+/* Inter is loaded via <link> in layouts/_head.erb (see design system). */
 
 /* ═══════════════════════════════════════════════════════════════
    HEALTHROOM BRAND PALETTE

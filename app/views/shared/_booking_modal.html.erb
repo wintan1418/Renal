@@ -1,0 +1,120 @@
+<% booking_services = Service.active.order(:service_type, :name).limit(8) %>
+<% booking_doctors = User.doctors.active.includes(:staff_profile) %>
+<% times = ["09:00 AM", "10:30 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM"] %>
+<% reasons = ["New patient", "Follow-up", "Dialysis session", "Second opinion", "Emergency"] %>
+
+<div class="mk-overlay" data-marketing-booking-target="modal" data-action="click->marketing-booking#close" hidden>
+  <div class="mk-sheet" data-action="click->marketing-booking#stop">
+    <div class="mk-sheet__head">
+      <div>
+        <div class="mk-sheet__title">Book an appointment</div>
+        <div style="font-size:13px;color:var(--mk-muted-2);margin-top:2px" data-marketing-booking-target="stepLabel">Step 1 of 3 · Select a service</div>
+      </div>
+      <button class="mk-sheet__close" data-action="marketing-booking#close" aria-label="Close">✕</button>
+    </div>
+
+    <div class="mk-progress"><div class="mk-progress__bar" style="width:33%" data-marketing-booking-target="progressBar"></div></div>
+
+    <div class="mk-sheet__body">
+      <!-- hidden fields -->
+      <input type="hidden" data-marketing-booking-target="serviceField">
+      <input type="hidden" data-marketing-booking-target="doctorField" value="No preference">
+      <input type="hidden" data-marketing-booking-target="timeField">
+
+      <!-- STEP 1: service -->
+      <div data-marketing-booking-target="panel" data-step="1" class="mk-pg">
+        <div style="font-weight:700;font-size:16px;color:var(--mk-ink);margin-bottom:6px">What do you need help with?</div>
+        <div style="font-size:14px;color:var(--mk-muted-2);margin-bottom:20px">Select a service to continue.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <% booking_services.each do |s| %>
+            <% v = service_visual(s) %>
+            <div class="mk-opt-card" data-name="<%= s.name %>" data-action="click->marketing-booking#selectService">
+              <span class="mk-icchip mk-icchip--sm <%= v[:tint] %>"><%= mk_icon v[:icon], size: 20 %></span>
+              <div style="font-weight:600;font-size:14.5px;color:var(--mk-ink);line-height:1.2"><%= s.name %></div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- STEP 2: doctor + date + time -->
+      <div data-marketing-booking-target="panel" data-step="2" class="mk-pg" hidden>
+        <div style="font-weight:700;font-size:16px;color:var(--mk-ink);margin-bottom:6px">Choose a doctor &amp; time</div>
+        <div style="font-size:14px;color:var(--mk-muted-2);margin-bottom:20px">Pick a preferred specialist, date and time slot.</div>
+        <div class="mk-label">Preferred doctor</div>
+        <div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:24px">
+          <button type="button" class="mk-pill is-sel" data-name="No preference" data-action="marketing-booking#selectDoctor">No preference</button>
+          <% booking_doctors.each do |d| %>
+            <button type="button" class="mk-pill" data-name="Dr. <%= d.full_name %>" data-action="marketing-booking#selectDoctor">Dr. <%= d.full_name %></button>
+          <% end %>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+          <div>
+            <div class="mk-label">Preferred date</div>
+            <input type="date" class="mk-input" data-marketing-booking-target="dateField" data-action="change->marketing-booking#validate">
+          </div>
+          <div>
+            <div class="mk-label">Reason for visit</div>
+            <select class="mk-select" data-marketing-booking-target="reasonField">
+              <% reasons.each { |r| %><option value="<%= r %>"><%= r %></option><% } %>
+            </select>
+          </div>
+        </div>
+        <div class="mk-label" style="margin:22px 0 10px">Available time slots</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <% times.each do |t| %>
+            <button type="button" class="mk-time" data-value="<%= t %>" data-action="marketing-booking#selectTime"><%= t %></button>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- STEP 3: details -->
+      <div data-marketing-booking-target="panel" data-step="3" class="mk-pg" hidden>
+        <div style="font-weight:700;font-size:16px;color:var(--mk-ink);margin-bottom:6px">Your details</div>
+        <div style="font-size:14px;color:var(--mk-muted-2);margin-bottom:20px">We'll use these to confirm your appointment.</div>
+        <div style="display:grid;gap:16px">
+          <div>
+            <div class="mk-label">Full name *</div>
+            <input class="mk-input" placeholder="e.g. Adaeze Okonkwo" data-marketing-booking-target="nameField" data-action="input->marketing-booking#validate">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+              <div class="mk-label">Phone *</div>
+              <input class="mk-input" placeholder="+234 ..." data-marketing-booking-target="phoneField" data-action="input->marketing-booking#validate">
+            </div>
+            <div>
+              <div class="mk-label">Email</div>
+              <input class="mk-input" placeholder="you@email.com" data-marketing-booking-target="emailField">
+            </div>
+          </div>
+          <div>
+            <div class="mk-label">Notes (optional)</div>
+            <textarea class="mk-textarea" style="min-height:90px" placeholder="Anything we should know before your visit?" data-marketing-booking-target="notesField"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: confirmation -->
+      <div data-marketing-booking-target="panel" data-step="4" class="mk-pg" style="text-align:center;padding:18px 0 8px" hidden>
+        <div class="mk-confirm-icon"><%= mk_icon :check, size: 36, stroke: "var(--mk-teal)", width: 2.4 %></div>
+        <div style="font-family:var(--mk-display);font-weight:800;font-size:24px;color:var(--mk-navy)">Appointment requested!</div>
+        <p style="font-size:15px;color:var(--mk-muted);margin-top:10px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.6">Thank you, <strong data-marketing-booking-target="confName">there</strong>. Our team will call <strong data-marketing-booking-target="confPhone">your number</strong> shortly to confirm.</p>
+        <div class="mk-summary" style="margin-top:26px">
+          <div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--mk-muted-2)">Service</span><span style="font-size:14px;font-weight:600;color:var(--mk-ink)" data-marketing-booking-target="sumService">—</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--mk-muted-2)">Doctor</span><span style="font-size:14px;font-weight:600;color:var(--mk-ink)" data-marketing-booking-target="sumDoctor">No preference</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="font-size:13px;color:var(--mk-muted-2)">Date &amp; time</span><span style="font-size:14px;font-weight:600;color:var(--mk-ink)" data-marketing-booking-target="sumWhen">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- footer nav -->
+    <div class="mk-sheet__foot">
+      <button class="mk-btn mk-btn--outline" data-marketing-booking-target="backBtn" data-action="marketing-booking#prev" style="visibility:hidden">← Back</button>
+      <div style="display:flex;gap:10px;margin-left:auto">
+        <button class="mk-btn mk-btn--teal" data-marketing-booking-target="continue1" data-action="marketing-booking#next" data-step-btn="1" disabled>Continue →</button>
+        <button class="mk-btn mk-btn--teal" data-marketing-booking-target="continue2" data-action="marketing-booking#next" data-step-btn="2" disabled hidden>Continue →</button>
+        <button class="mk-btn mk-btn--teal" data-marketing-booking-target="submitBtn" data-action="marketing-booking#submit" data-step-btn="3" disabled hidden>Confirm booking</button>
+        <button class="mk-btn mk-btn--teal" data-action="marketing-booking#close" data-step-btn="4" hidden>Done</button>
+      </div>
+    </div>
+  </div>
+</div>

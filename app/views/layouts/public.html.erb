@@ -1,260 +1,126 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="corporate">
+<html lang="en">
   <head>
-    <title><%= page_title(content_for(:title)) %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="<%= content_for(:meta_description) || 'Healthroom Renal Centre - Expert kidney care in Nigeria' %>">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.14/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
+    <%= render "layouts/head" %>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Schibsted+Grotesk:wght@500;600;700;800;900&family=Spectral:ital,wght@0,600;1,500;1,600&display=swap" rel="stylesheet">
+    <%= stylesheet_link_tag "marketing", "data-turbo-track": "reload" %>
   </head>
 
-  <body class="min-h-screen bg-base-100" style="font-family: 'Inter', system-ui, -apple-system, sans-serif;">
+  <body class="mk">
     <% content_for(:title) { "Healthroom Renal Centre" } unless content_for?(:title) %>
+    <% nav = [["Home", root_path], ["Services", public_services_path], ["Our Doctors", doctors_path], ["About", about_path], ["Blog", blog_posts_path], ["Contact", contact_path]] %>
+    <% active = ->(path) { request.path == path || (path != "/" && request.path.start_with?(path)) } %>
 
-    <div class="min-h-screen flex flex-col bg-base-100">
-      <!-- Navbar -->
-      <header class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-        <div class="navbar max-w-7xl mx-auto px-4 sm:px-6 h-16">
-          <!-- Mobile hamburger -->
-          <div class="navbar-start">
-            <div class="dropdown">
-              <label tabindex="0" class="btn btn-ghost lg:hidden btn-sm" aria-label="Open navigation menu">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
-                </svg>
-              </label>
-              <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-lg bg-white rounded-2xl w-56 border border-gray-100">
-                <li><%= link_to "Home", root_path, class: "text-gray-700 font-medium" %></li>
-                <li><%= link_to "About", about_path, class: "text-gray-700 font-medium" %></li>
-                <li><%= link_to "Services", public_services_path, class: "text-gray-700 font-medium" %></li>
-                <li><%= link_to "Our Doctors", doctors_path, class: "text-gray-700 font-medium" %></li>
-                <li><%= link_to "Blog", blog_posts_path, class: "text-gray-700 font-medium" %></li>
-                <li><%= link_to "Contact", contact_path, class: "text-gray-700 font-medium" %></li>
-                <% if user_signed_in? %>
-                  <li class="mt-2 border-t border-gray-100 pt-2">
-                    <% dashboard = case current_user.role
-                      when "admin" then admin_root_path
-                      when "doctor", "nurse" then staff_root_path
-                      when "receptionist" then receptionist_root_path
-                      when "patient" then patient_portal_root_path
-                      else root_path
-                    end %>
-                    <%= link_to "Dashboard", dashboard, class: "text-gray-700 font-medium" %>
-                  </li>
-                <% else %>
-                  <li class="mt-2 border-t border-gray-100 pt-2">
-                    <%= link_to "Sign In", new_user_session_path, class: "text-gray-700 font-medium" %>
-                  </li>
-                  <li>
-                    <%= link_to "Book Appointment", contact_path, class: "hr-nav-cta text-center mt-1" %>
-                  </li>
-                <% end %>
-              </ul>
-            </div>
+    <div data-controller="marketing-booking">
+      <!-- ===================== NAV ===================== -->
+      <header class="mk-nav">
+        <div class="mk-nav__inner">
+          <%= link_to root_path, class: "mk-brand" do %>
+            <span class="mk-brand__mark"><%= mk_icon :droplet, size: 20, stroke: "#fff", width: 2 %></span>
+            <span style="display:flex;flex-direction:column;line-height:1">
+              <span class="mk-brand__name">Healthroom</span>
+              <span class="mk-brand__sub">Renal Centre</span>
+            </span>
+          <% end %>
 
-            <!-- Brand -->
-            <%= link_to root_path, class: "flex items-center gap-2 hover:opacity-90 transition-opacity" do %>
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: var(--hr-teal)">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-              </div>
-              <span class="text-lg font-bold tracking-tight" style="color: var(--hr-navy)">HealthRoom</span>
+          <nav class="mk-navlinks">
+            <% nav.each do |label, path| %>
+              <%= link_to label, path, class: class_names("mk-navlink", "is-active" => active.call(path)) %>
             <% end %>
-          </div>
+          </nav>
 
-          <!-- Desktop navigation links -->
-          <div class="navbar-center hidden lg:flex">
-            <ul class="flex items-center gap-1">
-              <% nav_links = [
-                ["Home", root_path],
-                ["About", about_path],
-                ["Services", public_services_path],
-                ["Our Doctors", doctors_path],
-                ["Blog", blog_posts_path],
-                ["Contact", contact_path]
-              ] %>
-              <% nav_links.each do |label, path| %>
-                <li>
-                  <%= link_to label, path, class: "px-3 py-2 text-sm font-medium rounded-lg transition-colors #{request.path == path || (label == 'Blog' && request.path.start_with?('/blog')) ? 'font-semibold' : 'text-gray-500 hover:text-gray-900'}", style: "#{request.path == path || (label == 'Blog' && request.path.start_with?('/blog')) ? 'color: var(--hr-navy)' : ''}" %>
-                </li>
-              <% end %>
-            </ul>
-          </div>
-
-          <!-- Right side -->
-          <div class="navbar-end flex items-center gap-3">
+          <div class="mk-nav__actions">
             <% if user_signed_in? %>
               <% dashboard = case current_user.role
-                when "admin" then admin_root_path
-                when "doctor", "nurse" then staff_root_path
-                when "receptionist" then receptionist_root_path
-                when "patient" then patient_portal_root_path
-                else root_path
-              end %>
-              <%= link_to "Dashboard", dashboard, class: "hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors" %>
-              <div class="dropdown dropdown-end">
-                <label tabindex="0" class="cursor-pointer">
-                  <%= avatar_for(current_user, size: "w-9 h-9", text_size: "text-xs") %>
-                </label>
-                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow-lg bg-white rounded-2xl w-52 border border-gray-100">
-                  <li class="px-3 py-2">
-                    <span class="text-gray-800 font-semibold text-sm block"><%= current_user.full_name %></span>
-                    <span class="text-gray-400 text-xs"><%= current_user.email %></span>
-                  </li>
-                  <li class="border-t border-gray-100 mt-1 pt-1">
-                    <%= link_to "Dashboard", dashboard, class: "text-gray-700" %>
-                  </li>
-                  <li><%= link_to "Profile", edit_user_registration_path, class: "text-gray-700" %></li>
-                  <li><%= link_to "Sign Out", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-gray-700" %></li>
-                </ul>
-              </div>
+                   when "admin" then admin_root_path
+                   when "doctor", "nurse" then staff_root_path
+                   when "receptionist" then receptionist_root_path
+                   else patient_portal_root_path end %>
+              <details class="mk-usermenu" style="position:relative">
+                <summary style="list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px">
+                  <span class="mk-avatar"><%= current_user.initials %></span>
+                </summary>
+                <div class="mk-glass-card" style="position:absolute;right:0;top:48px;width:220px;padding:8px;z-index:60;border:1px solid var(--mk-line)">
+                  <div style="padding:10px 12px"><div style="font-weight:700;font-size:14px;color:var(--mk-ink)"><%= current_user.full_name %></div><div style="font-size:12px;color:var(--mk-muted-2);overflow:hidden;text-overflow:ellipsis"><%= current_user.email %></div></div>
+                  <div style="border-top:1px solid var(--mk-line);margin:4px 0"></div>
+                  <%= link_to "Dashboard", dashboard, style: "display:block;padding:10px 12px;border-radius:9px;font-size:14px;font-weight:600;color:var(--mk-ink);text-decoration:none" %>
+                  <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "mk-navlink", style: "width:100%;text-align:left;padding:10px 12px;background:none;border:none;cursor:pointer" %>
+                </div>
+              </details>
             <% else %>
-              <%= link_to "Sign In", new_user_session_path, class: "hidden sm:inline-flex text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors" %>
-              <%= link_to "Book Appointment", contact_path, class: "hr-nav-cta" %>
+              <%= link_to "Sign In", new_user_session_path, class: "mk-nav__signin" %>
             <% end %>
+            <button class="mk-btn mk-btn--cta" data-action="marketing-booking#open">Book Appointment</button>
+            <button class="mk-burger" data-action="marketing-booking#toggleNav" aria-label="Menu">
+              <%= mk_icon :menu, size: 20, stroke: "oklch(0.3 0.03 165)", width: 2 %>
+            </button>
           </div>
+        </div>
+        <div class="mk-mobile-nav" data-marketing-booking-target="mobileNav" hidden>
+          <% nav.each do |label, path| %>
+            <%= link_to label, path %>
+          <% end %>
+          <% unless user_signed_in? %>
+            <%= link_to "Sign In", new_user_session_path %>
+          <% end %>
         </div>
       </header>
 
-      <!-- Flash Messages -->
-      <div class="max-w-7xl mx-auto w-full px-4 mt-4">
-        <%= render "shared/flash" %>
-      </div>
+      <!-- Flash -->
+      <% if flash.any? %>
+        <div class="mk-wrap" style="padding-top:18px"><%= render "shared/flash" %></div>
+      <% end %>
 
-      <!-- Main Content -->
-      <main class="flex-1">
-        <%= yield %>
-      </main>
+      <main><%= yield %></main>
 
-      <!-- Footer -->
-      <footer class="hr-footer mt-auto">
-        <!-- Main footer content -->
-        <div class="max-w-7xl mx-auto px-4 py-12">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <!-- Brand & Description -->
-            <div class="space-y-4">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background-color: var(--hr-teal)">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </div>
-                <span class="text-lg font-bold text-white">Healthroom Renal Centre</span>
-              </div>
-              <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.6)">
-                Providing world-class kidney care and dialysis services in Nigeria.
-                Your health is our priority, and we are committed to delivering compassionate,
-                expert renal treatment.
-              </p>
+      <!-- ===================== FOOTER ===================== -->
+      <footer class="mk-footer">
+        <div class="mk-footer__grid">
+          <div>
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px">
+              <span class="mk-brand__mark"><%= mk_icon :droplet, size: 20, stroke: "#fff", width: 2 %></span>
+              <span style="font-family:var(--mk-display);font-weight:800;font-size:19px;color:#fff">Healthroom Renal Centre</span>
             </div>
-
-            <!-- Quick Links -->
-            <div>
-              <h6 class="text-sm uppercase tracking-wider mb-4 font-semibold" style="color: rgba(255,255,255,0.4)">Quick Links</h6>
-              <ul class="space-y-2 text-sm">
-                <li><%= link_to "About Us", about_path %></li>
-                <li><%= link_to "Our Services", public_services_path %></li>
-                <li><%= link_to "Our Doctors", doctors_path %></li>
-                <li><%= link_to "Testimonials", testimonials_path %></li>
-                <li><%= link_to "Blog", blog_posts_path %></li>
-                <li><%= link_to "Contact Us", contact_path %></li>
-              </ul>
+            <p style="font-size:14px;line-height:1.65;max-width:300px">Providing world-class kidney care and dialysis services in Nigeria. Your health is our priority — compassionate, expert renal treatment.</p>
+          </div>
+          <div>
+            <div class="mk-footer__head">Quick Links</div>
+            <div class="mk-footer__links">
+              <%= link_to "About Us", about_path %>
+              <%= link_to "Our Services", public_services_path %>
+              <%= link_to "Our Doctors", doctors_path %>
+              <%= link_to "Blog", blog_posts_path %>
+              <%= link_to "Contact Us", contact_path %>
             </div>
-
-            <!-- Services -->
-            <div>
-              <h6 class="text-sm uppercase tracking-wider mb-4 font-semibold" style="color: rgba(255,255,255,0.4)">Services</h6>
-              <ul class="space-y-2 text-sm" style="color: rgba(255,255,255,0.6)">
-                <li>Haemodialysis</li>
-                <li>Peritoneal Dialysis</li>
-                <li>Kidney Transplant Evaluation</li>
-                <li>Nephrology Consultation</li>
-                <li>Laboratory Services</li>
-                <li>Nutrition Counselling</li>
-              </ul>
+          </div>
+          <div>
+            <div class="mk-footer__head">Services</div>
+            <div class="mk-footer__links">
+              <%= link_to "Haemodialysis", public_services_path %>
+              <%= link_to "Peritoneal Dialysis", public_services_path %>
+              <%= link_to "Transplant Evaluation", public_services_path %>
+              <%= link_to "Nephrology Consultation", public_services_path %>
+              <%= link_to "Nutrition Counselling", public_services_path %>
             </div>
-
-            <!-- Contact Info -->
-            <div>
-              <h6 class="text-sm uppercase tracking-wider mb-4 font-semibold" style="color: rgba(255,255,255,0.4)">Contact Us</h6>
-              <ul class="space-y-3 text-sm" style="color: rgba(255,255,255,0.6)">
-                <li class="flex items-start gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mt-0.5 shrink-0" style="color: var(--hr-teal-light)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span><%= current_hospital.address.presence || "Lagos, Nigeria" %></span>
-                </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" style="color: var(--hr-teal-light)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                  </svg>
-                  <span><%= current_hospital.phone.presence || "+234 800 000 0000" %></span>
-                </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" style="color: var(--hr-teal-light)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <span><%= current_hospital.email.presence || "info@healthroom.ng" %></span>
-                </li>
-                <li class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" style="color: var(--hr-teal-light)" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>Mon - Sat: 8:00 AM - 6:00 PM</span>
-                </li>
-              </ul>
-
-              <!-- Social Links -->
-              <div class="flex gap-3 mt-4">
-                <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-all" style="background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5)" aria-label="Facebook">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                  </svg>
-                </a>
-                <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-all" style="background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5)" aria-label="Twitter">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </a>
-                <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-all" style="background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5)" aria-label="Instagram">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-                  </svg>
-                </a>
-                <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-all" style="background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5)" aria-label="LinkedIn">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                </a>
-              </div>
+          </div>
+          <div>
+            <div class="mk-footer__head">Contact Us</div>
+            <div class="mk-footer__links" style="gap:13px">
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:oklch(0.6 0.1 162)">◷</span><%= current_hospital.address.presence || "15 Medical Drive, Victoria Island" %></div>
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:oklch(0.6 0.1 162)">✆</span><%= current_hospital.phone.presence || "+234 800 HEALTH" %></div>
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:oklch(0.6 0.1 162)">✉</span><%= current_hospital.email.presence || "info@healthroom.ng" %></div>
+              <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:oklch(0.6 0.1 162)">◔</span>Mon – Sat: 8:00 AM – 6:00 PM</div>
             </div>
           </div>
         </div>
-
-        <!-- Bottom bar -->
-        <div style="border-top: 1px solid rgba(255,255,255,0.08)">
-          <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-sm" style="color: rgba(255,255,255,0.4)">
-            <p>&copy; <%= Date.current.year %> Healthroom Renal Centre. All rights reserved.</p>
-            <div class="flex gap-4">
-              <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
-            </div>
-          </div>
+        <div class="mk-footer__bar">
+          <span>© <%= Date.current.year %> Healthroom Renal Centre. All rights reserved.</span>
+          <span style="display:flex;gap:20px"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></span>
         </div>
       </footer>
+
+      <!-- ===================== BOOKING MODAL ===================== -->
+      <%= render "shared/booking_modal" %>
     </div>
   </body>
 </html>

@@ -1,0 +1,18 @@
+<%#
+  Reusable empty-state block.
+  locals: icon: (SVG path d), title:, body: (optional), cta_label: (optional), cta_href: (optional)
+%>
+<div class="flex flex-col items-center justify-center text-center py-10 px-4">
+  <div class="flex h-14 w-14 items-center justify-center rounded-full bg-base-200 text-base-content/40">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
+      <path stroke-linecap="round" stroke-linejoin="round" d="<%= icon %>" />
+    </svg>
+  </div>
+  <h3 class="mt-4 font-semibold text-base-content"><%= title %></h3>
+  <% if local_assigns[:body].present? %>
+    <p class="mt-1 text-sm text-base-content/55 max-w-xs"><%= body %></p>
+  <% end %>
+  <% if local_assigns[:cta_label].present? && local_assigns[:cta_href].present? %>
+    <%= link_to cta_label, cta_href, class: "btn btn-primary btn-sm mt-4" %>
+  <% end %>
+</div>

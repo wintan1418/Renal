@@ -1,163 +1,47 @@
 <% content_for(:title) { "About Us" } %>
-<% content_for(:meta_description) { "Learn about Healthroom Renal Centre - our mission, vision, and commitment to expert kidney care in Nigeria." } %>
+<% content_for(:meta_description) { "Learn about Healthroom Renal Centre — our mission and commitment to expert, compassionate kidney care in Nigeria." } %>
 
-<!-- Page Header -->
-<section class="hr-page-header">
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="max-w-3xl">
-      <div class="breadcrumbs-text mb-4">
-        <%= link_to "Home", root_path %> &nbsp;/&nbsp; <span class="text-white font-medium">About Us</span>
-      </div>
-      <h1>About Healthroom Renal Centre</h1>
-      <p class="mt-4" style="max-width: 560px">
-        For over 15 years, we have been at the forefront of kidney care in Nigeria, combining
-        medical excellence with genuine compassion for every patient who walks through our doors.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- Our Story -->
-<section class="py-16 lg:py-20 bg-white">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div class="mk-pg">
+  <section class="mk-section" style="padding:80px 0 64px">
+    <div class="mk-wrap mk-two-col" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
       <div>
-        <span class="hr-section-label">— Our Story</span>
-        <h2 class="text-3xl hr-section-title mt-3 mb-6">How It All Began</h2>
-        <div class="space-y-4 text-gray-500 leading-relaxed">
-          <p>
-            Healthroom Renal Centre was founded with a singular mission: to make world-class
-            kidney care accessible to every Nigerian. What started as a small nephrology clinic
-            has grown into one of the most respected renal care facilities in West Africa.
-          </p>
-          <p>
-            Our founder recognized a critical gap in renal healthcare in Nigeria. Patients
-            were travelling abroad for treatments that could be delivered right at home, with the
-            right expertise, equipment, and commitment. Healthroom was born to fill that gap.
-          </p>
-          <p>
-            Today, we serve thousands of patients annually, providing everything from routine kidney
-            function screenings to complex dialysis programmes and transplant evaluations. Our team
-            of nephrologists, nurses, and support staff work tirelessly to ensure every patient
-            receives personalized, evidence-based care.
-          </p>
-        </div>
+        <div class="mk-eyebrow">— About us</div>
+        <h1 class="mk-h1" style="font-size:clamp(34px,4.5vw,46px)">Compassionate kidney care, built for Nigeria</h1>
+        <p class="mk-lead" style="margin-top:20px">Founded over 15 years ago, Healthroom Renal Centre has grown into one of Nigeria's most trusted dedicated kidney hospitals. We pair advanced technology with a genuinely human approach — because behind every chart is a person and a family.</p>
+        <p class="mk-lead" style="margin-top:14px">Our mission is simple: make world-class renal care accessible, dignified and affordable for every patient who walks through our doors.</p>
       </div>
-      <div class="flex items-center justify-center">
-        <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=600&fit=crop&q=80" alt="Healthroom Renal Centre facility" class="rounded-2xl w-full aspect-[4/3] object-cover shadow-lg" loading="lazy" />
-      </div>
+      <%= image_tag "marketing/about-hospital.jpg", alt: "Healthroom Renal Centre ward", style: "width:100%;height:440px;object-fit:cover;border-radius:24px" %>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Mission, Vision, Values -->
-<section class="py-16 lg:py-20" style="background-color: var(--hr-cream)">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="text-center max-w-2xl mx-auto mb-12">
-      <span class="hr-section-label">— What Drives Us</span>
-      <h2 class="text-3xl hr-section-title mt-3">Our Foundation</h2>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <!-- Mission -->
-      <div class="hr-card">
-        <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-4" style="background: rgba(43,139,117,0.1)">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="color: var(--hr-teal)">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold" style="color: var(--hr-navy)">Our Mission</h3>
-        <p class="text-gray-500 leading-relaxed mt-2">
-          To provide accessible, affordable, and exceptional renal care that improves
-          the quality of life for kidney disease patients in Nigeria and across West Africa.
-          We strive to be the healthcare partner that every patient deserves.
-        </p>
-      </div>
-
-      <!-- Vision -->
-      <div class="hr-card">
-        <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-4" style="background: rgba(59,130,246,0.1)">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="color: #3b82f6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold" style="color: var(--hr-navy)">Our Vision</h3>
-        <p class="text-gray-500 leading-relaxed mt-2">
-          To become Africa's leading renal care institution, recognized globally for clinical
-          excellence, innovation in kidney disease management, and a patient-first approach
-          that sets the standard for nephrology care on the continent.
-        </p>
-      </div>
-
-      <!-- Values -->
-      <div class="hr-card">
-        <div class="w-14 h-14 rounded-xl flex items-center justify-center mb-4" style="background: rgba(232,119,63,0.1)">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="color: var(--hr-orange)">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </div>
-        <h3 class="text-xl font-bold" style="color: var(--hr-navy)">Our Values</h3>
-        <p class="text-gray-500 leading-relaxed mt-2">
-          Compassion, excellence, integrity, and innovation guide everything we do. We treat
-          every patient as family, hold ourselves to the highest medical standards, and
-          continuously seek better ways to deliver kidney care.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Core Values Detail -->
-<section class="py-16 lg:py-20 bg-white">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="text-center max-w-2xl mx-auto mb-12">
-      <span class="hr-section-label">— Our Strengths</span>
-      <h2 class="text-3xl hr-section-title mt-3">What Sets Us Apart</h2>
-      <p class="text-gray-500 mt-4">
-        Our commitment to excellence goes beyond medical treatment
-      </p>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <% [
-        { icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', title: "Patient Safety", desc: "Rigorous safety protocols and infection control standards protect every patient at all times.", bg: "rgba(43,139,117,0.1)", color: "var(--hr-teal)" },
-        { icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z', title: "Modern Equipment", desc: "State-of-the-art dialysis machines, laboratory instruments, and diagnostic tools for accurate treatment.", bg: "rgba(59,130,246,0.1)", color: "#3b82f6" },
-        { icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', title: "Expert Team", desc: "Board-certified nephrologists and highly trained nurses with decades of combined renal care experience.", bg: "rgba(168,85,247,0.1)", color: "#a855f7" },
-        { icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z', title: "Compassionate Care", desc: "We treat every patient with dignity, empathy, and respect, ensuring comfort at every step of their journey.", bg: "rgba(232,119,63,0.1)", color: "var(--hr-orange)" }
-      ].each do |item| %>
-        <div class="text-center p-6 rounded-xl transition-all hover:bg-gray-50">
-          <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4" style="background: <%= item[:bg] %>">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="color: <%= item[:color] %>">
-              <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>" />
-            </svg>
-          </div>
-          <h3 class="font-semibold mb-2" style="color: var(--hr-navy)"><%= item[:title] %></h3>
-          <p class="text-sm text-gray-500 leading-relaxed"><%= item[:desc] %></p>
-        </div>
+  <section class="mk-section--cream" style="padding:64px 0">
+    <div class="mk-wrap mk-grid mk-grid--4" style="text-align:center">
+      <% [["15+","Years in service"],["10,000+","Patients treated"],["50+","Specialists available"],["24/7","Emergency care"]].each do |num, label| %>
+        <div><div class="mk-stat__num" style="font-size:44px"><%= num %></div><div style="font-size:14px;color:var(--mk-muted);font-weight:500;margin-top:4px"><%= label %></div></div>
       <% end %>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- CTA -->
-<section class="py-12 lg:py-20 bg-white">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6">
-    <div class="hr-cta-section p-10 lg:p-14 text-center">
-      <h2 class="text-2xl lg:text-3xl font-extrabold text-white leading-snug">
-        Have Questions About Your Kidney Health?
-      </h2>
-      <p class="mt-4 text-sm leading-relaxed max-w-xl mx-auto" style="color: rgba(255,255,255,0.55)">
-        Our team is ready to help. Get in touch today for a consultation.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-        <%= link_to contact_path, class: "btn btn-lg hr-btn-orange rounded-xl font-semibold" do %>
-          Contact Us
-        <% end %>
-        <%= link_to doctors_path, class: "btn btn-lg hr-btn-ghost-white rounded-xl font-semibold" do %>
-          Meet Our Doctors
-        <% end %>
-      </div>
+  <section class="mk-section" style="max-width:880px;margin:0 auto;padding:88px 28px 96px">
+    <div style="text-align:center;margin-bottom:48px"><h2 class="mk-h2">Frequently asked questions</h2></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <% faqs = [
+        ["Do I need a referral to book an appointment?", "No referral is required for an initial nephrology consultation. If you have one from another physician, bring it along so our specialists have your full history."],
+        ["Which insurance and HMOs do you accept?", "We work with most major Nigerian HMOs and offer self-pay packages. Our front desk will confirm your coverage when you book."],
+        ["How long does a dialysis session take?", "A typical haemodialysis session lasts about 4 hours, three times a week. Your nephrologist will tailor a schedule to your needs."],
+        ["Do you offer emergency renal care?", "Yes. Our emergency renal service operates 24/7 for acute kidney injury, dialysis emergencies and urgent consultations."],
+        ["Can I get a second opinion?", "Absolutely. We welcome second-opinion consultations and will review any prior records, scans and lab results you provide."]
+      ] %>
+      <% faqs.each do |q, a| %>
+        <details class="mk-card" style="overflow:hidden">
+          <summary style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;cursor:pointer;list-style:none">
+            <span style="font-weight:700;font-size:16px;color:var(--mk-ink)"><%= q %></span>
+            <span style="font-size:22px;color:var(--mk-teal);flex-shrink:0">+</span>
+          </summary>
+          <p style="padding:0 24px 22px;font-size:15px;line-height:1.65;color:var(--mk-muted)"><%= a %></p>
+        </details>
+      <% end %>
     </div>
-  </div>
-</section>
+  </section>
+</div>
+<style>details[open] summary span:last-child{transform:rotate(45deg)}details summary span:last-child{transition:transform .2s;display:inline-block}details summary::-webkit-details-marker{display:none}</style>

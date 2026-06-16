@@ -1,128 +1,51 @@
-<% content_for(:title) { "Blog - Kidney Health & Wellness" } %>
-<% content_for(:meta_description) { "Read expert articles on kidney health, dialysis tips, nutrition, and wellness from the Healthroom Renal Centre medical team." } %>
+<% content_for(:title) { "Blog — Kidney Health & Wellness" } %>
+<% content_for(:meta_description) { "Read expert articles on kidney health, dialysis tips, nutrition and wellness from the Healthroom Renal Centre medical team." } %>
 
-<%
-  blog_images = {
-    "kidney_health" => "https://images.unsplash.com/photo-1559757175-5700dde675bc?w=600&h=400&fit=crop&q=80",
-    "dialysis"      => "https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=600&h=400&fit=crop&q=80",
-    "nutrition"     => "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&h=400&fit=crop&q=80",
-    "lifestyle"     => "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop&q=80",
-    "news"          => "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&h=400&fit=crop&q=80",
-    "default"       => "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop&q=80"
-  }
-
-  blog_chip_styles = {
-    "kidney_health" => { bg: "rgba(43,139,117,0.12)", color: "var(--hr-teal)" },
-    "dialysis"      => { bg: "rgba(59,130,246,0.12)", color: "#3b82f6" },
-    "nutrition"     => { bg: "rgba(234,179,8,0.12)", color: "#ca8a04" },
-    "lifestyle"     => { bg: "rgba(168,85,247,0.12)", color: "#a855f7" },
-    "news"          => { bg: "rgba(232,119,63,0.12)", color: "var(--hr-orange)" }
-  }
-%>
-
-<!-- Page Header -->
-<section class="hr-page-header" style="padding: 5rem 0 4rem">
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="max-w-3xl">
-      <div class="breadcrumbs-text mb-4">
-        <%= link_to "Home", root_path %> &nbsp;/&nbsp; <span class="text-white font-medium">Blog</span>
-      </div>
-      <h1>Health & Wellness Blog</h1>
-      <p class="text-lg mt-4 leading-relaxed max-w-xl">
-        Expert insights on kidney health, dialysis, nutrition, and overall wellness from our team of nephrologists.
-      </p>
+<div class="mk-pg" data-controller="marketing-filter">
+  <section class="mk-section" style="padding:72px 0 40px;text-align:center">
+    <div class="mk-wrap">
+      <div class="mk-eyebrow">— From our blog</div>
+      <h1 class="mk-h1">Health &amp; wellness insights</h1>
+      <p class="mk-lead" style="margin:18px auto 0;max-width:560px">Expert advice from our medical team on kidney health, dialysis, nutrition and living well.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Blog Posts Grid -->
-<section class="py-16 lg:py-24 bg-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    <% if @posts.any? %>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <% @posts.each do |post| %>
-          <% chip = blog_chip_styles[post.category] || { bg: "rgba(43,139,117,0.12)", color: "var(--hr-teal)" } %>
-          <article class="blog-card group rounded-2xl overflow-hidden bg-white shadow-md border border-gray-100">
-            <!-- Featured Image -->
-            <figure class="relative overflow-hidden h-52">
-              <% if post.featured_image.attached? %>
-                <%= image_tag post.featured_image.variant(resize_to_limit: [600, 400]),
-                    class: "w-full h-full object-cover",
-                    alt: post.title %>
-              <% else %>
-                <img src="<%= blog_images[post.category] || blog_images['default'] %>" alt="<%= post.title %>" class="w-full h-full object-cover" loading="lazy" />
-              <% end %>
-
-              <!-- Category Badge -->
-              <div class="absolute top-4 left-4">
-                <span class="hr-blog-chip" style="background: <%= chip[:bg] %>; color: <%= chip[:color] %>"><%= post.category.humanize %></span>
-              </div>
-            </figure>
-
-            <div class="p-6">
-              <!-- Meta -->
-              <div class="flex items-center gap-3 text-xs text-gray-400 mb-3">
-                <span class="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <%= post.published_at&.strftime("%b %d, %Y") || post.created_at.strftime("%b %d, %Y") %>
-                </span>
-                <span class="w-1 h-1 rounded-full bg-gray-300"></span>
-                <span class="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <%= post.reading_time %> min read
-                </span>
-              </div>
-
-              <!-- Title -->
-              <h2 class="font-bold text-lg leading-snug line-clamp-2 transition-colors" style="color: var(--hr-navy)">
-                <%= link_to post.title, blog_post_path(post), class: "hover:opacity-80" %>
-              </h2>
-
-              <!-- Excerpt -->
-              <p class="text-sm text-gray-500 leading-relaxed line-clamp-3 mt-3">
-                <%= post.excerpt.presence || truncate(strip_tags(post.body.to_s), length: 150) %>
-              </p>
-
-              <!-- Author + Read More -->
-              <div class="flex items-center justify-between mt-5 pt-4" style="border-top: 1px solid #f0f0f0">
-                <div class="flex items-center gap-2">
-                  <%= avatar_for(post.author, size: "w-7 h-7", text_size: "text-xs") %>
-                  <span class="text-xs text-gray-400 font-medium"><%= post.author.full_name %></span>
-                </div>
-                <%= link_to blog_post_path(post), class: "text-sm font-bold flex items-center gap-1 hover:gap-2 transition-all", style: "color: var(--hr-teal)" do %>
-                  Read More
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                <% end %>
-              </div>
-            </div>
-          </article>
+  <section class="mk-section" style="padding-top:0">
+    <div class="mk-wrap">
+      <% cats = ["All"] + @posts.map { |p| blog_category_label(p) }.uniq %>
+      <div class="mk-chips" style="margin-bottom:44px">
+        <% cats.each_with_index do |c, i| %>
+          <button class="mk-chip <%= 'is-active' if i.zero? %>" data-filter="<%= c %>" data-action="marketing-filter#filter" data-marketing-filter-target="chip"><%= c %></button>
         <% end %>
       </div>
 
-      <!-- Pagination -->
-      <div class="flex justify-center mt-12">
-        <%== pagy_nav(@pagy) if @pagy.pages > 1 %>
-      </div>
-
-    <% else %>
-      <div class="text-center py-16">
-        <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style="background: rgba(43,139,117,0.1)">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--hr-teal)">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-          </svg>
+      <% if @posts.any? %>
+        <div class="mk-grid mk-grid--3" style="gap:24px">
+          <% @posts.each_with_index do |p, i| %>
+            <div class="mk-card mk-card--hover" data-category="<%= blog_category_label(p) %>" data-marketing-filter-target="item" style="overflow:hidden;display:flex;flex-direction:column">
+              <%= link_to blog_post_path(p.slug), style: "text-decoration:none;display:block" do %>
+                <%= image_tag blog_image_for(p, i), alt: p.title, loading: "lazy", class: "mk-card__media", style: "height:200px" %>
+              <% end %>
+              <div style="padding:24px;display:flex;flex-direction:column;flex:1">
+                <span class="mk-cat" style="align-self:flex-start;margin-bottom:14px"><%= blog_category_label(p) %></span>
+                <%= link_to blog_post_path(p.slug), style: "text-decoration:none" do %>
+                  <div class="mk-h3" style="font-size:19px;line-height:1.25"><%= p.title %></div>
+                <% end %>
+                <p style="font-size:14px;line-height:1.6;color:var(--mk-muted);margin-top:10px;flex:1"><%= p.excerpt.presence&.truncate(120) || truncate(strip_tags(p.body.to_s), length: 120) %></p>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:18px">
+                  <span style="font-size:12.5px;color:var(--mk-muted-3)"><%= p.published_at&.strftime("%b %d, %Y") %> · <%= blog_read_time(p) %></span>
+                  <%= link_to "Read →", blog_post_path(p.slug), style: "font-size:14px;font-weight:700;color:var(--mk-teal);text-decoration:none" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
         </div>
-        <h3 class="text-2xl font-bold text-gray-400">No Blog Posts Yet</h3>
-        <p class="text-gray-400 mt-3 max-w-md mx-auto text-lg">
-          We are working on informative articles about kidney health and wellness. Check back soon.
-        </p>
-        <%= link_to "Back to Home", root_path, class: "btn hr-btn-teal rounded-xl mt-6" %>
-      </div>
-    <% end %>
-  </div>
-</section>
+        <% if @pagy && @pagy.pages > 1 %>
+          <div style="display:flex;justify-content:center;margin-top:48px"><%== pagy_nav(@pagy) %></div>
+        <% end %>
+      <% else %>
+        <div class="mk-card mk-card--pad" style="text-align:center;padding:64px"><p class="mk-muted">No posts published yet. Check back soon.</p></div>
+      <% end %>
+    </div>
+  </section>
+</div>

@@ -1,103 +1,42 @@
 <% content_for(:title) { "Our Doctors" } %>
 <% content_for(:meta_description) { "Meet the expert nephrologists and specialists at Healthroom Renal Centre dedicated to your kidney health." } %>
 
-<%
-  doctor_photos = [
-    "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1622253694242-abeb37a33e97?w=400&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1594824476967-48c8b964ac31?w=400&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=400&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1618498082410-b4aa22193b38?w=400&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=400&h=500&fit=crop&q=80"
-  ]
-%>
-
-<!-- Page Header -->
-<section class="hr-page-header" style="padding: 5rem 0 4rem">
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6">
-    <div class="max-w-3xl">
-      <div class="breadcrumbs-text mb-4">
-        <%= link_to "Home", root_path %> &nbsp;/&nbsp; <span class="text-white font-medium">Our Doctors</span>
-      </div>
-      <h1>Our Doctors</h1>
-      <p class="text-lg mt-4 leading-relaxed max-w-xl">
-        Board-certified nephrologists and kidney specialists with decades of combined experience delivering the highest standard of renal care.
-      </p>
+<div class="mk-pg" data-controller="marketing-filter">
+  <section class="mk-section--cream" style="border-top:none;padding:72px 0 64px">
+    <div class="mk-wrap" style="text-align:center">
+      <div class="mk-eyebrow">— Our team</div>
+      <h1 class="mk-h1">Meet your specialists</h1>
+      <p class="mk-lead" style="margin:18px auto 0;max-width:560px">A multidisciplinary team of nephrologists, dialysis experts and renal dietitians.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Doctors Grid -->
-<section class="py-16 lg:py-24 bg-white">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6">
-    <% if @doctors.any? %>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-        <% @doctors.each_with_index do |doctor, idx| %>
-          <%= link_to doctor_path(doctor), class: "hr-doctor-card-light group block" do %>
-            <div class="relative overflow-hidden">
-              <% if doctor.avatar.attached? %>
-                <%= image_tag doctor.avatar.variant(resize_to_limit: [400, 500]), alt: doctor.full_name %>
-              <% else %>
-                <img src="<%= doctor_photos[idx % doctor_photos.length] %>" alt="Dr. <%= doctor.full_name %>" loading="lazy" />
-              <% end %>
-              <% if doctor.staff_profile&.available_for_telemedicine? %>
-                <div class="absolute top-3 right-3">
-                  <span class="hr-blog-chip text-xs" style="background: rgba(34,197,94,0.15); color: #16a34a">
-                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block mr-1"></span>Telemedicine
-                  </span>
-                </div>
-              <% end %>
-            </div>
-            <div class="doctor-details">
-              <h3>Dr. <%= doctor.full_name %></h3>
-              <% if doctor.staff_profile&.specialization.present? %>
-                <p><%= doctor.staff_profile.specialization %></p>
-              <% end %>
-              <% if doctor.staff_profile&.years_of_experience %>
-                <span class="text-xs text-gray-400 mt-1 block"><%= doctor.staff_profile.years_of_experience %> years experience</span>
-              <% end %>
-              <% if doctor.staff_profile&.consultation_fee_cents && doctor.staff_profile.consultation_fee_cents > 0 %>
-                <span class="text-sm font-bold mt-2 block" style="color: var(--hr-teal)"><%= format_naira(doctor.staff_profile.consultation_fee_cents) %></span>
-              <% end %>
-              <div class="mt-3 flex items-center justify-center gap-1 text-sm font-semibold opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all" style="color: var(--hr-teal)">
-                View Profile
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-              </div>
-            </div>
-          <% end %>
+  <section class="mk-section" style="padding-top:40px">
+    <div class="mk-wrap">
+      <% specs = ["All"] + @doctors.map { |d| doctor_specialty(d) }.uniq %>
+      <div class="mk-chips" style="margin-bottom:44px">
+        <% specs.each_with_index do |c, i| %>
+          <button class="mk-chip <%= 'is-active' if i.zero? %>" data-filter="<%= c %>" data-action="marketing-filter#filter" data-marketing-filter-target="chip"><%= c %></button>
         <% end %>
       </div>
-    <% else %>
-      <div class="text-center py-16">
-        <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style="background: rgba(43,139,117,0.1)">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--hr-teal)">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-        </div>
-        <h3 class="text-2xl font-bold text-gray-400">Our Doctor Profiles Are Being Updated</h3>
-        <p class="text-gray-400 mt-3 max-w-md mx-auto text-lg">
-          Please contact us directly to learn more about our medical team and book a consultation.
-        </p>
-        <%= link_to "Contact Us", contact_path, class: "btn hr-btn-teal rounded-xl mt-6" %>
-      </div>
-    <% end %>
-  </div>
-</section>
 
-<!-- CTA -->
-<section class="py-12 lg:py-20" style="background-color: var(--hr-cream)">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6">
-    <div class="hr-cta-section p-10 lg:p-14 text-center">
-      <h2 class="text-2xl lg:text-3xl font-extrabold text-white leading-snug">Ready to See a Specialist?</h2>
-      <p class="mt-4 max-w-xl mx-auto" style="color: rgba(255,255,255,0.55)">
-        Book a consultation with one of our experienced nephrologists today and take the first step towards better kidney health.
-      </p>
-      <%= link_to contact_path, class: "btn btn-lg hr-btn-orange rounded-xl font-semibold mt-8 gap-2 shadow-lg" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-        Book an Appointment
-      <% end %>
+      <div class="mk-grid mk-grid--3" style="gap:24px">
+        <% @doctors.each_with_index do |d, i| %>
+          <div class="mk-card mk-card--hover" data-category="<%= doctor_specialty(d) %>" data-marketing-filter-target="item" style="overflow:hidden">
+            <%= link_to doctor_path(d), style: "text-decoration:none;display:block" do %>
+              <%= image_tag doctor_photo(i), alt: d.full_name, loading: "lazy", class: "mk-card__media", style: "height:280px" %>
+            <% end %>
+            <div style="padding:22px 22px 24px">
+              <%= link_to doctor_path(d), style: "text-decoration:none" do %>
+                <div class="mk-h3" style="font-size:19px">Dr. <%= d.full_name %></div>
+              <% end %>
+              <div style="font-size:14px;color:var(--mk-teal);font-weight:600;margin-top:3px"><%= doctor_specialty(d) %></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:10px"><span class="mk-stars">★★★★★</span><span style="font-size:12.5px;color:var(--mk-muted-2);font-weight:600"><%= doctor_rating(d) %></span></div>
+              <p style="font-size:13.5px;line-height:1.55;color:var(--mk-muted);margin-top:14px"><%= d.staff_profile&.bio.presence&.truncate(110) || "Dedicated specialist providing expert, compassionate renal care at Healthroom." %></p>
+              <button class="mk-btn mk-btn--teal mk-btn--block" style="margin-top:18px" data-action="marketing-booking#open">Book with Dr. <%= d.last_name %></button>
+            </div>
+          </div>
+        <% end %>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+</div>
