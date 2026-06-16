@@ -65,10 +65,11 @@ puts "\n[3/9] Users..."
 def create_user(attrs)
   user = User.find_or_initialize_by(email: attrs[:email])
   if user.new_record?
+    pwd = attrs[:password].presence || "password123"
     user.assign_attributes(
       first_name: attrs[:first_name], last_name: attrs[:last_name],
-      phone: attrs[:phone], password: "password123",
-      password_confirmation: "password123", role: attrs[:role],
+      phone: attrs[:phone], password: pwd,
+      password_confirmation: pwd, role: attrs[:role],
       confirmed_at: Time.current
     )
     user.save!
@@ -77,8 +78,11 @@ def create_user(attrs)
   user
 end
 
+# Admin password is read from ENV["ADMIN_PASSWORD"] in production (set it on
+# Hatchbox); falls back to the demo password locally if unset.
 admin = create_user(email: "admin@healthroom.ng", first_name: "System", last_name: "Admin",
-                    phone: "+2348000000001", role: :admin)
+                    phone: "+2348000000001", role: :admin,
+                    password: ENV["ADMIN_PASSWORD"])
 
 nephrology    = Department.find_by!(name: "Nephrology")
 dialysis_dept = Department.find_by!(name: "Dialysis Unit")
