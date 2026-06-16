@@ -319,7 +319,7 @@
     <% end %>
 
     <!-- Consumables Used -->
-    <% if @session.session_consumables.any? %>
+    <% if @session.dialysis_consumable_usages.any? %>
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body p-0">
           <div class="p-4 border-b border-base-200">
@@ -335,7 +335,7 @@
                 </tr>
               </thead>
               <tbody>
-                <% @session.session_consumables.includes(:dialysis_consumable).each do |sc| %>
+                <% @session.dialysis_consumable_usages.includes(:dialysis_consumable).each do |sc| %>
                   <tr>
                     <td class="font-medium"><%= sc.dialysis_consumable&.name %></td>
                     <td><%= sc.quantity_used %> <%= sc.dialysis_consumable&.unit %></td>
