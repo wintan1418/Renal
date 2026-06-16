@@ -48,6 +48,9 @@ gem "groupdate", "~> 6.5"
 # HTTP client (Paystack, Termii SMS)
 gem "faraday", "~> 2.12"
 
+# AI — unified LLM interface (Gemini + OpenAI/ChatGPT)
+gem "ruby_llm", "~> 1.16"
+
 # PDF generation
 gem "prawn", "~> 2.5"
 gem "prawn-table", "~> 0.2"
