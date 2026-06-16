@@ -196,3 +196,45 @@
   .mk-footer__grid { grid-template-columns: 1fr; }
   .mk-wrap { padding: 0 20px; }
 }
+
+/* ─── Scroll reveal + motion polish ─────────────────────────
+   .reveal-on is added by reveal_controller.js only when JS is active and
+   the user hasn't requested reduced motion, so without JS everything is
+   visible by default. */
+.reveal-on .mk-reveal { opacity: 0; transform: translateY(22px); }
+.reveal-on .mk-reveal.is-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity .7s ease, transform .75s cubic-bezier(.2, .8, .2, 1);
+}
+
+/* Smooth in-page anchoring */
+html { scroll-behavior: smooth; }
+
+/* Image zoom inside hoverable cards (cards already clip with overflow:hidden) */
+.mk-card__media { transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
+.mk-card--hover:hover .mk-card__media { transform: scale(1.06); }
+
+/* A touch more lift + crisper shadow on hover */
+.mk-card--hover { transition: transform .25s cubic-bezier(.2, .8, .2, 1), box-shadow .25s, border-color .25s; }
+.mk-card--hover:hover { transform: translateY(-6px); box-shadow: 0 28px 60px -28px rgba(20, 40, 30, .34); }
+
+/* Icon chips gently pop on card hover */
+.mk-card--hover:hover .mk-icchip { transform: scale(1.08) rotate(-3deg); }
+.mk-icchip { transition: transform .25s cubic-bezier(.2, .8, .2, 1); }
+
+/* Nav links get an animated underline */
+.mk-navlink::after {
+  content: ""; display: block; height: 2px; width: 0; margin-top: 3px;
+  background: var(--mk-teal); border-radius: 2px; transition: width .22s ease;
+}
+.mk-navlink:hover::after, .mk-navlink.is-active::after { width: 100%; }
+
+/* Buttons add a subtle press feedback */
+.mk-btn:active { transform: translateY(1px) scale(.99); }
+
+/* Avatar ring pulse on hero floaty cards already animate via mkFloaty */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .mk-floaty { animation: none; }
+}

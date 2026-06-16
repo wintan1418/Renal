@@ -1,27 +1,30 @@
 <% content_for(:title, "Sign In") %>
 
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 px-4">
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 px-4 py-10">
   <div class="w-full max-w-md">
     <div class="text-center mb-8">
       <a href="<%= root_path %>" class="text-3xl font-bold text-primary">Healthroom</a>
       <p class="text-base-content/60 mt-2">Sign in to your account</p>
     </div>
 
-    <div class="card bg-base-100 shadow-xl">
+    <div class="card bg-base-100 shadow-xl" data-controller="demo-login">
       <div class="card-body">
-        <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-4" }) do |f| %>
+        <%= form_for(resource, as: resource_name, url: session_path(resource_name),
+              html: { class: "space-y-4", data: { "demo-login-target": "form" } }) do |f| %>
           <div class="form-control">
             <%= f.label :email, class: "label" do %>
               <span class="label-text font-medium">Email</span>
             <% end %>
-            <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "you@example.com", class: "input input-bordered w-full" %>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", placeholder: "you@example.com",
+                  class: "input input-bordered w-full", data: { "demo-login-target": "email" } %>
           </div>
 
           <div class="form-control">
             <%= f.label :password, class: "label" do %>
               <span class="label-text font-medium">Password</span>
             <% end %>
-            <%= f.password_field :password, autocomplete: "current-password", placeholder: "Enter your password", class: "input input-bordered w-full" %>
+            <%= f.password_field :password, autocomplete: "current-password", placeholder: "Enter your password",
+                  class: "input input-bordered w-full", data: { "demo-login-target": "password" } %>
           </div>
 
           <% if devise_mapping.rememberable? %>
@@ -37,6 +40,27 @@
             <%= f.submit "Sign In", class: "btn btn-primary w-full" %>
           </div>
         <% end %>
+
+        <!-- ── Demo accounts (one-click sign in) ── -->
+        <div class="divider text-xs text-base-content/50 mt-6 mb-2">Try a demo account</div>
+        <p class="text-center text-xs text-base-content/50 mb-3">One click signs you in — explore each role.</p>
+        <div class="grid grid-cols-2 gap-2">
+          <% demo_accounts.each do |acct| %>
+            <button type="button"
+                    class="btn btn-sm btn-outline justify-start gap-2 normal-case font-medium h-auto py-2"
+                    data-action="demo-login#fill"
+                    data-email="<%= acct[:email] %>"
+                    data-password="<%= acct[:password] %>">
+              <span class="inline-flex h-6 w-6 items-center justify-center rounded-full text-[10px] font-bold text-white shrink-0 <%= acct[:color] %>">
+                <%= acct[:badge] %>
+              </span>
+              <span class="flex flex-col items-start leading-tight text-left">
+                <span class="text-xs font-semibold"><%= acct[:role] %></span>
+                <span class="text-[10px] text-base-content/50"><%= acct[:name] %></span>
+              </span>
+            </button>
+          <% end %>
+        </div>
 
         <%= render "devise/shared/links" %>
       </div>
