@@ -44,12 +44,6 @@
               <%= @visit.chief_complaint.presence || "<span class='text-base-content/40 italic'>Not recorded</span>".html_safe %>
             </dd>
           </div>
-          <% if @visit.notes.present? %>
-            <div class="space-y-1 sm:col-span-2">
-              <dt class="text-xs text-base-content/60 uppercase tracking-wider font-medium">Visit Notes</dt>
-              <dd class="text-base-content/80 text-sm bg-base-200 rounded-lg p-3"><%= @visit.notes %></dd>
-            </div>
-          <% end %>
         </dl>
       </div>
     </div>

@@ -53,7 +53,7 @@
         </div>
         <div>
           <p class="text-xs text-base-content/50 uppercase tracking-wider">Visit</p>
-          <p class="font-semibold"><%= @invoice.visit&.visit_number || "N/A" %></p>
+          <p class="font-semibold"><%= @invoice.visit&.visit_date&.strftime("%b %d, %Y") || "N/A" %></p>
         </div>
       </div>
 
@@ -136,7 +136,7 @@
           <div>
             <p class="font-semibold"><%= @invoice.patient.full_name %></p>
             <p class="text-xs text-base-content/50"><%= @invoice.patient.email %></p>
-            <p class="text-xs text-base-content/50"><%= @invoice.patient.patient_profile&.phone_number %></p>
+            <p class="text-xs text-base-content/50"><%= @invoice.patient.phone %></p>
           </div>
         </div>
       <% else %>

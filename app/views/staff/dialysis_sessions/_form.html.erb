@@ -54,7 +54,7 @@
         <div class="form-control mb-4">
           <%= f.label :session_type, "Session Type", class: "label label-text font-medium" %>
           <%= f.select :session_type,
-              [["Hemodialysis", "hemodialysis"], ["Peritoneal Dialysis", "peritoneal_dialysis"], ["CRRT", "crrt"]],
+              [["Hemodialysis", "hemodialysis"], ["Peritoneal Dialysis", "peritoneal"], ["Hemofiltration", "hemofiltration"]],
               { prompt: "Select type" },
               class: "select select-bordered w-full" %>
         </div>
@@ -74,7 +74,7 @@
         <div class="form-control mb-4">
           <%= f.label :access_type, "Access Type", class: "label label-text font-medium" %>
           <%= f.select :access_type,
-              [["AV Fistula", "av_fistula"], ["AV Graft", "av_graft"], ["Central Venous Catheter", "central_venous_catheter"], ["Peritoneal Catheter", "peritoneal_catheter"]],
+              [["AV Fistula", "fistula"], ["AV Graft", "graft"], ["Catheter", "catheter"]],
               { prompt: "Select access type" },
               class: "select select-bordered w-full" %>
         </div>
