@@ -126,6 +126,13 @@ Rails.application.routes.draw do
     resources :pages
     resources :testimonials
     resources :contact_submissions, only: [ :index, :show, :update ]
+    resources :leads, only: [ :index, :show, :update ] do
+      member do
+        patch :move
+        post :draft_reply
+      end
+      resources :lead_activities, only: [ :create ]
+    end
     resources :lab_tests
     resources :visits, only: [ :index, :show ]
     resources :dialysis_machines

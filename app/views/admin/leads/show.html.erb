@@ -1,0 +1,116 @@
+<% content_for(:title) { "Lead · #{@lead.name}" } %>
+
+<div class="max-w-5xl mx-auto space-y-6">
+  <div class="flex items-center gap-2 text-sm text-base-content/60">
+    <%= link_to "Lead pipeline", admin_leads_path, class: "hover:text-primary" %>
+    <span>/</span><span class="text-base-content font-medium"><%= @lead.name %></span>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Enquiry -->
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h1 class="text-xl font-bold"><%= @lead.name %></h1>
+              <p class="text-sm text-base-content/60"><%= mail_to @lead.email %> <%= "· #{@lead.phone}" if @lead.phone.present? %></p>
+            </div>
+            <span class="badge badge-lg"><%= @lead.stage_label %></span>
+          </div>
+          <% if @lead.subject.present? %><p class="font-medium mt-3"><%= @lead.subject %></p><% end %>
+          <p class="text-sm text-base-content/80 mt-1 whitespace-pre-line"><%= @lead.message %></p>
+        </div>
+      </div>
+
+      <!-- AI reply drafter -->
+      <div class="card bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10 shadow"
+           data-controller="ai-reply" data-ai-reply-url-value="<%= draft_reply_admin_lead_path(@lead) %>">
+        <div class="card-body">
+          <div class="flex items-center justify-between">
+            <h2 class="card-title text-base flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Draft a reply
+            </h2>
+            <button type="button" class="btn btn-sm btn-primary" data-ai-reply-target="button" data-action="ai-reply#generate">Generate ✨</button>
+          </div>
+          <textarea data-ai-reply-target="output" rows="7" class="textarea textarea-bordered w-full text-sm mt-2" placeholder="Click Generate to draft a reply you can copy into your email…"></textarea>
+          <p data-ai-reply-target="status" class="text-xs text-base-content/50"></p>
+        </div>
+      </div>
+
+      <!-- Activity timeline -->
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title text-base">Activity</h2>
+          <%= form_with url: admin_lead_lead_activities_path(@lead), method: :post, class: "flex flex-col sm:flex-row gap-2 mt-1" do |f| %>
+            <%= f.fields_for :lead_activity do |a| %>
+              <%= a.select :kind, LeadActivity.kinds.keys.map { |k| [k.humanize, k] }, {}, class: "select select-bordered select-sm" %>
+              <%= a.text_field :body, placeholder: "Log a note, call, message…", class: "input input-bordered input-sm flex-1", required: true %>
+            <% end %>
+            <%= f.submit "Add", class: "btn btn-sm btn-primary" %>
+          <% end %>
+
+          <ul class="mt-4 space-y-3">
+            <% if @activities.any? %>
+              <% @activities.each do |act| %>
+                <li class="flex gap-3 text-sm">
+                  <span class="text-lg leading-none"><%= act.icon %></span>
+                  <div>
+                    <p class="text-base-content/80"><%= act.body %></p>
+                    <p class="text-xs text-base-content/40"><%= act.kind.humanize %> · <%= act.user&.full_name || "System" %> · <%= act.created_at.strftime("%b %d, %H:%M") %></p>
+                  </div>
+                </li>
+              <% end %>
+            <% else %>
+              <li class="text-sm text-base-content/50">No activity logged yet.</li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar: stage / assignment / follow-up -->
+    <div class="space-y-6">
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title text-base">Manage</h2>
+          <%= form_with model: @lead, url: admin_lead_path(@lead), method: :patch, class: "space-y-3" do |f| %>
+            <div class="form-control">
+              <label class="label label-text text-xs font-medium">Stage</label>
+              <%= f.select :stage, ContactSubmission.stages.keys.map { |s| [ContactSubmission::STAGE_META[s][:label], s] }, {}, class: "select select-bordered select-sm w-full" %>
+            </div>
+            <div class="form-control">
+              <label class="label label-text text-xs font-medium">Assigned to</label>
+              <%= f.collection_select :assigned_to_id, @staff, :id, :full_name, { include_blank: "Unassigned" }, class: "select select-bordered select-sm w-full" %>
+            </div>
+            <div class="form-control">
+              <label class="label label-text text-xs font-medium">Follow-up date</label>
+              <%= f.date_field :follow_up_on, class: "input input-bordered input-sm w-full" %>
+            </div>
+            <div class="form-control">
+              <label class="label label-text text-xs font-medium">Estimated value (₦)</label>
+              <%= f.number_field :estimated_value_cents, value: (@lead.estimated_value_cents.to_i / 100 if @lead.estimated_value_cents), step: 1000, class: "input input-bordered input-sm w-full", placeholder: "0" %>
+              <span class="text-[11px] text-base-content/40 mt-1">Enter naira; stored to the kobo.</span>
+            </div>
+            <div class="form-control">
+              <label class="label label-text text-xs font-medium">Source</label>
+              <%= f.text_field :source, class: "input input-bordered input-sm w-full" %>
+            </div>
+            <%= f.submit "Save", class: "btn btn-sm btn-primary w-full" %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 shadow">
+        <div class="card-body text-sm">
+          <h2 class="card-title text-base">Details</h2>
+          <div class="flex justify-between"><span class="text-base-content/60">Received</span><span><%= @lead.created_at.strftime("%b %d, %Y") %></span></div>
+          <div class="flex justify-between"><span class="text-base-content/60">Last contacted</span><span><%= @lead.last_contacted_at&.strftime("%b %d, %Y") || "—" %></span></div>
+          <div class="flex justify-between"><span class="text-base-content/60">Source</span><span><%= @lead.source.presence || "—" %></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

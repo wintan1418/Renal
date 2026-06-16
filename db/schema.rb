@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_17_173644) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_16_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -162,7 +162,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_17_173644) do
     t.text "response_notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "stage", default: 0, null: false
+    t.bigint "assigned_to_id"
+    t.date "follow_up_on"
+    t.datetime "last_contacted_at"
+    t.string "source", default: "website"
+    t.integer "estimated_value_cents"
+    t.index ["assigned_to_id"], name: "index_contact_submissions_on_assigned_to_id"
+    t.index ["follow_up_on"], name: "index_contact_submissions_on_follow_up_on"
     t.index ["responded_by_id"], name: "index_contact_submissions_on_responded_by_id"
+    t.index ["stage"], name: "index_contact_submissions_on_stage"
   end
 
   create_table "conversation_participants", force: :cascade do |t|
@@ -480,6 +489,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_17_173644) do
     t.datetime "updated_at", null: false
     t.index ["category"], name: "index_lab_tests_on_category"
     t.index ["code"], name: "index_lab_tests_on_code", unique: true
+  end
+
+  create_table "lead_activities", force: :cascade do |t|
+    t.bigint "contact_submission_id", null: false
+    t.bigint "user_id"
+    t.integer "kind", default: 0, null: false
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contact_submission_id"], name: "index_lead_activities_on_contact_submission_id"
+    t.index ["user_id"], name: "index_lead_activities_on_user_id"
   end
 
   create_table "medications", force: :cascade do |t|
@@ -841,6 +861,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_17_173644) do
   add_foreign_key "blog_posts", "users", column: "author_id"
   add_foreign_key "clinical_notes", "users", column: "author_id"
   add_foreign_key "clinical_notes", "visits"
+  add_foreign_key "contact_submissions", "users", column: "assigned_to_id"
   add_foreign_key "contact_submissions", "users", column: "responded_by_id"
   add_foreign_key "conversation_participants", "conversations"
   add_foreign_key "conversation_participants", "users"
@@ -873,6 +894,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_17_173644) do
   add_foreign_key "lab_results", "lab_tests"
   add_foreign_key "lab_results", "users", column: "patient_id"
   add_foreign_key "lab_results", "users", column: "resulted_by_id"
+  add_foreign_key "lead_activities", "contact_submissions"
+  add_foreign_key "lead_activities", "users"
   add_foreign_key "medications", "users", column: "patient_id"
   add_foreign_key "medications", "users", column: "prescribed_by_id"
   add_foreign_key "messages", "conversations"
