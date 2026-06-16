@@ -31,6 +31,8 @@ Rails.application.routes.draw do
         get :available_slots
       end
     end
+    get "assistant", to: "assistant#index"
+    post "assistant/message", to: "assistant#message", as: :assistant_message
     resources :medical_records, only: [ :index ]
     resources :lab_results, only: [ :index, :show ]
     resources :prescriptions, only: [ :index, :show ]
