@@ -6,6 +6,15 @@ class PatientPortal::DietLogsController < PatientPortal::BaseController
     @logs = current_user.diet_logs.for_date(@date).order(:meal_type)
     @daily_fluid = DietLog.daily_fluid_total(current_user, @date)
     @week_logs = current_user.diet_logs.where(log_date: 6.days.ago.to_date..Date.current).order(log_date: :asc)
+
+    # AI dietary coaching, cached for the day and refreshed as logs change.
+    @diet_analysis = Intelligence::DietAnalyzer.call(current_user)
+    if @diet_analysis[:available]
+      last_log = current_user.diet_logs.maximum(:updated_at).to_i
+      @diet_coaching = Rails.cache.fetch("ai/diet_coach/#{current_user.id}/#{last_log}", expires_in: 1.day) do
+        Ai::DietCoach.call(current_user, analysis: @diet_analysis).content
+      end
+    end
   end
 
   def show; end
