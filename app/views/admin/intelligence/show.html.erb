@@ -1,0 +1,119 @@
+<% content_for(:title) { "#{@patient.full_name} · Intelligence" } %>
+<%
+  a = @analysis
+  risk_meta = {
+    critical: ["badge-error", "Critical"], elevated: ["badge-warning", "Elevated"],
+    monitor: ["badge-info", "Monitor"], stable: ["badge-success", "Stable"], unknown: ["badge-ghost", "Unknown"]
+  }
+  badge_class, badge_label = risk_meta[a.risk_level] || risk_meta[:unknown]
+%>
+
+<div class="max-w-5xl mx-auto space-y-6">
+  <div class="flex items-center gap-2 text-sm text-base-content/60">
+    <%= link_to "Smart Intelligence", admin_intelligence_path, class: "hover:text-primary" %>
+    <span>/</span><span class="text-base-content font-medium"><%= @patient.full_name %></span>
+  </div>
+
+  <!-- Patient header -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body flex-row items-center gap-4 flex-wrap">
+      <%= avatar_for @patient, size: "w-16 h-16", text_size: "text-xl" %>
+      <div class="flex-1">
+        <h1 class="text-xl font-bold"><%= @patient.full_name %></h1>
+        <p class="text-sm text-base-content/60"><%= @patient.email %> · <%= @patient.phone %></p>
+      </div>
+      <div class="text-right">
+        <span class="badge <%= badge_class %> badge-lg"><%= badge_label %> risk</span>
+        <p class="text-xs text-base-content/50 mt-1"><%= a.stage ? a.stage.to_s.humanize : "Stage unknown" %><%= " · On dialysis" if a.on_dialysis %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI clinical briefing -->
+  <div class="card bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        AI clinical briefing
+        <span class="badge badge-xs badge-ghost"><%= @briefing_source || "rule-based" %></span>
+      </h2>
+      <p class="text-sm leading-relaxed text-base-content/80 whitespace-pre-line"><%= @briefing || a.summary %></p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- eGFR trajectory -->
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">Kidney function trajectory</h2>
+        <% if a.egfr_series.size >= 2 %>
+          <%= line_chart [{ name: "eGFR", data: a.egfr_series.map { |d, v| [d.strftime("%b %Y"), v] } }],
+                colors: ["#2B8B75"], height: "220px", min: 0,
+                library: { annotations: nil } %>
+          <div class="grid grid-cols-3 gap-2 mt-2 text-center">
+            <div><p class="text-lg font-bold"><%= a.latest_egfr&.round(0) || "—" %></p><p class="text-xs text-base-content/50">latest eGFR</p></div>
+            <div><p class="text-lg font-bold <%= a.slope_per_year&.negative? ? 'text-error' : 'text-success' %>"><%= a.slope_per_year ? "#{a.slope_per_year}/yr" : "—" %></p><p class="text-xs text-base-content/50">trend</p></div>
+            <div><p class="text-lg font-bold"><%= a.projected_months_to_esrd&.positive? ? "#{a.projected_months_to_esrd}mo" : "—" %></p><p class="text-xs text-base-content/50">to ESRD</p></div>
+          </div>
+        <% else %>
+          <p class="text-sm text-base-content/50 py-8 text-center">Not enough eGFR results to plot a trend yet.</p>
+        <% end %>
+        <% if a.factors.any? %>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <% a.factors.each do |f| %><span class="badge badge-outline badge-sm"><%= f %></span><% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Medication safety -->
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">Medication safety screen</h2>
+        <% if @med_safety[:warnings].any? %>
+          <div class="space-y-2 mt-1">
+            <% @med_safety[:warnings].each do |w| %>
+              <div class="alert <%= w[:severity] == :high ? 'alert-error' : 'alert-warning' %> py-2 text-sm">
+                <div>
+                  <span class="font-semibold"><%= w[:medication] %></span> —
+                  <span><%= w[:message] %></span>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-sm text-base-content/50 py-6 text-center">No medication-safety flags.</p>
+        <% end %>
+        <% if @med_safety[:medications].any? %>
+          <p class="text-xs text-base-content/50 mt-2">Screened: <%= @med_safety[:medications].join(", ") %></p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diet analysis -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base">Renal diet analysis <% if @diet[:available] %><span class="text-xs font-normal text-base-content/50">(last <%= @diet[:days] %> days)</span><% end %></h2>
+      <% if @diet[:available] %>
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 mt-2">
+          <% @diet[:metrics].each do |m| %>
+            <div>
+              <div class="flex items-baseline justify-between">
+                <span class="text-sm font-medium"><%= m[:label] %></span>
+                <span class="text-xs <%= m[:over] ? 'text-error font-semibold' : 'text-base-content/50' %>"><%= m[:pct] %>%</span>
+              </div>
+              <progress class="progress <%= m[:over] ? 'progress-error' : 'progress-success' %> w-full h-2 mt-1" value="<%= [m[:pct], 100].min %>" max="100"></progress>
+              <p class="text-xs text-base-content/50 mt-1"><%= number_with_delimiter(m[:daily_avg]) %> / <%= number_with_delimiter(m[:limit]) %> <%= m[:unit] %></p>
+            </div>
+          <% end %>
+        </div>
+        <% if @diet[:alerts].any? %>
+          <p class="text-xs text-error mt-3">⚠ Over recommended limit: <%= @diet[:alerts].map { |m| m[:label] }.join(", ") %></p>
+        <% end %>
+      <% else %>
+        <p class="text-sm text-base-content/50 py-6 text-center">No diet logs recorded for this patient.</p>
+      <% end %>
+    </div>
+  </div>
+</div>
