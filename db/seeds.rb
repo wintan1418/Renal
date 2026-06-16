@@ -265,6 +265,17 @@ User.where(role: :doctor).find_each do |doc|
 end
 puts "  ✓ #{DoctorSchedule.count} doctor schedules"
 
+# ─── DEMO / TRANSACTIONAL DATA (seed once) ────────────────
+# Everything below uses RELATIVE dates (e.g. 8.weeks.ago) as part of its
+# find_or_create_by! key, so re-running on a later calendar day would create
+# NEW rows = duplicates. Guard it so it only seeds on a fresh database.
+# All the *reference* data above (hospital, departments, services, doctors,
+# lab tests, blog posts, testimonials, schedules) stays fully idempotent and
+# upserts on every run.
+if Appointment.exists? || Invoice.exists?
+  puts "  ↻ Demo transactional data already present — skipping (idempotent)."
+else
+
 dr1 = User.find_by(email: "adaeze.okonkwo@healthroom.ng")
 dr4 = User.find_by(email: "oluwaseun.adeleke@healthroom.ng")
 nephrology    = Department.find_by!(name: "Nephrology")
@@ -785,6 +796,8 @@ ContactSubmission.find_or_create_by!(email: "mrs.ade@example.com") do |cs|
   cs.message = "Please can you send me information about your dialysis packages? My father was recently diagnosed with ESRD and we need to know the costs involved."
   cs.status = :unread
 end
+
+end # ─── end demo / transactional data guard ───────────────
 
 puts "\n" + "=" * 60
 puts "SEED COMPLETE!"
