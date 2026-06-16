@@ -115,7 +115,7 @@
           <ul class="mt-2 space-y-3">
             <% @recent_lab_results.each do |result| %>
               <li>
-                <%= link_to patient_portal_lab_result_path(result), class: "flex items-center justify-between gap-3 group" do %>
+                <%= link_to patient_portal_lab_result_path(result.lab_order_id), class: "flex items-center justify-between gap-3 group" do %>
                   <div class="min-w-0">
                     <p class="font-medium text-sm truncate group-hover:text-secondary transition-colors"><%= result.lab_test&.name || "Lab test" %></p>
                     <p class="text-xs text-base-content/50"><%= result.result_date&.strftime("%b %-d, %Y") %></p>
