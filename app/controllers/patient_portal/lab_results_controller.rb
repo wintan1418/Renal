@@ -34,7 +34,7 @@ class PatientPortal::LabResultsController < PatientPortal::BaseController
     results = @lab_order.lab_results.select { |r| r.value.present? }
     return if results.empty?
 
-    @explanation = Rails.cache.fetch("ai/lab_explain/#{@lab_order.id}/#{@lab_order.updated_at.to_i}", expires_in: 30.days) do
+    @explanation = resilient_cache("ai/lab_explain/#{@lab_order.id}/#{@lab_order.updated_at.to_i}", expires_in: 30.days) do
       Ai::LabExplainer.call(results).content
     end
   end

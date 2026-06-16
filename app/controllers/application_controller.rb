@@ -12,6 +12,16 @@ class ApplicationController < ActionController::Base
     @current_hospital ||= Hospital.current
   end
 
+  # Cache helper that degrades gracefully if the cache backend is unavailable
+  # (e.g. the Solid Cache table isn't set up). Falls back to computing the
+  # value directly so a broken cache can never 500 a page.
+  def resilient_cache(key, **options)
+    Rails.cache.fetch(key, **options) { yield }
+  rescue StandardError => e
+    Rails.logger.warn("[resilient_cache] #{e.class}: #{e.message}")
+    yield
+  end
+
   protected
 
   def configure_permitted_parameters

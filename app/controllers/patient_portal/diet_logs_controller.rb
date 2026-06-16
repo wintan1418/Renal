@@ -11,7 +11,7 @@ class PatientPortal::DietLogsController < PatientPortal::BaseController
     @diet_analysis = Intelligence::DietAnalyzer.call(current_user)
     if @diet_analysis[:available]
       last_log = current_user.diet_logs.maximum(:updated_at).to_i
-      @diet_coaching = Rails.cache.fetch("ai/diet_coach/#{current_user.id}/#{last_log}", expires_in: 1.day) do
+      @diet_coaching = resilient_cache("ai/diet_coach/#{current_user.id}/#{last_log}", expires_in: 1.day) do
         Ai::DietCoach.call(current_user, analysis: @diet_analysis).content
       end
     end

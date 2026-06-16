@@ -17,7 +17,7 @@ module Admin
         LabResult.where(patient_id: @patient.id).maximum(:updated_at).to_i
       ].join("-")
 
-      briefing = Rails.cache.fetch("ai/briefing/#{@patient.id}/#{fingerprint}", expires_in: 12.hours) do
+      briefing = resilient_cache("ai/briefing/#{@patient.id}/#{fingerprint}", expires_in: 12.hours) do
         result = Ai::ClinicalBriefing.call(@patient, analysis: @analysis, diet: @diet, med_safety: @med_safety)
         { content: result.content, source: result.ai? ? "AI · #{result.source}" : "rule-based" }
       end

@@ -8,6 +8,39 @@ module Ai
       @context = context
     end
 
+    # Convenience: returns the note already split into SOAP sections plus the
+    # source, used by both the in-form scribe endpoint and server-side save.
+    def self.soap(notes, context: {})
+      result = call(notes, context: context)
+      parse(result.content).merge(source: result.source, ai: result.ai?)
+    end
+
+    # The prompt/fallback emit "Subjective:/Objective:/Assessment:/Plan:"
+    # headings (markdown-tolerant). Anything before the first heading becomes
+    # Subjective.
+    def self.parse(text)
+      sections = { subjective: "", objective: "", assessment: "", plan: "" }
+      current = :subjective
+      headings = {
+        /\Asubjective:/i => :subjective, /\Aobjective:/i => :objective,
+        /\Aassessment:/i => :assessment, /\Aplan:/i => :plan
+      }
+
+      text.to_s.each_line do |raw|
+        line = raw.gsub("**", "").gsub(/\A\s*#+\s*/, "").gsub(/\A\s*[-*]\s+/, "")
+        stripped = line.strip
+        if (match = headings.find { |re, _| stripped.match?(re) })
+          current = match.last
+          rest = stripped.sub(/\A[a-z]+:/i, "").strip
+          sections[current] << "#{rest}\n" unless rest.empty?
+        else
+          sections[current] << line.gsub("**", "")
+        end
+      end
+
+      sections.transform_values(&:strip)
+    end
+
     private
 
     def temperature = 0.2
