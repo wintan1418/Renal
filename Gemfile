@@ -78,6 +78,7 @@ gem "thruster", require: false
 
 
 group :development, :test do
+  gem "dotenv-rails" # loads .env so local API keys (Gemini, OpenRouter, etc.) are available
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
   gem "brakeman", require: false
   gem "rubocop-rails-omakase", require: false
