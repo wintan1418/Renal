@@ -68,7 +68,9 @@ Rails.application.routes.draw do
       member do
         get :chart
       end
-      resources :visits, only: [ :index, :new, :create, :show, :update ]
+      resources :visits, only: [ :index, :new, :create, :show, :update ] do
+        resources :clinical_notes, only: [ :create ]
+      end
       resources :vital_signs, only: [ :new, :create ]
       resources :diagnoses, only: [ :new, :create, :edit, :update ]
       resources :allergies, only: [ :new, :create, :edit, :update, :destroy ]
@@ -77,6 +79,7 @@ Rails.application.routes.draw do
       resources :prescriptions, only: [ :new, :create, :show ]
     end
     resources :lab_results, only: [ :edit, :update ]
+    post "ai/scribe", to: "ai#scribe", as: :ai_scribe
     resources :dialysis_sessions do
       member do
         patch :start

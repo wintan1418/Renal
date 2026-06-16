@@ -77,6 +77,55 @@
         <% else %>
           <p class="text-base-content/60 text-sm">No clinical notes yet.</p>
         <% end %>
+
+        <!-- Add clinical note (with AI scribe) -->
+        <details class="mt-4 rounded-xl border border-base-300 bg-base-200/40">
+          <summary class="cursor-pointer select-none px-4 py-3 font-medium text-sm flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            Add clinical note
+          </summary>
+          <div class="px-4 pb-4" data-controller="ai-scribe"
+               data-ai-scribe-url-value="<%= staff_ai_scribe_path %>"
+               data-ai-scribe-patient-name-value="<%= @patient.full_name %>"
+               data-ai-scribe-reason-value="<%= @visit.chief_complaint %>">
+
+            <!-- AI scribe -->
+            <div class="rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10 p-3 mb-4">
+              <label class="text-xs font-semibold flex items-center gap-1.5 text-primary mb-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                AI scribe — type rough notes, generate a SOAP draft
+              </label>
+              <textarea data-ai-scribe-target="rough" rows="2" class="textarea textarea-bordered w-full text-sm" placeholder="e.g. 52yo male, swollen legs, bp high 150/95, on lisinopril, eGFR dropping, start furosemide, recheck 4 weeks"></textarea>
+              <button type="button" data-ai-scribe-target="button" data-action="ai-scribe#generate" class="btn btn-sm btn-primary mt-2">Generate SOAP ✨</button>
+              <p data-ai-scribe-target="status" class="text-xs mt-1 text-base-content/50"></p>
+            </div>
+
+            <%= form_with url: staff_patient_visit_clinical_notes_path(@patient, @visit), method: :post, class: "space-y-3" do |f| %>
+              <%= f.hidden_field :note_type, value: "soap" %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="label label-text text-xs font-medium">Subjective</label>
+                  <%= f.text_area :subjective, rows: 3, class: "textarea textarea-bordered w-full text-sm", data: { "ai-scribe-target": "subjective" } %>
+                </div>
+                <div>
+                  <label class="label label-text text-xs font-medium">Objective</label>
+                  <%= f.text_area :objective, rows: 3, class: "textarea textarea-bordered w-full text-sm", data: { "ai-scribe-target": "objective" } %>
+                </div>
+                <div>
+                  <label class="label label-text text-xs font-medium">Assessment</label>
+                  <%= f.text_area :assessment, rows: 3, class: "textarea textarea-bordered w-full text-sm", data: { "ai-scribe-target": "assessment" } %>
+                </div>
+                <div>
+                  <label class="label label-text text-xs font-medium">Plan</label>
+                  <%= f.text_area :plan, rows: 3, class: "textarea textarea-bordered w-full text-sm", data: { "ai-scribe-target": "plan" } %>
+                </div>
+              </div>
+              <div class="flex justify-end">
+                <%= f.submit "Save note", class: "btn btn-sm btn-primary" %>
+              </div>
+            <% end %>
+          </div>
+        </details>
       </div>
     </div>
 

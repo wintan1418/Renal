@@ -22,5 +22,20 @@ class PatientPortal::LabResultsController < PatientPortal::BaseController
         @trend_data[result.lab_test.name] = history.map { |r| [ r.result_date&.to_s || r.created_at.to_date.to_s, r.numeric_value.to_f ] }
       end
     end
+
+    load_explanation
+  end
+
+  private
+
+  # Plain-language explanation of the results (AI when configured, otherwise a
+  # rule-based summary). Cached per order so we don't re-call the LLM.
+  def load_explanation
+    results = @lab_order.lab_results.select { |r| r.value.present? }
+    return if results.empty?
+
+    @explanation = Rails.cache.fetch("ai/lab_explain/#{@lab_order.id}/#{@lab_order.updated_at.to_i}", expires_in: 30.days) do
+      Ai::LabExplainer.call(results).content
+    end
   end
 end
