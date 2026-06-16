@@ -2,6 +2,9 @@ Rails.application.routes.draw do
   # Authentication
   devise_for :users
 
+  # Account / profile (all signed-in roles)
+  resource :profile, only: [ :show, :update ]
+
   # Public Website
   root "public/home#index"
 
