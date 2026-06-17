@@ -5,17 +5,23 @@ puts "=" * 60
 # ─── HOSPITAL ─────────────────────────────────────────────
 puts "\n[1/9] Hospital..."
 hospital = Hospital.find_or_create_by!(name: "Healthroom Renal Centre") do |h|
-  h.address = "15 Medical Drive, Victoria Island"
-  h.city = "Lagos"
-  h.state = "Lagos"
-  h.country = "Nigeria"
-  h.phone = "+234 800 HEALTH"
-  h.email = "info@healthroom.ng"
-  h.website = "https://healthroom.ng"
+  h.address = "125 Riverside Medical Drive"
+  h.city = "Central District"
+  h.state = ""
+  h.country = ""
+  h.phone = "+1 800 HEALTH"
+  h.email = "info@healthroom.health"
+  h.website = "https://healthroom.health"
   h.currency = "NGN"
-  h.timezone = "Africa/Lagos"
+  h.timezone = "UTC"
   h.opening_time = "08:00"
   h.closing_time = "18:00"
+end
+# Globalize an existing record that was seeded with the old Nigeria-specific defaults.
+if hospital.country == "Nigeria" || hospital.city == "Lagos"
+  hospital.update!(address: "125 Riverside Medical Drive", city: "Central District", state: "",
+                   country: "", phone: "+1 800 HEALTH", email: "info@healthroom.health",
+                   website: "https://healthroom.health", timezone: "UTC")
 end
 puts "  ✓ #{hospital.name}"
 
@@ -160,10 +166,10 @@ PatientProfile.find_or_create_by!(user: patient1) do |pp|
   pp.date_of_birth = Date.new(1975, 3, 15); pp.gender = :male
   pp.blood_group = :o_positive; pp.genotype = :aa
   pp.marital_status = :married
-  pp.address = "42 Broad Street, Lagos Island"; pp.city = "Lagos"
-  pp.state = "Lagos"; pp.lga = "Lagos Island"; pp.occupation = "Business Owner"
+  pp.address = "42 Broad Street"; pp.city = "Riverton"
+  pp.state = "Central"; pp.lga = "Downtown"; pp.occupation = "Business Owner"
   pp.nok_name = "Yemi Bakare"; pp.nok_phone = "+2348044444002"; pp.nok_relationship = "Wife"
-  pp.insurance_provider = "NHIS"; pp.insurance_policy_number = "NHIS-TBK-2023-001"
+  pp.insurance_provider = "Aetna"; pp.insurance_policy_number = "AET-TBK-2023-001"
   pp.ckd_stage = :stage_3a; pp.on_dialysis = false
 end
 
@@ -173,10 +179,10 @@ PatientProfile.find_or_create_by!(user: patient2) do |pp|
   pp.date_of_birth = Date.new(1968, 8, 22); pp.gender = :female
   pp.blood_group = :a_positive; pp.genotype = :as_genotype
   pp.marital_status = :widowed
-  pp.address = "7 Adetokunbo Ademola Crescent, Wuse 2"; pp.city = "Abuja"
-  pp.state = "FCT"; pp.lga = "Abuja Municipal"; pp.occupation = "Civil Servant"
+  pp.address = "7 Maple Crescent"; pp.city = "Lakeside"
+  pp.state = "North"; pp.lga = "Midtown"; pp.occupation = "Civil Servant"
   pp.nok_name = "Chidi Obi"; pp.nok_phone = "+2348044444011"; pp.nok_relationship = "Son"
-  pp.insurance_provider = "Leadway Health"; pp.insurance_policy_number = "LH-NOB-2022-4456"
+  pp.insurance_provider = "Bupa"; pp.insurance_policy_number = "BUP-NOB-2022-4456"
   pp.ckd_stage = :stage_5; pp.on_dialysis = true
 end
 
@@ -186,8 +192,8 @@ PatientProfile.find_or_create_by!(user: patient3) do |pp|
   pp.date_of_birth = Date.new(1990, 11, 5); pp.gender = :male
   pp.blood_group = :b_positive; pp.genotype = :aa
   pp.marital_status = :single
-  pp.address = "21 Gowon Estate, Ipaja"; pp.city = "Lagos"
-  pp.state = "Lagos"; pp.lga = "Alimosho"; pp.occupation = "Teacher"
+  pp.address = "21 Park Estate"; pp.city = "Hillview"
+  pp.state = "West"; pp.lga = "Parkside"; pp.occupation = "Teacher"
   pp.nok_name = "Fatima Aliyu"; pp.nok_phone = "+2348044444021"; pp.nok_relationship = "Mother"
   pp.ckd_stage = :stage_2; pp.on_dialysis = false
 end
@@ -197,9 +203,9 @@ puts "  ✓ #{User.count} users total"
 # ─── CONTENT (Blog, Testimonials) ─────────────────────────
 puts "\n[4/9] Content..."
 blog_posts = [
-  { title: "Understanding Chronic Kidney Disease: What Every Nigerian Should Know",
-    excerpt: "CKD affects millions of Nigerians, yet many remain unaware until it reaches advanced stages.",
-    body: "Chronic Kidney Disease is a progressive condition where the kidneys gradually lose their ability to filter waste. In Nigeria, CKD is a growing public health concern with diabetes and hypertension as leading causes.\n\nEarly detection through simple blood and urine tests can catch CKD before symptoms appear. If you have diabetes, high blood pressure, or a family history of kidney disease, annual screening is essential.\n\nKey symptoms include fatigue, leg swelling, changes in urination, and persistent itching.",
+  { title: "Understanding Chronic Kidney Disease: What Everyone Should Know",
+    excerpt: "CKD affects hundreds of millions of people worldwide, yet many remain unaware until it reaches advanced stages.",
+    body: "Chronic Kidney Disease is a progressive condition where the kidneys gradually lose their ability to filter waste. Worldwide, CKD is a growing public health concern with diabetes and hypertension as leading causes.\n\nEarly detection through simple blood and urine tests can catch CKD before symptoms appear. If you have diabetes, high blood pressure, or a family history of kidney disease, annual screening is essential.\n\nKey symptoms include fatigue, leg swelling, changes in urination, and persistent itching.",
     category: :kidney_health },
   { title: "Nutrition Tips for Dialysis Patients",
     excerpt: "Proper nutrition is vital for patients undergoing dialysis. Learn what to eat and avoid.",
@@ -677,7 +683,7 @@ end
 
 # Patient 2 — insurance claim
 InsuranceClaim.find_or_create_by!(invoice: inv3, patient: patient2) do |c|
-  c.provider_name = "Leadway Health"; c.policy_number = "LH-NOB-2022-4456"
+  c.provider_name = "Bupa"; c.policy_number = "BUP-NOB-2022-4456"
   c.claim_amount_cents = 8_000_000; c.status = :submitted
   c.notes = "Submitted via portal. Awaiting approval."
 end
@@ -825,9 +831,9 @@ end # ─── end demo / transactional data guard ─────────�
 # RAILS_ENV=production (Faker is dev/test-only).
 puts "\n[+] Bulk demo population..."
 
-ng_first = %w[Chidi Amaka Yusuf Bola Ifeoma Emeka Halima Sade Obinna Zainab Tope Uche Kelechi Aisha Femi Suleiman Bisi Chinedu Folake Damilola]
-ng_last  = %w[Okafor Adeyemi Bello Okeke Lawal Eze Mohammed Balogun Nwankwo Aliyu Obi Adebayo Danjuma Chukwu Olawale Ogunleye Sani Onyeka Afolabi Ndukwe]
-cities   = [ [ "Lagos", "Lagos", "Eti-Osa" ], [ "Abuja", "FCT", "Abuja Municipal" ], [ "Port Harcourt", "Rivers", "Port Harcourt" ], [ "Kano", "Kano", "Nassarawa" ], [ "Ibadan", "Oyo", "Ibadan North" ] ]
+ng_first = %w[Liam Sofia Noah Aisha Mateo Mei Omar Chloe Arjun Fatima Lucas Yara Ethan Priya Diego Hana Daniel Zara Kenji Amara]
+ng_last  = %w[Smith Garcia Khan Chen Muller Rossi Andersson Silva Nguyen Kim Patel Hassan Dubois Costa Ali Johansson Tanaka Mwangi Reyes Novak]
+cities   = [ [ "London", "England", "Westminster" ], [ "Toronto", "Ontario", "Downtown" ], [ "Sydney", "New South Wales", "CBD" ], [ "Nairobi", "Nairobi", "Westlands" ], [ "Dubai", "Dubai", "Deira" ] ]
 occs     = %w[Trader Teacher Engineer Civil-Servant Nurse Accountant Retired Farmer Banker Student]
 stages   = %i[stage_1 stage_2 stage_3a stage_3b stage_4 stage_5]
 bloods   = %i[o_positive a_positive b_positive ab_positive o_negative a_negative]
@@ -953,7 +959,7 @@ puts "  ✓ today's clinic for Dr. #{lead_doc&.last_name}: #{lead_doc&.appointme
 
 # ── Diet & fluid logs (7 days, 3 meals/day) for the tracker + AI diet coach ──
 meal_set = %w[breakfast lunch dinner]
-notes_set = [ "Oat porridge, low-potassium", "Rice and grilled fish", "Yam with vegetable soup" ]
+notes_set = [ "Oat porridge with berries", "Grilled chicken with rice", "Steamed vegetables with quinoa" ]
 User.where(role: :patient).find_each.with_index do |patient, pi|
   next if patient.diet_logs.exists?
   heavy = pi.odd? # some patients exceed renal limits so the coach has something to flag

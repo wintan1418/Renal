@@ -17,7 +17,7 @@ module Ai
     def system_prompt
       <<~SYS
         You are a renal-care clinical decision-support assistant for a nephrology
-        hospital in Nigeria. Write a concise briefing for the treating clinician
+        hospital. Write a concise briefing for the treating clinician
         based ONLY on the structured data provided — never invent values or
         diagnoses. Use 4–6 sentences covering risk trajectory, medication-safety
         issues and dietary concerns, then end with up to 3 short, prioritised

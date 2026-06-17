@@ -1,5 +1,5 @@
 <% content_for(:title) { "Contact Us" } %>
-<% content_for(:meta_description) { "Get in touch with Healthroom Renal Centre. Book an appointment, ask a question, or find our location in Nigeria." } %>
+<% content_for(:meta_description) { "Get in touch with Healthroom Renal Centre. Book an appointment, ask a question,." } %>
 
 <div class="mk-pg">
   <section class="mk-section" style="padding:72px 0 56px">
@@ -15,9 +15,9 @@
       <!-- info -->
       <div style="display:flex;flex-direction:column;gap:14px">
         <% [
-          { icon: :pin, label: "Visit Us", value: (current_hospital.address.presence || "15 Medical Drive, Victoria Island") },
-          { icon: :phone, label: "Call Us", value: (current_hospital.phone.presence || "+234 800 HEALTH") },
-          { icon: :mail, label: "Email Us", value: (current_hospital.email.presence || "info@healthroom.ng") },
+          { icon: :pin, label: "Visit Us", value: (current_hospital.address.presence || "125 Riverside Medical Drive") },
+          { icon: :phone, label: "Call Us", value: (current_hospital.phone.presence || "+1 800 HEALTH") },
+          { icon: :mail, label: "Email Us", value: (current_hospital.email.presence || "info@healthroom.health") },
           { icon: :clock, label: "Hours", value: "Mon – Sat: 8:00 AM – 6:00 PM" }
         ].each do |c| %>
           <div style="display:flex;align-items:center;gap:16px;background:var(--mk-cream);border:1px solid var(--mk-cream-line);border-radius:16px;padding:20px 22px">
@@ -26,7 +26,7 @@
           </div>
         <% end %>
         <div style="width:100%;height:180px;border-radius:16px;background:linear-gradient(135deg, oklch(0.42 0.09 162), var(--mk-navy));display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.85);font-weight:600;gap:8px">
-          <%= mk_icon :pin, size: 22, stroke: "#fff", width: 2 %> Victoria Island, Lagos
+          <%= mk_icon :pin, size: 22, stroke: "#fff", width: 2 %> Central District
         </div>
       </div>
 

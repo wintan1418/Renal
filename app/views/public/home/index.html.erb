@@ -1,5 +1,5 @@
-<% content_for(:title) { "Expert Kidney Care in Nigeria" } %>
-<% content_for(:meta_description) { "Healthroom Renal Centre — Nigeria's premier renal hospital offering expert kidney care, dialysis services, and compassionate treatment." } %>
+<% content_for(:title) { "Expert Kidney Care" } %>
+<% content_for(:meta_description) { "Healthroom Renal Centre — A premier renal hospital offering expert kidney care, dialysis services, and compassionate treatment." } %>
 
 <div class="mk-pg">
   <!-- ===================== HERO ===================== -->
@@ -7,7 +7,7 @@
     <div class="mk-wrap mk-hero-grid" style="display:grid;grid-template-columns:1.05fr 0.95fr;gap:40px;align-items:center;min-height:560px">
       <div style="padding:64px 0">
         <div style="display:inline-flex;align-items:center;gap:8px;background:var(--mk-teal-soft);color:var(--mk-teal-ink);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:8px 15px;border-radius:999px;margin-bottom:26px">
-          <span style="width:7px;height:7px;border-radius:50%;background:var(--mk-teal);display:inline-block"></span>Nigeria's premier renal hospital
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--mk-teal);display:inline-block"></span>A premier renal centre
         </div>
         <h1 class="mk-h1">Expert <span class="mk-serif-em">kidney care,</span><br>compassionate healing.</h1>
         <p class="mk-lead" style="margin-top:24px;max-width:440px">Comprehensive nephrology — from early diagnosis to advanced dialysis — delivered by board-certified specialists with modern technology and a deeply human touch.</p>
@@ -52,11 +52,11 @@
       </div>
       <div>
         <div class="mk-eyebrow">— Why choose us</div>
-        <h2 class="mk-h2">Nigeria's most trusted renal care centre</h2>
+        <h2 class="mk-h2">A trusted renal care centre</h2>
         <p class="mk-lead" style="margin-top:18px;max-width:480px">We combine advanced medical technology with a deeply human approach to kidney care — so every patient feels seen, supported and safe.</p>
         <div style="display:grid;gap:14px;margin-top:32px">
           <% [
-            { icon: :shield, tint: "mk-t-green", title: "Board-Certified Nephrologists", desc: "Trained at top institutions in Nigeria, the UK and the US." },
+            { icon: :shield, tint: "mk-t-green", title: "Board-Certified Nephrologists", desc: "Trained at leading institutions worldwide." },
             { icon: :droplet, tint: "mk-t-blue", title: "Modern Dialysis Facility", desc: "Advanced haemodialysis and peritoneal dialysis suites." },
             { icon: :flask, tint: "mk-t-purple", title: "On-Site Laboratory", desc: "Fast, accurate kidney function tests and diagnostics." },
             { icon: :heart, tint: "mk-t-coral", title: "Patient-First Approach", desc: "Personalised plans, nutrition counselling and ongoing support." }
@@ -188,9 +188,9 @@
         </div>
         <div style="position:relative;display:flex;flex-direction:column;gap:14px">
           <% [
-            { icon: :pin, label: "Visit Us", value: (current_hospital.address.presence || "15 Medical Drive, Victoria Island") },
-            { icon: :phone, label: "Call Us", value: (current_hospital.phone.presence || "+234 800 HEALTH") },
-            { icon: :mail, label: "Email Us", value: (current_hospital.email.presence || "info@healthroom.ng") }
+            { icon: :pin, label: "Visit Us", value: (current_hospital.address.presence || "125 Riverside Medical Drive") },
+            { icon: :phone, label: "Call Us", value: (current_hospital.phone.presence || "+1 800 HEALTH") },
+            { icon: :mail, label: "Email Us", value: (current_hospital.email.presence || "info@healthroom.health") }
           ].each do |c| %>
             <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 18px">
               <span style="width:42px;height:42px;border-radius:11px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><%= mk_icon c[:icon], size: 20, stroke: "oklch(0.7 0.1 162)", width: 2 %></span>
