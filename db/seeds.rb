@@ -923,6 +923,65 @@ if consult && neph_dept && labdocs.any?
 end
 puts "  ✓ appointments=#{Appointment.count}"
 
+# ── Diet & fluid logs (7 days, 3 meals/day) for the tracker + AI diet coach ──
+meal_set = %w[breakfast lunch dinner]
+notes_set = [ "Oat porridge, low-potassium", "Rice and grilled fish", "Yam with vegetable soup" ]
+User.where(role: :patient).find_each.with_index do |patient, pi|
+  next if patient.diet_logs.exists?
+  heavy = pi.odd? # some patients exceed renal limits so the coach has something to flag
+  (0..6).each do |d|
+    date = d.days.ago.to_date
+    meal_set.each_with_index do |meal, mi|
+      DietLog.find_or_create_by!(patient: patient, log_date: date, meal_type: meal) do |dl|
+        dl.fluid_intake_ml = 180 + mi * 60 + ((pi + d) % 4) * 30
+        dl.sodium_mg       = (heavy ? 750 : 340) + ((pi + mi) % 5) * 30
+        dl.potassium_mg    = (heavy ? 850 : 300) + ((d + mi) % 5) * 25
+        dl.phosphorus_mg   = 180 + ((pi + d) % 4) * 45
+        dl.protein_g       = 14 + mi * 4 + pi % 4
+        dl.calories_kcal   = 300 + mi * 90 + (pi % 5) * 25
+        dl.notes           = notes_set[mi]
+      end
+    end
+  end
+end
+puts "  ✓ diet_logs=#{DietLog.count} for #{DietLog.distinct.count(:patient_id)} patients"
+
+# ── Billing for demo patients + repair invoice totals ──
+# The Invoice#calculate_totals callback runs before items are attached, so
+# seeded invoices end up with total_cents = 0. We set totals via update_columns
+# (bypassing the callback) and repair every invoice from its items.
+bill_services = Service.where(name: [ "Nephrology Consultation", "Hemodialysis Session", "Follow-up Consultation", "Serum Creatinine" ]).to_a
+pay_methods = %i[cash card paystack bank_transfer]
+bill_statuses = %i[paid sent overdue draft sent paid]
+
+User.where(role: :patient).where("email LIKE ?", "demo.patient.%").each_with_index do |patient, i|
+  next if patient.invoices_as_patient.exists?
+  status = bill_statuses[i % bill_statuses.size]
+  inv = Invoice.create!(patient: patient, status: status, notes: "Demo invoice",
+                        due_date: (status == :overdue ? 10.days.ago.to_date : 21.days.from_now.to_date))
+  svc = bill_services[i % bill_services.size] || Service.first
+  InvoiceItem.create!(invoice: inv, description: svc&.name || "Consultation",
+                      quantity: 1 + (i % 3), unit_price_cents: (svc&.price_cents || 2_500_000))
+  sub = inv.invoice_items.sum(:total_cents)
+  inv.update_columns(subtotal_cents: sub, total_cents: sub)
+
+  if status == :paid
+    Payment.create!(invoice: inv, patient: patient, amount_cents: sub, payment_method: pay_methods[i % pay_methods.size], status: :successful, notes: "Demo payment")
+    inv.update_columns(amount_paid_cents: sub)
+  elsif status == :sent && i.odd?
+    part = (sub / 2.0).round
+    Payment.create!(invoice: inv, patient: patient, amount_cents: part, payment_method: :paystack, status: :successful, notes: "Part payment")
+    inv.update_columns(amount_paid_cents: part)
+  end
+end
+
+Invoice.includes(:invoice_items).find_each do |inv|
+  sub = inv.invoice_items.sum(:total_cents)
+  total = sub - inv.discount_cents.to_i + inv.tax_cents.to_i
+  inv.update_columns(subtotal_cents: sub, total_cents: total) if inv.subtotal_cents != sub || inv.total_cents != total
+end
+puts "  ✓ invoices=#{Invoice.count}, total invoiced=₦#{(Invoice.sum(:total_cents) / 100).to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse}"
+
 puts "\n" + "=" * 60
 puts "SEED COMPLETE!"
 puts "=" * 60
