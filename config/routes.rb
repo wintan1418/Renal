@@ -84,6 +84,7 @@ Rails.application.routes.draw do
       resources :medications, only: [ :new, :create, :edit, :update ]
       resources :lab_orders, only: [ :new, :create, :show, :update ]
       resources :prescriptions, only: [ :new, :create, :show ]
+      resources :vascular_accesses, only: [ :create, :update ]
     end
     resources :lab_results, only: [ :index, :edit, :update ]
     get "dose_calculator", to: "dose_calculator#index", as: :dose_calculator

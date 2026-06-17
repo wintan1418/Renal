@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_17_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_17_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -812,6 +812,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_000001) do
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
 
+  create_table "vascular_accesses", force: :cascade do |t|
+    t.bigint "patient_id", null: false
+    t.integer "access_type", default: 0, null: false
+    t.string "location"
+    t.date "created_on"
+    t.integer "status", default: 0, null: false
+    t.date "last_assessed_on"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["patient_id"], name: "index_vascular_accesses_on_patient_id"
+  end
+
   create_table "visits", force: :cascade do |t|
     t.bigint "appointment_id"
     t.bigint "patient_id", null: false
@@ -928,6 +941,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_000001) do
   add_foreign_key "telemedicine_sessions", "users", column: "doctor_id"
   add_foreign_key "telemedicine_sessions", "users", column: "patient_id"
   add_foreign_key "transplant_waitlist_entries", "users", column: "patient_id"
+  add_foreign_key "vascular_accesses", "users", column: "patient_id"
   add_foreign_key "visits", "appointments"
   add_foreign_key "visits", "users", column: "doctor_id"
   add_foreign_key "visits", "users", column: "patient_id"

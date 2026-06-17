@@ -53,6 +53,7 @@ class User < ApplicationRecord
   has_many :telemedicine_sessions_as_doctor, class_name: "TelemedicineSession", foreign_key: :doctor_id, dependent: :nullify
   has_many :patient_surveys, foreign_key: :patient_id, dependent: :destroy
   has_many :transplant_waitlist_entries, foreign_key: :patient_id, dependent: :destroy
+  has_many :vascular_accesses, foreign_key: :patient_id, dependent: :destroy
   has_many :diet_logs, foreign_key: :patient_id, dependent: :destroy
   has_many :emergency_contacts, foreign_key: :patient_id, dependent: :destroy
 

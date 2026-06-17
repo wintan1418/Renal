@@ -19,7 +19,28 @@ class LabResult < ApplicationRecord
 
   delegate :name, :unit, :normal_range, to: :lab_test, prefix: true
 
+  # Escalate a critical result to the ordering clinician as soon as it's set.
+  after_save :escalate_if_critical, if: -> { saved_change_to_flag? && critical? }
+
   def abnormal?
     low? || high? || critical?
+  end
+
+  private
+
+  def escalate_if_critical
+    doctor = lab_order&.ordered_by
+    return if doctor.nil?
+
+    Notifications::DispatchService.call(
+      recipient: doctor,
+      actor: resulted_by,
+      notifiable: self,
+      action: "critical_result",
+      title: "⚠ Critical lab result: #{lab_test&.name}",
+      body: "#{patient&.full_name}: #{lab_test&.name} = #{value} #{lab_test&.unit} (critical). Review urgently."
+    )
+  rescue StandardError => e
+    Rails.logger.error("[LabResult escalate] #{e.class}: #{e.message}")
   end
 end

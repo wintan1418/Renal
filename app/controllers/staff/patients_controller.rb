@@ -21,6 +21,7 @@ class Staff::PatientsController < Staff::BaseController
     @profile = @patient.patient_profile
     @tab = params[:tab] || "demographics"
     @renal_panel = Clinical::RenalLabPanel.call(@patient)
+    @vascular_accesses = @patient.vascular_accesses.recent
 
     case @tab
     when "visits"

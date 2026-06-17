@@ -1055,6 +1055,22 @@ if DialysisSession.where(session_date: Date.current).none?
 end
 puts "  ✓ today dialysis sessions=#{DialysisSession.where(session_date: Date.current).count}"
 
+# Vascular access for dialysis patients (idempotent — one per patient if none).
+locations = [ "Left forearm", "Right forearm", "Left upper arm", "Right internal jugular" ]
+va_status = %i[functioning functioning monitoring failing]
+User.where(role: :patient).joins(:patient_profile).where(patient_profiles: { on_dialysis: true }).find_each.with_index do |patient, i|
+  next if patient.vascular_accesses.exists?
+  patient.vascular_accesses.create!(
+    access_type: (i.even? ? :fistula : :graft),
+    location: locations[i % locations.size],
+    created_on: (12 + i).months.ago.to_date,
+    status: va_status[i % va_status.size],
+    last_assessed_on: (i % 14).days.ago.to_date,
+    notes: i % 3 == 2 ? "Thrill present, no bruit changes. Monitor flow." : nil
+  )
+end
+puts "  ✓ vascular accesses=#{VascularAccess.count}"
+
 # Backfill dialysis adequacy (Kt/V, URR, IDWG) on completed sessions that lack
 # urea readings — idempotent, fixes existing data so the metrics show.
 DialysisSession.status_completed.where(pre_urea: nil).find_each.with_index do |ds, i|
