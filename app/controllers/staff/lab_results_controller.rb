@@ -1,4 +1,10 @@
 class Staff::LabResultsController < Staff::BaseController
+  def index
+    orders = current_user.lab_orders_ordered.includes(:patient, lab_results: :lab_test).recent
+    @pending = orders.pending_orders.limit(25)
+    @completed = orders.status_completed.limit(25)
+  end
+
   def edit
     @lab_result = LabResult.includes(:lab_test, :lab_order).find(params[:id])
     @patient = @lab_result.patient

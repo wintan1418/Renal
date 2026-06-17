@@ -85,7 +85,7 @@ Rails.application.routes.draw do
       resources :lab_orders, only: [ :new, :create, :show, :update ]
       resources :prescriptions, only: [ :new, :create, :show ]
     end
-    resources :lab_results, only: [ :edit, :update ]
+    resources :lab_results, only: [ :index, :edit, :update ]
     post "ai/scribe", to: "ai#scribe", as: :ai_scribe
     resources :dialysis_sessions do
       member do

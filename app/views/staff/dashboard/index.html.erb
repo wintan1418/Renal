@@ -48,19 +48,24 @@
           <%= link_to "All appointments →", staff_appointments_path, class: "text-sm text-primary hover:underline" %>
         </div>
         <% if @today_appointments.any? %>
-          <ul class="divide-y divide-base-200 -mx-2">
+          <ul class="mt-3 space-y-2">
             <% @today_appointments.each do |appt| %>
+              <% t = appt.start_time %>
+              <% hm = t.respond_to?(:strftime) ? t.strftime("%-I:%M") : t.to_s %>
+              <% ampm = t.respond_to?(:strftime) ? t.strftime("%p") : "" %>
               <li>
-                <%= link_to staff_appointment_path(appt), class: "flex items-center gap-3 px-2 py-3 hover:bg-base-200/50 rounded-lg" do %>
-                  <div class="text-center w-14 shrink-0">
-                    <div class="font-bold text-sm"><%= appt.start_time.to_s %></div>
+                <%= link_to staff_appointment_path(appt), class: "group flex items-center gap-3 rounded-xl border border-base-200 p-2.5 hover:border-primary/40 hover:bg-base-200/40 transition-colors" do %>
+                  <div class="flex flex-col items-center justify-center w-16 shrink-0 rounded-lg bg-base-200/70 py-1.5">
+                    <span class="text-sm font-bold leading-none text-base-content"><%= hm %></span>
+                    <span class="text-[10px] font-medium text-base-content/50 tracking-wide"><%= ampm %></span>
                   </div>
                   <%= avatar_for appt.patient, size: "w-9 h-9", text_size: "text-xs" %>
                   <div class="flex-1 min-w-0">
-                    <p class="font-medium text-sm truncate"><%= appt.patient.full_name %></p>
+                    <p class="font-semibold text-sm truncate group-hover:text-primary transition-colors"><%= appt.patient.full_name %></p>
                     <p class="text-xs text-base-content/50 truncate"><%= appt.service&.name || appt.reason %></p>
                   </div>
-                  <span class="<%= appt_badge.call(appt.status) %> capitalize"><%= appt.status.humanize %></span>
+                  <span class="<%= appt_badge.call(appt.status) %> capitalize hidden sm:inline-flex"><%= appt.status.humanize %></span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/30 group-hover:text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                 <% end %>
               </li>
             <% end %>

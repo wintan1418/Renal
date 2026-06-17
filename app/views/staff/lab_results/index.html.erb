@@ -1,0 +1,44 @@
+<% content_for(:title, "Lab Results") %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Lab Results</h1>
+    <p class="text-base-content/60 text-sm mt-1">Lab orders you've requested — awaiting results and recently completed.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Awaiting results -->
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Awaiting results</h2>
+          <span class="badge badge-warning badge-sm"><%= @pending.size %></span>
+        </div>
+        <% if @pending.any? %>
+          <ul class="mt-2 space-y-2">
+            <% @pending.each do |lo| %><li><%= render "order_row", lo: lo %></li><% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-base-content/40 py-8 text-center">No pending lab orders.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Recently completed -->
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Recently completed</h2>
+          <span class="badge badge-success badge-sm"><%= @completed.size %></span>
+        </div>
+        <% if @completed.any? %>
+          <ul class="mt-2 space-y-2">
+            <% @completed.each do |lo| %><li><%= render "order_row", lo: lo %></li><% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-base-content/40 py-8 text-center">No completed lab orders yet.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
