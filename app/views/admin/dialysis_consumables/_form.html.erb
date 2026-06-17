@@ -49,10 +49,10 @@
         </div>
 
         <div class="form-control">
-          <%= f.label :unit_cost_cents, "Unit Cost (kobo)", class: "label label-text font-medium" %>
+          <%= f.label :unit_cost_cents, "Unit Cost (cents)", class: "label label-text font-medium" %>
           <%= f.number_field :unit_cost_cents, min: 0, class: "input input-bordered w-full",
-              placeholder: "e.g. 450000 = ₦4,500" %>
-          <span class="label-text-alt text-base-content/50 mt-1">Enter amount in kobo (1 NGN = 100 kobo)</span>
+              placeholder: "e.g. 45000 = #{money_symbol}450" %>
+          <span class="label-text-alt text-base-content/50 mt-1">Enter amount in cents (100 cents = 1 unit)</span>
         </div>
 
         <div class="form-control">

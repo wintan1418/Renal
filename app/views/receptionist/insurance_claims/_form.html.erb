@@ -12,7 +12,7 @@
   <div class="form-control">
     <%= f.label :invoice_id, "Invoice", class: "label label-text font-medium" %>
     <%= f.select :invoice_id,
-      @invoices.map { |inv| ["#{inv.invoice_number} — #{inv.patient&.full_name} (₦#{number_with_delimiter(inv.total_cents / 100)})", inv.id] },
+      @invoices.map { |inv| ["#{inv.invoice_number} — #{inv.patient&.full_name} (#{money_symbol}#{number_with_delimiter(inv.total_cents / 100)})", inv.id] },
       { prompt: "Select invoice..." },
       class: "select select-bordered w-full" %>
   </div>
@@ -31,11 +31,11 @@
       <%= f.text_field :member_id, class: "input input-bordered w-full" %>
     </div>
     <div class="form-control">
-      <%= f.label :claim_amount_cents, "Claim Amount (kobo)", class: "label label-text font-medium" %>
+      <%= f.label :claim_amount_cents, "Claim Amount (cents)", class: "label label-text font-medium" %>
       <%= f.number_field :claim_amount_cents, min: 0, step: 100, class: "input input-bordered w-full", placeholder: "0" %>
     </div>
     <div class="form-control">
-      <%= f.label :approved_amount_cents, "Approved Amount (kobo)", class: "label label-text font-medium" %>
+      <%= f.label :approved_amount_cents, "Approved Amount (cents)", class: "label label-text font-medium" %>
       <%= f.number_field :approved_amount_cents, min: 0, step: 100, class: "input input-bordered w-full", placeholder: "0" %>
     </div>
     <div class="form-control">

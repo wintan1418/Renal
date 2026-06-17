@@ -31,11 +31,11 @@
           class: "select select-bordered w-full" %>
       </div>
       <div class="form-control">
-        <%= f.label :discount_cents, "Discount (kobo)", class: "label label-text font-medium" %>
+        <%= f.label :discount_cents, "Discount (cents)", class: "label label-text font-medium" %>
         <%= f.number_field :discount_cents, min: 0, step: 100, class: "input input-bordered w-full", placeholder: "0" %>
       </div>
       <div class="form-control">
-        <%= f.label :tax_cents, "Tax (kobo)", class: "label label-text font-medium" %>
+        <%= f.label :tax_cents, "Tax (cents)", class: "label label-text font-medium" %>
         <%= f.number_field :tax_cents, min: 0, step: 100, class: "input input-bordered w-full", placeholder: "0" %>
       </div>
     </div>

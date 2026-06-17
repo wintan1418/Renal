@@ -90,9 +90,9 @@
               <%= f.date_field :follow_up_on, class: "input input-bordered input-sm w-full" %>
             </div>
             <div class="form-control">
-              <label class="label label-text text-xs font-medium">Estimated value (₦)</label>
+              <label class="label label-text text-xs font-medium">Estimated value (<%= money_symbol %>)</label>
               <%= f.number_field :estimated_value_cents, value: (@lead.estimated_value_cents.to_i / 100 if @lead.estimated_value_cents), step: 1000, class: "input input-bordered input-sm w-full", placeholder: "0" %>
-              <span class="text-[11px] text-base-content/40 mt-1">Enter naira; stored to the kobo.</span>
+              <span class="text-[11px] text-base-content/40 mt-1">Enter the amount in major units; stored as cents.</span>
             </div>
             <div class="form-control">
               <label class="label label-text text-xs font-medium">Source</label>

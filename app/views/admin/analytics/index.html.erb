@@ -22,7 +22,7 @@
     </div>
     <div class="stat">
       <div class="stat-title">Revenue (Month)</div>
-      <div class="stat-value text-success text-2xl">&#8358;<%= number_with_delimiter((@data[:revenue_this_month] / 100.0).round) %></div>
+      <div class="stat-value text-success text-2xl"><%= money_symbol %><%= number_with_delimiter((@data[:revenue_this_month] / 100.0).round) %></div>
       <div class="stat-desc"><%= @data[:outstanding_invoices] %> unpaid invoices</div>
     </div>
     <div class="stat">
@@ -47,7 +47,7 @@
     </div>
     <div class="card bg-base-100 shadow">
       <div class="card-body">
-        <h2 class="card-title text-base">Revenue Trend (&#8358;)</h2>
+        <h2 class="card-title text-base">Revenue Trend (<%= money_symbol %>)</h2>
         <%= bar_chart @data[:revenue_trend], height: "200px", colors: ["#22c55e"], legend: false %>
       </div>
     </div>

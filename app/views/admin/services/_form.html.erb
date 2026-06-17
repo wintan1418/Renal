@@ -41,14 +41,14 @@
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <div class="form-control w-full">
       <%= f.label :price_cents, class: "label" do %>
-        <span class="label-text">Price (in kobo)</span>
+        <span class="label-text">Price (in cents)</span>
       <% end %>
       <label class="input input-bordered flex items-center gap-2">
-        <span class="text-base-content/60">NGN</span>
+        <span class="text-base-content/60"><%= money_symbol %></span>
         <%= f.number_field :price_cents, class: "grow", placeholder: "0", min: 0, step: 100 %>
       </label>
       <label class="label">
-        <span class="label-text-alt text-base-content/50">Enter amount in kobo (100 kobo = 1 Naira)</span>
+        <span class="label-text-alt text-base-content/50">Enter amount in cents (100 cents = 1 unit)</span>
       </label>
     </div>
 

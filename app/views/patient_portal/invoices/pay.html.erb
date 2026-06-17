@@ -25,7 +25,7 @@
     <!-- Amount Due -->
     <div class="text-center mb-6">
       <p class="text-base-content/50 text-sm mb-1">Balance Due</p>
-      <p class="text-4xl font-extrabold text-error">₦<%= number_with_delimiter(@invoice.balance_due_cents / 100) %></p>
+      <p class="text-4xl font-extrabold text-error"><%= money_symbol %><%= number_with_delimiter(@invoice.balance_due_cents / 100) %></p>
     </div>
 
     <div class="divider"></div>
@@ -35,17 +35,17 @@
       <% @invoice.invoice_items.each do |item| %>
         <div class="flex justify-between">
           <span class="text-base-content/70"><%= item.description || item.service&.name %> &times; <%= item.quantity %></span>
-          <span>₦<%= number_with_delimiter(item.total_cents / 100) %></span>
+          <span><%= money_symbol %><%= number_with_delimiter(item.total_cents / 100) %></span>
         </div>
       <% end %>
       <div class="flex justify-between font-semibold pt-2 border-t border-base-200">
         <span>Total</span>
-        <span>₦<%= number_with_delimiter(@invoice.total_cents / 100) %></span>
+        <span><%= money_symbol %><%= number_with_delimiter(@invoice.total_cents / 100) %></span>
       </div>
       <% if @invoice.amount_paid_cents > 0 %>
         <div class="flex justify-between text-success">
           <span>Previously Paid</span>
-          <span>-₦<%= number_with_delimiter(@invoice.amount_paid_cents / 100) %></span>
+          <span>-<%= money_symbol %><%= number_with_delimiter(@invoice.amount_paid_cents / 100) %></span>
         </div>
       <% end %>
     </div>
@@ -62,7 +62,7 @@
     </div>
 
     <%= form_with url: initiate_payment_patient_portal_invoice_path(@invoice), method: :post do |f| %>
-      <%= f.submit "Record demo payment of ₦#{number_with_delimiter(@invoice.balance_due_cents / 100)}",
+      <%= f.submit "Record demo payment of #{money_symbol}#{number_with_delimiter(@invoice.balance_due_cents / 100)}",
         class: "btn btn-primary btn-block btn-lg" %>
     <% end %>
   </div>

@@ -340,7 +340,7 @@
                     <td class="font-medium"><%= sc.dialysis_consumable&.name %></td>
                     <td><%= sc.quantity_used %> <%= sc.dialysis_consumable&.unit %></td>
                     <td class="text-sm text-base-content/70">
-                      &#8358;<%= number_with_delimiter((sc.dialysis_consumable&.unit_cost_cents.to_i / 100.0).to_i) %>
+                      <%= money_symbol %><%= number_with_delimiter((sc.dialysis_consumable&.unit_cost_cents.to_i / 100.0).to_i) %>
                     </td>
                   </tr>
                 <% end %>

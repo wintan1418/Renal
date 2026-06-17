@@ -99,14 +99,14 @@
         <!-- Price -->
         <div class="form-control w-full">
           <%= f.label :price_cents, class: "label" do %>
-            <span class="label-text font-medium">Price (in kobo)</span>
+            <span class="label-text font-medium">Price (in cents)</span>
           <% end %>
           <div class="input input-bordered flex items-center gap-2">
-            <span class="text-base-content/50 text-sm">₦</span>
-            <%= f.number_field :price_cents, min: 0, class: "grow bg-transparent border-none outline-none", placeholder: "e.g. 500000 for ₦5,000" %>
+            <span class="text-base-content/50 text-sm"><%= money_symbol %></span>
+            <%= f.number_field :price_cents, min: 0, class: "grow bg-transparent border-none outline-none", placeholder: "e.g. 50000 for #{money_symbol}500" %>
           </div>
           <label class="label">
-            <span class="label-text-alt text-base-content/60">Enter price in kobo (100 kobo = ₦1). Enter 0 if free.</span>
+            <span class="label-text-alt text-base-content/60">Enter price in minor units (100 = #{money_symbol}1). Enter 0 if free.</span>
           </label>
         </div>
 

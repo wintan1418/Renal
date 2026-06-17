@@ -42,12 +42,12 @@
       </div>
       <div>
         <p class="text-base-content/50">Claim Amount</p>
-        <p class="font-semibold text-lg">₦<%= number_with_delimiter(@claim.claim_amount_cents / 100) %></p>
+        <p class="font-semibold text-lg"><%= money_symbol %><%= number_with_delimiter(@claim.claim_amount_cents / 100) %></p>
       </div>
       <div>
         <p class="text-base-content/50">Approved Amount</p>
         <p class="font-semibold text-lg <%= @claim.approved_amount_cents.to_i > 0 ? 'text-success' : 'text-base-content/40' %>">
-          ₦<%= number_with_delimiter(@claim.approved_amount_cents.to_i / 100) %>
+          <%= money_symbol %><%= number_with_delimiter(@claim.approved_amount_cents.to_i / 100) %>
         </p>
       </div>
       <% if @claim.responded_at %>
@@ -72,8 +72,8 @@
       <div class="p-4 bg-base-200 rounded-xl">
         <p class="font-mono font-bold"><%= @claim.invoice.invoice_number %></p>
         <p class="text-sm text-base-content/60"><%= @claim.patient&.full_name %></p>
-        <p class="text-sm mt-2">Total: <span class="font-semibold">₦<%= number_with_delimiter(@claim.invoice.total_cents / 100) %></span></p>
-        <p class="text-sm">Balance: <span class="font-semibold text-error">₦<%= number_with_delimiter(@claim.invoice.balance_due_cents / 100) %></span></p>
+        <p class="text-sm mt-2">Total: <span class="font-semibold"><%= money_symbol %><%= number_with_delimiter(@claim.invoice.total_cents / 100) %></span></p>
+        <p class="text-sm">Balance: <span class="font-semibold text-error"><%= money_symbol %><%= number_with_delimiter(@claim.invoice.balance_due_cents / 100) %></span></p>
       </div>
       <%= link_to receptionist_invoice_path(@claim.invoice), class: "btn btn-outline btn-sm btn-block mt-2" do %>
         View Invoice

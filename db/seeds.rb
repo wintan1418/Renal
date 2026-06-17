@@ -59,7 +59,7 @@ services_data = [
 services_data.each do |s|
   dept = Department.find_by!(name: s[:dept])
   Service.find_or_create_by!(name: s[:name]) do |r|
-    r.department = dept; r.price_cents = s[:price]
+    r.department = dept; r.price_cents = s[:price] / 100
     r.duration_minutes = s[:dur]; r.service_type = s[:type]
   end
 end
@@ -135,7 +135,7 @@ doctors = doctors_data.map do |d|
     sp.department = d[:dept]; sp.employee_id = "DR-#{u.id.to_s.rjust(4, '0')}"
     sp.specialization = d[:specialization]; sp.qualification = d[:qualification]
     sp.bio = d[:bio]; sp.years_of_experience = d[:years]
-    sp.consultation_fee_cents = d[:fee]
+    sp.consultation_fee_cents = d[:fee] / 100
   end
   u
 end
@@ -274,7 +274,7 @@ lab_tests_data = [
 lab_tests_data.each do |lt|
   LabTest.find_or_create_by!(code: lt[:code]) do |t|
     t.name = lt[:name]; t.category = lt[:cat]; t.unit = lt[:unit]
-    t.normal_range_min = lt[:min]; t.normal_range_max = lt[:max]; t.price_cents = lt[:price]
+    t.normal_range_min = lt[:min]; t.normal_range_max = lt[:max]; t.price_cents = lt[:price] / 100
   end
 end
 puts "  ✓ #{LabTest.count} lab tests"
@@ -556,7 +556,7 @@ consumables_data = [
 consumables_data.each do |c|
   DialysisConsumable.find_or_create_by!(name: c[:name]) do |item|
     item.category = c[:cat]; item.unit = c[:unit]; item.quantity_in_stock = c[:qty]
-    item.reorder_level = c[:reorder]; item.unit_cost_cents = c[:cost]; item.active = true
+    item.reorder_level = c[:reorder]; item.unit_cost_cents = c[:cost] / 100; item.active = true
   end
 end
 
@@ -636,70 +636,70 @@ puts "  ✓ #{NotificationPreference.count} notification preferences"
 # Patient 1 — sent invoice (unpaid)
 inv1 = Invoice.find_or_create_by!(invoice_number: "INV-#{Date.current.year}-00001") do |inv|
   inv.patient = patient1; inv.status = :sent
-  inv.subtotal_cents = 5_000_000; inv.discount_cents = 0; inv.tax_cents = 0
-  inv.total_cents = 5_000_000; inv.amount_paid_cents = 0
+  inv.subtotal_cents = 50_000; inv.discount_cents = 0; inv.tax_cents = 0
+  inv.total_cents = 50_000; inv.amount_paid_cents = 0
   inv.due_date = 30.days.from_now.to_date; inv.notes = "Consultation and lab tests"
 end
 InvoiceItem.find_or_create_by!(invoice: inv1, description: "Nephrology Consultation") do |item|
-  item.quantity = 1; item.unit_price_cents = 2_500_000; item.total_cents = 2_500_000
+  item.quantity = 1; item.unit_price_cents = 25_000; item.total_cents = 25_000
 end
 InvoiceItem.find_or_create_by!(invoice: inv1, description: "Kidney Function Panel") do |item|
-  item.quantity = 1; item.unit_price_cents = 1_500_000; item.total_cents = 1_500_000
+  item.quantity = 1; item.unit_price_cents = 15_000; item.total_cents = 15_000
 end
 InvoiceItem.find_or_create_by!(invoice: inv1, description: "Urinalysis") do |item|
-  item.quantity = 1; item.unit_price_cents = 1_000_000; item.total_cents = 1_000_000
+  item.quantity = 1; item.unit_price_cents = 10_000; item.total_cents = 10_000
 end
 
 # Patient 1 — paid invoice (historical)
 inv2 = Invoice.find_or_create_by!(invoice_number: "INV-#{Date.current.year - 1}-99999") do |inv|
   inv.patient = patient1; inv.status = :paid
-  inv.subtotal_cents = 3_500_000; inv.discount_cents = 0; inv.tax_cents = 0
-  inv.total_cents = 3_500_000; inv.amount_paid_cents = 3_500_000
+  inv.subtotal_cents = 35_000; inv.discount_cents = 0; inv.tax_cents = 0
+  inv.total_cents = 35_000; inv.amount_paid_cents = 35_000
   inv.due_date = 2.months.ago.to_date; inv.notes = "Initial consultation visit"
 end
 InvoiceItem.find_or_create_by!(invoice: inv2, description: "Nephrology Consultation") do |item|
-  item.quantity = 1; item.unit_price_cents = 2_500_000; item.total_cents = 2_500_000
+  item.quantity = 1; item.unit_price_cents = 25_000; item.total_cents = 25_000
 end
 InvoiceItem.find_or_create_by!(invoice: inv2, description: "CBC + Urinalysis") do |item|
-  item.quantity = 1; item.unit_price_cents = 1_000_000; item.total_cents = 1_000_000
+  item.quantity = 1; item.unit_price_cents = 10_000; item.total_cents = 10_000
 end
 Payment.find_or_create_by!(invoice: inv2, patient: patient1) do |p|
-  p.amount_cents = 3_500_000; p.payment_method = :cash; p.status = :successful; p.notes = "Paid at reception"
+  p.amount_cents = 35_000; p.payment_method = :cash; p.status = :successful; p.notes = "Paid at reception"
 end
 
 # Patient 2 — sent invoice (dialysis)
 inv3 = Invoice.find_or_create_by!(invoice_number: "INV-#{Date.current.year}-00010") do |inv|
   inv.patient = patient2; inv.status = :sent
-  inv.subtotal_cents = 15_000_000; inv.discount_cents = 0; inv.tax_cents = 0
-  inv.total_cents = 15_000_000; inv.amount_paid_cents = 5_000_000
+  inv.subtotal_cents = 150_000; inv.discount_cents = 0; inv.tax_cents = 0
+  inv.total_cents = 150_000; inv.amount_paid_cents = 50_000
   inv.due_date = 14.days.from_now.to_date; inv.notes = "Three hemodialysis sessions"
 end
 InvoiceItem.find_or_create_by!(invoice: inv3, description: "Hemodialysis Session x 3") do |item|
-  item.quantity = 3; item.unit_price_cents = 5_000_000; item.total_cents = 15_000_000
+  item.quantity = 3; item.unit_price_cents = 50_000; item.total_cents = 150_000
 end
 Payment.find_or_create_by!(invoice: inv3, patient: patient2) do |p|
-  p.amount_cents = 5_000_000; p.payment_method = :cash; p.status = :successful; p.notes = "Part payment"
+  p.amount_cents = 50_000; p.payment_method = :cash; p.status = :successful; p.notes = "Part payment"
 end
 
 # Patient 2 — insurance claim
 InsuranceClaim.find_or_create_by!(invoice: inv3, patient: patient2) do |c|
   c.provider_name = "Bupa"; c.policy_number = "BUP-NOB-2022-4456"
-  c.claim_amount_cents = 8_000_000; c.status = :submitted
+  c.claim_amount_cents = 80_000; c.status = :submitted
   c.notes = "Submitted via portal. Awaiting approval."
 end
 
 # Patient 3 — draft invoice
 inv4 = Invoice.find_or_create_by!(invoice_number: "INV-#{Date.current.year}-00020") do |inv|
   inv.patient = patient3; inv.status = :draft
-  inv.subtotal_cents = 2_700_000; inv.discount_cents = 0; inv.tax_cents = 0
-  inv.total_cents = 2_700_000; inv.amount_paid_cents = 0
+  inv.subtotal_cents = 27_000; inv.discount_cents = 0; inv.tax_cents = 0
+  inv.total_cents = 27_000; inv.amount_paid_cents = 0
   inv.due_date = 30.days.from_now.to_date; inv.notes = "New patient consultation"
 end
 InvoiceItem.find_or_create_by!(invoice: inv4, description: "Nephrology Consultation") do |item|
-  item.quantity = 1; item.unit_price_cents = 2_500_000; item.total_cents = 2_500_000
+  item.quantity = 1; item.unit_price_cents = 25_000; item.total_cents = 25_000
 end
 InvoiceItem.find_or_create_by!(invoice: inv4, description: "Urinalysis") do |item|
-  item.quantity = 1; item.unit_price_cents = 200_000; item.total_cents = 200_000
+  item.quantity = 1; item.unit_price_cents = 2_000; item.total_cents = 2_000
 end
 
 puts "  ✓ #{Invoice.count} invoices, #{Payment.count} payments"
@@ -1035,7 +1035,7 @@ User.where(role: :patient).where("email LIKE ?", "demo.patient.%").each_with_ind
                         due_date: (status == :overdue ? 10.days.ago.to_date : 21.days.from_now.to_date))
   svc = bill_services[i % bill_services.size] || Service.first
   InvoiceItem.create!(invoice: inv, description: svc&.name || "Consultation",
-                      quantity: 1 + (i % 3), unit_price_cents: (svc&.price_cents || 2_500_000))
+                      quantity: 1 + (i % 3), unit_price_cents: (svc&.price_cents || 25_000))
   sub = inv.invoice_items.sum(:total_cents)
   inv.update_columns(subtotal_cents: sub, total_cents: sub)
 
@@ -1054,7 +1054,22 @@ Invoice.includes(:invoice_items).find_each do |inv|
   total = sub - inv.discount_cents.to_i + inv.tax_cents.to_i
   inv.update_columns(subtotal_cents: sub, total_cents: total) if inv.subtotal_cents != sub || inv.total_cents != total
 end
-puts "  ✓ invoices=#{Invoice.count}, total invoiced=₦#{(Invoice.sum(:total_cents) / 100).to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse}"
+puts "  ✓ invoices=#{Invoice.count}, total invoiced=#{(Invoice.sum(:total_cents) / 100)}"
+
+# One-time money rescale: older seeds stored NGN-magnitude amounts (e.g. a
+# 2,500,000 consultation). Now that currency is configurable (USD by default),
+# bring amounts to sensible minor units. Idempotent via a sentinel check.
+if Service.find_by(name: "Nephrology Consultation")&.price_cents.to_i >= 1_000_000
+  Service.update_all("price_cents = price_cents / 100")
+  LabTest.update_all("price_cents = price_cents / 100")
+  StaffProfile.update_all("consultation_fee_cents = consultation_fee_cents / 100")
+  DialysisConsumable.update_all("unit_cost_cents = unit_cost_cents / 100")
+  Invoice.update_all("subtotal_cents = subtotal_cents/100, total_cents = total_cents/100, amount_paid_cents = amount_paid_cents/100, discount_cents = discount_cents/100, tax_cents = tax_cents/100")
+  InvoiceItem.update_all("unit_price_cents = unit_price_cents/100, total_cents = total_cents/100")
+  Payment.update_all("amount_cents = amount_cents/100")
+  InsuranceClaim.update_all("claim_amount_cents = claim_amount_cents/100, approved_amount_cents = COALESCE(approved_amount_cents, 0) / 100")
+  puts "  ✓ rescaled monetary amounts to minor units"
+end
 
 puts "\n" + "=" * 60
 puts "SEED COMPLETE!"

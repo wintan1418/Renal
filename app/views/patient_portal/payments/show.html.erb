@@ -34,7 +34,7 @@
     <div class="space-y-3 text-sm">
       <div class="flex justify-between">
         <span class="text-base-content/50">Amount</span>
-        <span class="font-bold text-lg">₦<%= number_with_delimiter(@payment.amount_cents / 100) %></span>
+        <span class="font-bold text-lg"><%= money_symbol %><%= number_with_delimiter(@payment.amount_cents / 100) %></span>
       </div>
       <div class="flex justify-between">
         <span class="text-base-content/50">Method</span>

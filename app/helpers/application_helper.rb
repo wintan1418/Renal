@@ -22,9 +22,16 @@ module ApplicationHelper
     ]
   end
 
+  # Symbol for the configured currency (USD -> $, NGN -> ₦, GBP -> £, ...).
+  def money_symbol
+    Money.default_currency.symbol
+  rescue StandardError
+    "$"
+  end
+
+  # Kept this name (used widely) but now currency-aware via the configured symbol.
   def format_naira(amount_cents)
-    return "₦0.00" if amount_cents.nil? || amount_cents.zero?
-    "₦#{number_with_delimiter(amount_cents / 100.0, delimiter: ',')}"
+    "#{money_symbol}#{number_with_delimiter((amount_cents.to_i / 100.0).round(2), delimiter: ',')}"
   end
 
   def avatar_for(user, size: "w-10 h-10", text_size: "text-sm")

@@ -20,16 +20,16 @@
   <div class="bg-base-200 rounded-2xl p-4 mb-6">
     <div class="flex justify-between text-sm mb-1">
       <span class="text-base-content/60">Invoice Total</span>
-      <span class="font-semibold">₦<%= number_with_delimiter(@invoice.total_cents / 100) %></span>
+      <span class="font-semibold"><%= money_symbol %><%= number_with_delimiter(@invoice.total_cents / 100) %></span>
     </div>
     <div class="flex justify-between text-sm mb-1">
       <span class="text-base-content/60">Amount Paid</span>
-      <span class="text-success font-semibold">₦<%= number_with_delimiter(@invoice.amount_paid_cents / 100) %></span>
+      <span class="text-success font-semibold"><%= money_symbol %><%= number_with_delimiter(@invoice.amount_paid_cents / 100) %></span>
     </div>
     <div class="divider my-2"></div>
     <div class="flex justify-between font-bold text-lg text-error">
       <span>Balance Due</span>
-      <span>₦<%= number_with_delimiter(@invoice.balance_due_cents / 100) %></span>
+      <span><%= money_symbol %><%= number_with_delimiter(@invoice.balance_due_cents / 100) %></span>
     </div>
   </div>
 
@@ -45,15 +45,15 @@
     </div>
 
     <div class="form-control">
-      <%= f.label :amount_cents, "Amount (kobo)", class: "label label-text font-medium" %>
+      <%= f.label :amount_cents, "Amount (cents)", class: "label label-text font-medium" %>
       <div class="relative">
-        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50 text-sm">₦</span>
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50 text-sm"><%= money_symbol %></span>
         <%= f.number_field :amount_cents, min: 1, step: 100,
           value: @invoice.balance_due_cents,
           class: "input input-bordered w-full pl-7",
-          placeholder: "Enter amount in kobo (1 NGN = 100 kobo)" %>
+          placeholder: "Enter amount in cents (100 cents = 1 unit)" %>
       </div>
-      <p class="text-xs text-base-content/50 mt-1">Enter amount in kobo. E.g., ₦5,000 = 500000 kobo</p>
+      <p class="text-xs text-base-content/50 mt-1">Enter amount in minor units (100 = #{money_symbol}1).</p>
     </div>
 
     <div class="form-control">

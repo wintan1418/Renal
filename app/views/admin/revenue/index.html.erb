@@ -42,7 +42,7 @@
       <div class="card-body">
         <h2 class="card-title text-base">Collections (6 months)</h2>
         <% if @data[:monthly].present? %>
-          <%= column_chart @data[:monthly], colors: ["#2B8B75"], prefix: "₦", thousands: ",", height: "240px" %>
+          <%= column_chart @data[:monthly], colors: ["#2B8B75"], prefix: money_symbol, thousands: ",", height: "240px" %>
         <% else %>
           <p class="text-sm text-base-content/50 py-10 text-center">No payments recorded yet.</p>
         <% end %>
@@ -54,7 +54,7 @@
       <div class="card-body">
         <h2 class="card-title text-base">Invoiced by status</h2>
         <% if @data[:by_status].present? %>
-          <%= pie_chart @data[:by_status], colors: ["#9CA3AF","#3B82F6","#22C55E","#EF4444","#6B7280"], height: "240px", donut: true, prefix: "₦", thousands: "," %>
+          <%= pie_chart @data[:by_status], colors: ["#9CA3AF","#3B82F6","#22C55E","#EF4444","#6B7280"], height: "240px", donut: true, prefix: money_symbol, thousands: "," %>
         <% else %>
           <p class="text-sm text-base-content/50 py-10 text-center">No invoices yet.</p>
         <% end %>
@@ -74,7 +74,7 @@
             <div>
               <div class="flex justify-between text-sm">
                 <span><%= bucket %></span>
-                <span class="font-medium">₦<%= number_with_delimiter(amount) %></span>
+                <span class="font-medium"><%= money_symbol %><%= number_with_delimiter(amount) %></span>
               </div>
               <progress class="progress <%= bucket == '90+ days' ? 'progress-error' : (bucket == 'Current' ? 'progress-success' : 'progress-warning') %> w-full h-2" value="<%= amount %>" max="<%= max %>"></progress>
             </div>
@@ -108,7 +108,7 @@
           <div class="divider text-xs text-base-content/50 my-2">Payments by method</div>
           <div class="flex flex-wrap gap-2">
             <% @data[:by_method].each do |method, amount| %>
-              <span class="badge badge-ghost"><%= method %>: ₦<%= number_with_delimiter(amount) %></span>
+              <span class="badge badge-ghost"><%= method %>: <%= money_symbol %><%= number_with_delimiter(amount) %></span>
             <% end %>
           </div>
         <% end %>

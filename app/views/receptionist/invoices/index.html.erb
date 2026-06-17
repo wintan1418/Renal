@@ -23,7 +23,7 @@
 <div class="stats shadow mb-6 w-full">
   <div class="stat">
     <div class="stat-title">Total Outstanding Balance</div>
-    <div class="stat-value text-error">₦<%= number_with_delimiter(outstanding / 100) %></div>
+    <div class="stat-value text-error"><%= money_symbol %><%= number_with_delimiter(outstanding / 100) %></div>
     <div class="stat-desc">Across sent &amp; overdue invoices</div>
   </div>
   <div class="stat">
@@ -76,10 +76,10 @@
               </div>
             </td>
             <td class="text-sm"><%= invoice.created_at.strftime("%b %d, %Y") %></td>
-            <td class="font-semibold">₦<%= number_with_delimiter(invoice.total_cents / 100) %></td>
-            <td class="text-success">₦<%= number_with_delimiter(invoice.amount_paid_cents / 100) %></td>
+            <td class="font-semibold"><%= money_symbol %><%= number_with_delimiter(invoice.total_cents / 100) %></td>
+            <td class="text-success"><%= money_symbol %><%= number_with_delimiter(invoice.amount_paid_cents / 100) %></td>
             <td class="font-semibold <%= invoice.balance_due_cents > 0 ? 'text-error' : 'text-success' %>">
-              ₦<%= number_with_delimiter(invoice.balance_due_cents / 100) %>
+              <%= money_symbol %><%= number_with_delimiter(invoice.balance_due_cents / 100) %>
             </td>
             <td><%= status_badge(invoice.status, type: :invoice) %></td>
             <td>

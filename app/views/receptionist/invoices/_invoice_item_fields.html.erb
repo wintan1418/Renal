@@ -23,7 +23,7 @@
   </div>
 
   <div class="col-span-6 sm:col-span-2 form-control">
-    <%= f.label :unit_price_cents, "Unit Price (kobo)", class: "label label-text text-xs" %>
+    <%= f.label :unit_price_cents, "Unit Price (cents)", class: "label label-text text-xs" %>
     <%= f.number_field :unit_price_cents, min: 0, step: 100,
       class: "input input-bordered input-sm w-full", placeholder: "0",
       data: { action: "input->invoice-builder#recalculate" } %>

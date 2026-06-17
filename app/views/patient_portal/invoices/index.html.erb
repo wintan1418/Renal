@@ -8,7 +8,7 @@
 <div class="stats shadow mb-6 w-full bg-white">
   <div class="stat">
     <div class="stat-title">Total Balance Due</div>
-    <div class="stat-value text-error">₦<%= number_with_delimiter(@balance_due.to_i / 100) %></div>
+    <div class="stat-value text-error"><%= money_symbol %><%= number_with_delimiter(@balance_due.to_i / 100) %></div>
     <div class="stat-desc">Across all unpaid invoices</div>
   </div>
 </div>
@@ -33,10 +33,10 @@
           <tr class="hover">
             <td class="font-mono font-semibold text-sm"><%= invoice.invoice_number %></td>
             <td class="text-sm"><%= invoice.created_at.strftime("%b %d, %Y") %></td>
-            <td class="font-semibold">₦<%= number_with_delimiter(invoice.total_cents / 100) %></td>
-            <td class="text-success">₦<%= number_with_delimiter(invoice.amount_paid_cents / 100) %></td>
+            <td class="font-semibold"><%= money_symbol %><%= number_with_delimiter(invoice.total_cents / 100) %></td>
+            <td class="text-success"><%= money_symbol %><%= number_with_delimiter(invoice.amount_paid_cents / 100) %></td>
             <td class="font-semibold <%= invoice.balance_due_cents > 0 ? 'text-error' : 'text-success' %>">
-              ₦<%= number_with_delimiter(invoice.balance_due_cents / 100) %>
+              <%= money_symbol %><%= number_with_delimiter(invoice.balance_due_cents / 100) %>
             </td>
             <td><%= status_badge(invoice.status, type: :invoice) %></td>
             <td>

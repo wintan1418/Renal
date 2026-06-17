@@ -46,7 +46,7 @@
       <div class="card-body">
         <h2 class="card-title text-base">Revenue trend (6 months)</h2>
         <% if rev[:monthly_revenue].present? %>
-          <%= area_chart rev[:monthly_revenue], colors: ["#2B8B75"], suffix: "", prefix: "₦", thousands: ",", height: "240px", curve: true %>
+          <%= area_chart rev[:monthly_revenue], colors: ["#2B8B75"], suffix: "", prefix: money_symbol, thousands: ",", height: "240px", curve: true %>
         <% else %>
           <p class="text-sm text-base-content/50 py-10 text-center">No payment history yet.</p>
         <% end %>

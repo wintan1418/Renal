@@ -80,7 +80,7 @@
               <td class="text-sm text-base-content/70"><%= lab_test.unit.presence || '—' %></td>
               <td class="text-sm">
                 <% if lab_test.price_cents > 0 %>
-                  ₦<%= number_with_delimiter(lab_test.price_naira.to_i) %>
+                  <%= money_symbol %><%= number_with_delimiter(lab_test.price_naira.to_i) %>
                 <% else %>
                   <span class="text-base-content/40">—</span>
                 <% end %>

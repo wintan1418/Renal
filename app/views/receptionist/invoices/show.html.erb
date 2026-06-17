@@ -73,8 +73,8 @@
               <tr>
                 <td><%= item.description || item.service&.name %></td>
                 <td class="text-right"><%= item.quantity %></td>
-                <td class="text-right">₦<%= number_with_delimiter(item.unit_price_cents / 100) %></td>
-                <td class="text-right font-semibold">₦<%= number_with_delimiter(item.total_cents / 100) %></td>
+                <td class="text-right"><%= money_symbol %><%= number_with_delimiter(item.unit_price_cents / 100) %></td>
+                <td class="text-right font-semibold"><%= money_symbol %><%= number_with_delimiter(item.total_cents / 100) %></td>
               </tr>
             <% end %>
           </tbody>
@@ -86,32 +86,32 @@
         <div class="w-64 space-y-2">
           <div class="flex justify-between text-sm">
             <span class="text-base-content/70">Subtotal</span>
-            <span>₦<%= number_with_delimiter(@invoice.subtotal_cents / 100) %></span>
+            <span><%= money_symbol %><%= number_with_delimiter(@invoice.subtotal_cents / 100) %></span>
           </div>
           <% if @invoice.discount_cents > 0 %>
             <div class="flex justify-between text-sm text-success">
               <span>Discount</span>
-              <span>-₦<%= number_with_delimiter(@invoice.discount_cents / 100) %></span>
+              <span>-<%= money_symbol %><%= number_with_delimiter(@invoice.discount_cents / 100) %></span>
             </div>
           <% end %>
           <% if @invoice.tax_cents > 0 %>
             <div class="flex justify-between text-sm">
               <span>Tax</span>
-              <span>₦<%= number_with_delimiter(@invoice.tax_cents / 100) %></span>
+              <span><%= money_symbol %><%= number_with_delimiter(@invoice.tax_cents / 100) %></span>
             </div>
           <% end %>
           <div class="divider my-1"></div>
           <div class="flex justify-between font-semibold">
             <span>Total</span>
-            <span>₦<%= number_with_delimiter(@invoice.total_cents / 100) %></span>
+            <span><%= money_symbol %><%= number_with_delimiter(@invoice.total_cents / 100) %></span>
           </div>
           <div class="flex justify-between text-sm text-success">
             <span>Amount Paid</span>
-            <span>₦<%= number_with_delimiter(@invoice.amount_paid_cents / 100) %></span>
+            <span><%= money_symbol %><%= number_with_delimiter(@invoice.amount_paid_cents / 100) %></span>
           </div>
           <div class="flex justify-between font-bold text-lg <%= @invoice.balance_due_cents > 0 ? 'text-error' : 'text-success' %>">
             <span>Balance Due</span>
-            <span>₦<%= number_with_delimiter(@invoice.balance_due_cents / 100) %></span>
+            <span><%= money_symbol %><%= number_with_delimiter(@invoice.balance_due_cents / 100) %></span>
           </div>
         </div>
       </div>
@@ -159,7 +159,7 @@
           <% @payments.each do |payment| %>
             <div class="flex items-center justify-between p-3 bg-base-200 rounded-xl">
               <div>
-                <p class="text-sm font-semibold">₦<%= number_with_delimiter(payment.amount_cents / 100) %></p>
+                <p class="text-sm font-semibold"><%= money_symbol %><%= number_with_delimiter(payment.amount_cents / 100) %></p>
                 <p class="text-xs text-base-content/50"><%= payment.payment_method&.humanize %></p>
                 <p class="text-xs text-base-content/50"><%= payment.created_at.strftime("%b %d, %Y") %></p>
               </div>
@@ -186,7 +186,7 @@
             <div class="p-3 bg-base-200 rounded-xl">
               <p class="text-sm font-semibold"><%= claim.provider_name %></p>
               <p class="text-xs text-base-content/50">Policy: <%= claim.policy_number %></p>
-              <p class="text-xs">Claim: ₦<%= number_with_delimiter(claim.claim_amount_cents / 100) %></p>
+              <p class="text-xs">Claim: <%= money_symbol %><%= number_with_delimiter(claim.claim_amount_cents / 100) %></p>
               <%= status_badge(claim.status, type: :claim) %>
             </div>
           <% end %>

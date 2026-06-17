@@ -39,9 +39,9 @@
             <td class="font-mono text-sm">#<%= claim.id %></td>
             <td class="font-medium text-sm"><%= claim.patient&.full_name %></td>
             <td class="text-sm"><%= claim.provider_name %></td>
-            <td class="font-semibold">₦<%= number_with_delimiter(claim.claim_amount_cents / 100) %></td>
+            <td class="font-semibold"><%= money_symbol %><%= number_with_delimiter(claim.claim_amount_cents / 100) %></td>
             <td class="<%= claim.approved_amount_cents > 0 ? 'text-success' : 'text-base-content/40' %>">
-              ₦<%= number_with_delimiter(claim.approved_amount_cents.to_i / 100) %>
+              <%= money_symbol %><%= number_with_delimiter(claim.approved_amount_cents.to_i / 100) %>
             </td>
             <td><%= status_badge(claim.status, type: :claim) %></td>
             <td class="text-sm text-base-content/60"><%= claim.submitted_at&.strftime("%b %d, %Y") %></td>

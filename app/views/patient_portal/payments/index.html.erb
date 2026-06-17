@@ -32,7 +32,7 @@
             <td>
               <span class="badge badge-outline badge-sm"><%= payment.payment_method&.humanize %></span>
             </td>
-            <td class="font-semibold">₦<%= number_with_delimiter(payment.amount_cents / 100) %></td>
+            <td class="font-semibold"><%= money_symbol %><%= number_with_delimiter(payment.amount_cents / 100) %></td>
             <td><%= status_badge(payment.status, type: :payment) %></td>
             <td>
               <%= link_to patient_portal_payment_path(payment), class: "btn btn-ghost btn-xs" do %>

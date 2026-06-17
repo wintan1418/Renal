@@ -84,7 +84,7 @@
               <td class="text-sm text-base-content/70"><%= item.unit %></td>
               <td class="text-sm">
                 <% if item.unit_cost_cents > 0 %>
-                  &#8358;<%= number_with_delimiter((item.unit_cost_cents / 100.0).to_i) %>
+                  <%= money_symbol %><%= number_with_delimiter((item.unit_cost_cents / 100.0).to_i) %>
                 <% else %>
                   <span class="text-base-content/40">—</span>
                 <% end %>
