@@ -24,19 +24,24 @@
   </div>
 
   <!-- Kanban board -->
-  <div class="overflow-x-auto pb-2">
+  <p class="text-xs text-base-content/50">Tip: drag a card between columns to change its stage, or use the ⋯ menu.</p>
+  <div class="overflow-x-auto pb-2" data-controller="kanban">
     <div class="flex gap-4 min-w-max">
       <% @stages.each do |stage| %>
         <% leads = @leads_by_stage[stage] || [] %>
         <% meta = ContactSubmission::STAGE_META[stage] %>
-        <div class="w-72 flex-shrink-0">
+        <div class="w-72 flex-shrink-0 rounded-xl transition-shadow"
+             data-kanban-target="column" data-stage="<%= stage %>"
+             data-action="dragover->kanban#dragover dragleave->kanban#dragleave drop->kanban#drop">
           <div class="flex items-center justify-between mb-2 px-1">
             <h2 class="font-semibold text-sm"><%= meta[:label] %></h2>
-            <span class="badge badge-ghost badge-sm"><%= leads.size %></span>
+            <span class="badge badge-ghost badge-sm" data-kanban-target="count"><%= leads.size %></span>
           </div>
-          <div class="space-y-2">
+          <div class="space-y-2 min-h-[60px]" data-kanban-list>
             <% leads.each do |lead| %>
-              <div class="card bg-base-100 shadow-sm border-l-4 <%= meta[:color] %>">
+              <div class="card bg-base-100 shadow-sm border-l-4 <%= meta[:color] %> cursor-grab active:cursor-grabbing"
+                   draggable="true" data-lead-id="<%= lead.id %>" data-move-url="<%= move_admin_lead_path(lead) %>"
+                   data-action="dragstart->kanban#dragstart dragend->kanban#dragend">
                 <div class="card-body p-3">
                   <%= link_to admin_lead_path(lead), class: "font-medium text-sm hover:text-primary" do %><%= lead.name %><% end %>
                   <p class="text-xs text-base-content/60 line-clamp-2"><%= lead.subject.presence || lead.message.truncate(60) %></p>
@@ -50,7 +55,7 @@
                     <span class="text-xs text-warning">⏰ follow-up due</span>
                   <% end %>
                   <details class="dropdown dropdown-end">
-                    <summary class="btn btn-ghost btn-xs mt-1">Move ▾</summary>
+                    <summary class="btn btn-ghost btn-xs mt-1">⋯</summary>
                     <ul class="dropdown-content menu bg-base-100 rounded-box z-10 w-40 p-1 shadow border border-base-300">
                       <% (@stages - [stage]).each do |target| %>
                         <li><%= button_to ContactSubmission::STAGE_META[target][:label], move_admin_lead_path(lead, stage: target), method: :patch, class: "text-sm" %></li>
@@ -61,7 +66,7 @@
               </div>
             <% end %>
             <% if leads.empty? %>
-              <p class="text-xs text-base-content/30 px-1 py-4 text-center">No leads</p>
+              <p class="text-xs text-base-content/30 px-1 py-4 text-center" data-kanban-placeholder>Drop leads here</p>
             <% end %>
           </div>
         </div>

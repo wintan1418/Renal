@@ -39,7 +39,10 @@ module Admin
         @lead.update(last_contacted_at: Time.current) if @lead.contacted?
         @lead.lead_activities.create(user: current_user, kind: :stage_change, body: "Moved from #{from} to #{@lead.stage_label}")
       end
-      redirect_back fallback_location: admin_leads_path, notice: "Moved to #{@lead.stage_label}."
+      respond_to do |format|
+        format.html { redirect_back fallback_location: admin_leads_path, notice: "Moved to #{@lead.stage_label}." }
+        format.json { head :ok }
+      end
     end
 
     # AI-drafted reply to the lead's enquiry (JSON for in-page use).
