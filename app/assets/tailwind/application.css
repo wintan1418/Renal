@@ -162,12 +162,16 @@
 
   /* ── Stats ──────────────────────────────────────────────────── */
   .stats {
-    @apply inline-flex overflow-hidden rounded-2xl;
+    @apply flex flex-col overflow-hidden rounded-2xl sm:flex-row;
     background-color: var(--color-base-100);
     border: 1px solid color-mix(in srgb, var(--color-base-300) 75%, transparent);
     box-shadow: var(--shadow-card);
   }
-  .stats > .stat + .stat { border-left: 1px solid color-mix(in srgb, var(--color-base-300) 75%, transparent); }
+  /* Stack on mobile (divider on top), switch to a row with a left divider on sm+. */
+  .stats > .stat + .stat { border-top: 1px solid color-mix(in srgb, var(--color-base-300) 75%, transparent); }
+  @media (min-width: 640px) {
+    .stats > .stat + .stat { border-top: 0; border-left: 1px solid color-mix(in srgb, var(--color-base-300) 75%, transparent); }
+  }
   .stat { @apply relative flex flex-col gap-1 p-5; }
   .stat-title { @apply text-xs font-medium uppercase tracking-wide; color: color-mix(in srgb, var(--color-base-content) 55%, transparent); }
   .stat-value { @apply text-3xl font-extrabold leading-tight; color: var(--color-primary); }
@@ -337,6 +341,13 @@
     background-color: var(--color-base-300); z-index: 0;
   }
   .step:first-child::before { content: none; }
+  /* Vertical steps: lay out left-to-right and run the connector downward
+     instead of the default horizontal line (which would bleed across the page). */
+  .steps-vertical .step { @apply flex-row items-start gap-3 text-left; min-width: 0; }
+  .steps-vertical .step::before {
+    @apply left-4 h-full w-0.5;
+    top: 1rem; right: auto; bottom: auto;
+  }
   .step::after {
     counter-increment: step; content: counter(step);
     @apply relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold;

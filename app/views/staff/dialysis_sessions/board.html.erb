@@ -35,7 +35,7 @@
     completed_today = @today_sessions.select { |s| s.status == "completed" }.count
     scheduled_today = @today_sessions.select { |s| s.status == "scheduled" }.count
   %>
-  <div class="stats stats-horizontal shadow-xl bg-base-100 w-full mb-6">
+  <div class="stats shadow-xl bg-base-100 w-full mb-6">
     <div class="stat">
       <div class="stat-title">Total Today</div>
       <div class="stat-value text-primary"><%= total_today %></div>
