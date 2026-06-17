@@ -863,6 +863,13 @@ start_n = User.where(role: :patient).count
     pp.on_dialysis = (stage == :stage_5)
   end
 end
+# Normalize existing demo-patient names to the international set (idempotent).
+User.where("email LIKE ?", "demo.patient.%").find_each do |u|
+  i = u.email[/\d+/].to_i - 1
+  fn = ng_first[i % ng_first.size]
+  ln = ng_last[(i * 3) % ng_last.size]
+  u.update_columns(first_name: fn, last_name: ln) if u.first_name != fn || u.last_name != ln
+end
 puts "  ✓ patients now #{User.where(role: :patient).count}"
 
 # Renal-panel history so eGFR trends, charts and the intelligence engine have data.
