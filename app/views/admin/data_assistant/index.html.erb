@@ -1,0 +1,39 @@
+<% content_for(:title) { "Ask Your Data" } %>
+
+<div class="max-w-3xl mx-auto space-y-6" data-controller="data-assistant" data-data-assistant-url-value="<%= admin_data_assistant_ask_path %>">
+  <div>
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      </span>
+      Ask your data
+    </h1>
+    <p class="text-base-content/60 text-sm mt-1">Ask plain-language questions about the practice. Answers are grounded in a live metrics snapshot.</p>
+  </div>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <form data-action="data-assistant#ask" class="flex flex-col sm:flex-row gap-2">
+        <input type="text" data-data-assistant-target="input" autocomplete="off"
+               class="input input-bordered flex-1" placeholder="e.g. What's our collection rate and how many patients are on dialysis?">
+        <button type="submit" data-data-assistant-target="button" class="btn btn-primary">Ask</button>
+      </form>
+
+      <div class="flex flex-wrap gap-2 mt-3">
+        <% [
+          "How many patients are on dialysis?",
+          "What's our dialysis adequacy and average Kt/V?",
+          "What's the no-show rate and collection rate?",
+          "Which consumables need reordering?"
+        ].each do |q| %>
+          <button type="button" class="btn btn-xs btn-outline" data-action="data-assistant#suggest"><%= q %></button>
+        <% end %>
+      </div>
+
+      <div class="mt-4 rounded-xl bg-base-200/60 p-4 min-h-[80px]">
+        <p data-data-assistant-target="answer" class="text-sm leading-relaxed text-base-content/80 whitespace-pre-line">Ask a question to see an answer here.</p>
+        <p data-data-assistant-target="status" class="text-xs text-base-content/40 mt-2"></p>
+      </div>
+    </div>
+  </div>
+</div>
