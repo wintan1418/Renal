@@ -16,7 +16,7 @@
         <%= link_to "View public site", root_path, class: "mk-btn mk-btn--outline mk-btn--lg" %>
       </div>
       <div class="dx-chips">
-        <% ["eGFR prediction", "AI clinical scribe", "Lab explainer", "Diet coach", "Triage chatbot", "CRM + AI replies", "Revenue cycle", "Live dialysis board"].each do |c| %>
+        <% ["Dialysis Kt/V adequacy", "eGFR dose calculator", "AI clinical scribe", "Lab explainer", "CKD prediction", "Home monitoring", "Video visits", "Triage chatbot", "Diet coach", "CRM + AI replies", "Revenue cycle", "Quality + PDF reports", "Chair scheduler", "Ask your data"].each do |c| %>
           <span class="dx-chip"><%= c %></span>
         <% end %>
       </div>
@@ -92,26 +92,29 @@
       <%
         tours = [
           { role: "Admin", who: "admin@healthroom.ng", color: "#0B2437", items: [
-            "Smart Intelligence — eGFR decline prediction, AI clinical briefing, no-show risk, inventory forecast",
-            "Revenue Cycle — collections, A/R aging, top debtors, insurance claims",
-            "CRM / Leads — drag leads across the pipeline, then \"Draft a reply\" (AI)",
-            "Analytics, Users, Services, Lab tests" ] },
+            "Smart Intelligence — eGFR decline prediction, AI briefing, no-show risk, inventory forecast",
+            "Ask Your Data — type a question, get a live, grounded answer",
+            "Revenue Cycle — collections, A/R aging, top debtors, claims",
+            "Quality & Compliance — adequacy %, no-show rate → download PDF report",
+            "CRM / Leads — drag the pipeline, then \"Draft a reply\" (AI)" ] },
           { role: "Doctor", who: "adaeze.okonkwo@healthroom.ng", color: "#2B8B75", items: [
             "Dashboard — today's clinic, patients needing attention, recent labs",
-            "Patients → chart → Visits → \"Add clinical note\" with the AI scribe (rough notes → SOAP)",
-            "Dialysis Unit Board — live station status with running timers" ] },
+            "Patient chart → renal snapshot, vascular access, home-monitoring",
+            "Add clinical note with the AI scribe (rough notes → SOAP)",
+            "Dose Calculator — eGFR-adjusted drug dosing",
+            "Dialysis Board + Chair Schedule (Kt/V adequacy) · Telemedicine" ] },
           { role: "Patient", who: "patient@healthroom.ng", color: "#E8773F", items: [
             "Book an appointment (3-step wizard)",
             "Lab Results → \"What your results mean\" (AI explainer)",
-            "Diet & Fluid Tracker → \"Your diet coach\" (AI)",
-            "Health Assistant — AI triage chatbot",
-            "Invoices → Pay → demo payment" ] },
+            "Diet coach · Health Assistant (AI triage chatbot)",
+            "Home Monitoring — log BP / weight / meds",
+            "Video Visits (one-tap) · Invoices → demo payment" ] },
           { role: "Receptionist", who: "receptionist@healthroom.ng", color: "#6366F1", items: [
             "Front-desk appointments, check-in & walk-ins",
             "Invoices, payments and insurance claims" ] },
           { role: "Nurse", who: "nurse.johnson@healthroom.ng", color: "#0EA5E9", items: [
-            "Record vitals and assist dialysis sessions",
-            "Live dialysis unit board" ] }
+            "Record vitals, run dialysis sessions & adequacy",
+            "Live dialysis board · chair schedule" ] }
         ]
       %>
       <div class="mk-grid mk-grid--2">

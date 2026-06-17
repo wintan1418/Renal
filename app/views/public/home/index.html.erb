@@ -71,6 +71,44 @@
     </div>
   </section>
 
+  <!-- ===================== PLATFORM CAPABILITIES ===================== -->
+  <section class="mk-section cap">
+    <div class="mk-wrap">
+      <div style="text-align:center;max-width:640px;margin:0 auto 12px">
+        <div class="mk-eyebrow">— One connected platform</div>
+        <h2 class="mk-h2">Smarter kidney care, end to end</h2>
+        <p class="mk-lead" style="margin-top:14px">From your first appointment to dialysis, labs, prescriptions and billing — powered by clinical AI and real-time monitoring, so nothing falls through the cracks.</p>
+      </div>
+
+      <div class="mk-grid mk-grid--3" style="margin-top:40px">
+        <% [
+          { icon: :pulse,   tint: "mk-t-green",  title: "AI-assisted clinical care", desc: "AI clinical summaries, plain-language lab explanations and a SOAP scribe help your doctors focus on you, not paperwork." },
+          { icon: :droplet, tint: "mk-t-blue",   title: "Dialysis adequacy tracking", desc: "Every session measured for Kt/V, URR and fluid removal against best-practice targets, with a live unit board." },
+          { icon: :shield,  tint: "mk-t-coral",  title: "Medication safety", desc: "eGFR-adjusted dosing guidance and automatic alerts on critical results keep your treatment safe." },
+          { icon: :heart,   tint: "mk-t-purple", title: "Home monitoring", desc: "Log blood pressure, weight and medications from home — your care team sees flagged readings instantly." },
+          { icon: :pin,     tint: "mk-t-teal",   title: "Video consultations", desc: "Secure video visits from anywhere — no app to install, just one tap to join." },
+          { icon: :flask,   tint: "mk-t-amber",  title: "Your records, always with you", desc: "Lab trends, prescriptions, dialysis history, invoices and an AI health assistant — all in your private portal." }
+        ].each_with_index do |f, i| %>
+          <div class="mk-card mk-card--pad mk-card--hover cap-card" style="--i:<%= i %>">
+            <span class="mk-icchip mk-icchip--lg <%= f[:tint] %>"><%= mk_icon f[:icon], size: 24, width: 2 %></span>
+            <h3 class="mk-h3" style="margin:16px 0 8px"><%= f[:title] %></h3>
+            <p style="font-size:14.5px;line-height:1.6;color:var(--mk-muted)"><%= f[:desc] %></p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- stat band -->
+      <div class="cap-stats">
+        <% [["6", "specialist roles, one system"], ["100%", "of dialysis sessions scored"], ["24/7", "AI health assistant"], ["1-tap", "video visits"]].each do |num, label| %>
+          <div class="cap-stat">
+            <div class="cap-stat__num"><%= num %></div>
+            <div class="cap-stat__label"><%= label %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
   <!-- ===================== SERVICES PREVIEW ===================== -->
   <section class="mk-section--cream mk-section">
     <div class="mk-wrap">

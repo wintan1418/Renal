@@ -238,3 +238,17 @@ html { scroll-behavior: smooth; }
   html { scroll-behavior: auto; }
   .mk-floaty { animation: none; }
 }
+
+/* ─── Platform capabilities section ─────────────────────────── */
+.cap-card { transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+.cap-stats {
+  margin-top: 44px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  background: var(--mk-line); border: 1px solid var(--mk-line); border-radius: 20px; overflow: hidden;
+}
+.cap-stat { background: linear-gradient(180deg, #fff, oklch(0.99 0.008 165)); padding: 30px 18px; text-align: center; }
+.cap-stat__num {
+  font-family: var(--mk-display); font-weight: 900; font-size: clamp(28px, 4vw, 40px); line-height: 1;
+  background: linear-gradient(90deg, var(--mk-teal), var(--mk-navy)); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.cap-stat__label { font-size: 13px; color: var(--mk-muted); margin-top: 8px; }
+@media (max-width: 760px) { .cap-stats { grid-template-columns: repeat(2, 1fr); } }
