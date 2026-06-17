@@ -48,6 +48,29 @@
   </div>
 </div>
 
+<!-- Renal snapshot -->
+<% if @renal_panel.any? %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <h2 class="card-title text-base">Renal snapshot</h2>
+      <p class="text-xs text-base-content/50 mb-2">Latest key markers vs renal targets.</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <% @renal_panel.each do |m| %>
+          <% tone = m[:status] == :normal ? "text-success" : "text-warning" %>
+          <div class="rounded-xl border border-base-200 p-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-base-content/60"><%= m[:label] %></span>
+              <span class="w-2 h-2 rounded-full <%= m[:status] == :normal ? 'bg-success' : 'bg-warning' %>"></span>
+            </div>
+            <div class="text-lg font-bold <%= tone %> mt-0.5"><%= m[:value].round(m[:value] < 10 ? 1 : 0) %> <span class="text-xs font-normal text-base-content/50"><%= m[:unit] %></span></div>
+            <div class="text-[11px] text-base-content/40">target <%= m[:target] %> · <%= m[:date]&.strftime("%b %d") %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
 <!-- Tab Navigation -->
 <div class="tabs tabs-boxed bg-base-100 shadow mb-6 p-1">
   <%= link_to "Demographics", chart_staff_patient_path(@patient, tab: "demographics"),

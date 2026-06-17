@@ -20,6 +20,7 @@ class Staff::PatientsController < Staff::BaseController
     @patient = User.find(params[:id])
     @profile = @patient.patient_profile
     @tab = params[:tab] || "demographics"
+    @renal_panel = Clinical::RenalLabPanel.call(@patient)
 
     case @tab
     when "visits"

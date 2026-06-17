@@ -901,12 +901,17 @@ User.where(role: :patient).find_each do |patient|
     date = m.months.ago.to_date
     egfr  = [ (base - idx * 2 + (patient.id % 5) - 2).round, 5 ].max
     creat = (1.0 + (100.0 / [ egfr, 8 ].max) * 0.9).round(1)
+    deficit = (60 - [ egfr, 60 ].min) # how far below normal kidney function
     values = {
       "EGFR" => egfr, "CREAT" => creat,
       "K"   => (4.2 + ((patient.id + m) % 9) * 0.1).round(1),
-      "HGB" => (13.5 - (60 - [ egfr, 60 ].min) * 0.04).round(1),
-      "UREA" => (15 + (60 - [ egfr, 60 ].min) * 0.4).round,
-      "NA"  => 138 + (patient.id % 6)
+      "HGB" => (13.5 - deficit * 0.04).round(1),
+      "UREA" => (15 + deficit * 0.4).round,
+      "NA"  => 138 + (patient.id % 6),
+      "FER"  => (120 + (patient.id % 5) * 90),                      # ferritin
+      "CA"   => (9.6 - deficit * 0.02).round(1),                    # calcium (drifts low)
+      "PHOS" => (3.6 + deficit * 0.04).round(1),                    # phosphorus (rises)
+      "PTH"  => (60 + deficit * 6 + (patient.id % 4) * 20).round    # PTH (rises in CKD)
     }
     lo = LabOrder.create!(patient: patient, ordered_by: doc, status: :completed, priority: :routine,
                           completed_at: date.to_time + 12.hours, created_at: date.to_time + 9.hours)
