@@ -120,39 +120,7 @@
         <%= status_badge(@appointment.status, type: :appointment) %>
       </div>
 
-      <ul class="steps steps-vertical text-sm">
-        <li class="step <%= 'step-primary' if %w[pending confirmed checked_in in_progress completed].include?(@appointment.status) %>">
-          <div class="text-left">
-            <p class="font-medium">Booked</p>
-            <p class="text-xs text-base-content/50"><%= @appointment.created_at.strftime("%b %d, %I:%M %p") %></p>
-          </div>
-        </li>
-        <li class="step <%= 'step-primary' if %w[confirmed checked_in in_progress completed].include?(@appointment.status) %>">
-          <div class="text-left"><p class="font-medium">Confirmed</p></div>
-        </li>
-        <li class="step <%= 'step-primary' if %w[checked_in in_progress completed].include?(@appointment.status) %>">
-          <div class="text-left">
-            <p class="font-medium">Checked In</p>
-            <% if @appointment.checked_in_at.present? %>
-              <p class="text-xs text-base-content/50"><%= @appointment.checked_in_at.strftime("%b %d, %I:%M %p") %></p>
-              <% if @appointment.checked_in_by.present? %>
-                <p class="text-xs text-base-content/50">by <%= @appointment.checked_in_by.full_name %></p>
-              <% end %>
-            <% end %>
-          </div>
-        </li>
-        <li class="step <%= 'step-primary' if %w[in_progress completed].include?(@appointment.status) %>">
-          <div class="text-left"><p class="font-medium">In Progress</p></div>
-        </li>
-        <li class="step <%= 'step-primary' if @appointment.completed? %>">
-          <div class="text-left"><p class="font-medium">Completed</p></div>
-        </li>
-        <% if @appointment.cancelled? %>
-          <li class="step step-error">
-            <div class="text-left"><p class="font-medium text-error">Cancelled</p></div>
-          </li>
-        <% end %>
-      </ul>
+      <%= render "shared/appointment_status", appointment: @appointment %>
     </div>
 
     <!-- Metadata -->

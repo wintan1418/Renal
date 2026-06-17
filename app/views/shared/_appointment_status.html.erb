@@ -1,0 +1,50 @@
+<%#
+  Clean vertical status timeline for an appointment.
+  Replaces DaisyUI's `steps steps-vertical` (whose connector pseudo-elements
+  bleed horizontally across the page). Pass `appointment:`.
+%>
+<%
+  idx = { "pending" => 0, "confirmed" => 1, "checked_in" => 2, "in_progress" => 3, "completed" => 4 }[appointment.status] || -1
+  steps = [
+    { label: "Booked",      sub: appointment.created_at&.strftime("%b %d, %I:%M %p") },
+    { label: "Confirmed",   sub: nil },
+    { label: "Checked In",  sub: (appointment.respond_to?(:checked_in_at) ? appointment.checked_in_at&.strftime("%b %d, %I:%M %p") : nil) },
+    { label: "In Progress", sub: nil },
+    { label: "Completed",   sub: nil }
+  ]
+%>
+
+<% if appointment.cancelled? %>
+  <div class="flex items-center gap-2 rounded-xl bg-error/10 text-error px-4 py-3">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    <span class="font-medium text-sm">Appointment cancelled</span>
+  </div>
+<% else %>
+  <ol class="relative">
+    <% steps.each_with_index do |step, i| %>
+      <% reached = idx >= i %>
+      <% next_reached = idx >= i + 1 %>
+      <li class="relative flex items-start gap-3 <%= i < steps.size - 1 ? 'pb-5' : '' %>">
+        <% if i < steps.size - 1 %>
+          <span class="absolute left-[11px] top-6 bottom-0 w-0.5 <%= next_reached ? 'bg-primary' : 'bg-base-300' %>"></span>
+        <% end %>
+        <span class="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold <%= reached ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content/40' %>">
+          <% if idx > i %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <% else %>
+            <%= i + 1 %>
+          <% end %>
+        </span>
+        <div class="pt-0.5 min-w-0">
+          <p class="text-sm <%= reached ? 'font-medium text-base-content' : 'text-base-content/40' %>"><%= step[:label] %></p>
+          <% if step[:sub].present? %>
+            <p class="text-xs text-base-content/50"><%= step[:sub] %></p>
+          <% end %>
+          <% if step[:label] == "Checked In" && appointment.respond_to?(:checked_in_by) && appointment.checked_in_by.present? %>
+            <p class="text-xs text-base-content/50">by <%= appointment.checked_in_by.full_name %></p>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+  </ol>
+<% end %>

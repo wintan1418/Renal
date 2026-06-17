@@ -109,16 +109,7 @@
         <span class="text-sm text-base-content/60">Queue #<%= @appointment.queue_number %></span>
       </div>
 
-      <ul class="steps steps-vertical text-sm">
-        <li class="step <%= 'step-primary' if %w[pending confirmed checked_in in_progress completed].include?(@appointment.status) %>">Booked</li>
-        <li class="step <%= 'step-primary' if %w[confirmed checked_in in_progress completed].include?(@appointment.status) %>">Confirmed</li>
-        <li class="step <%= 'step-primary' if %w[checked_in in_progress completed].include?(@appointment.status) %>">Checked In</li>
-        <li class="step <%= 'step-primary' if %w[in_progress completed].include?(@appointment.status) %>">In Progress</li>
-        <li class="step <%= 'step-primary' if @appointment.completed? %>">Completed</li>
-        <% if @appointment.cancelled? %>
-          <li class="step step-error">Cancelled</li>
-        <% end %>
-      </ul>
+      <%= render "shared/appointment_status", appointment: @appointment %>
     </div>
 
     <!-- Quick Actions -->
