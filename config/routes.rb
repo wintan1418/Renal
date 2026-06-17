@@ -10,6 +10,8 @@ Rails.application.routes.draw do
 
   scope module: :public do
     get "demo", to: "guide#show", as: :demo_guide
+    get "document", to: "document#show", as: :document
+    get "document/download", to: "document#download", as: :document_download
     get "about", to: "home#about", as: :about
     get "services", to: "home#services", as: :public_services
     get "contact", to: "contact#new", as: :contact

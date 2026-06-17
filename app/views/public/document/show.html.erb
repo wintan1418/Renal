@@ -1,0 +1,42 @@
+<% content_for(:title) { "Feature Overview — Healthroom" } %>
+<% content_for(:meta_description) { "The complete feature catalogue of the Healthroom renal hospital platform." } %>
+
+<div class="mk-pg">
+  <section class="mk-section--cream" style="border-top:none;padding:64px 0 48px;text-align:center">
+    <div class="mk-wrap" style="max-width:760px">
+      <div class="mk-eyebrow">— Feature overview</div>
+      <h1 class="mk-h1">Everything in the platform</h1>
+      <p class="mk-lead" style="margin:18px auto 0;max-width:600px">A complete, AI-powered renal hospital & dialysis management platform — across patient care, clinical workflows, the dialysis unit, billing, a CRM and quality reporting.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px">
+        <%= link_to "Download PDF", document_download_path, class: "mk-btn mk-btn--cta mk-btn--lg" %>
+        <%= link_to "View the demo", demo_guide_path, class: "mk-btn mk-btn--outline mk-btn--lg" %>
+      </div>
+    </div>
+  </section>
+
+  <section class="mk-section">
+    <div class="mk-wrap" style="max-width:920px">
+      <div class="mk-grid mk-grid--2" style="gap:22px">
+        <% @sections.each do |sec| %>
+          <div class="mk-card mk-card--pad">
+            <h2 class="mk-h3" style="font-size:18px"><%= sec[:title] %></h2>
+            <% if sec[:blurb].present? %>
+              <p style="font-size:13.5px;color:var(--mk-teal-ink);margin-top:2px"><%= sec[:blurb] %></p>
+            <% end %>
+            <ul style="margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px">
+              <% sec[:items].each do |item| %>
+                <li style="display:flex;gap:9px;font-size:14px;line-height:1.55;color:oklch(0.36 0.02 165)">
+                  <span style="color:var(--mk-teal);flex-shrink:0;font-weight:800">✓</span><span><%= item %></span>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+
+      <div style="text-align:center;margin-top:40px">
+        <%= link_to "Download the full PDF", document_download_path, class: "mk-btn mk-btn--teal mk-btn--lg" %>
+      </div>
+    </div>
+  </section>
+</div>
