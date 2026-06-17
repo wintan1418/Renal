@@ -956,6 +956,39 @@ User.where(role: :patient).find_each.with_index do |patient, pi|
 end
 puts "  ✓ diet_logs=#{DietLog.count} for #{DietLog.distinct.count(:patient_id)} patients"
 
+# ── Today's dialysis sessions so the live unit board shows activity ──
+if DialysisSession.where(session_date: Date.current).none?
+  stations_today = DialysisStation.order(:name).limit(5).to_a
+  dia_doc = User.find_by(email: "oluwaseun.adeleke@healthroom.ng") || User.doctors.active.first
+  dia_nurse = User.where(role: :nurse).first
+  machines = DialysisMachine.where(status: :available).to_a
+  dia_patients = User.where(role: :patient).joins(:patient_profile).where(patient_profiles: { on_dialysis: true }).to_a
+  dia_patients = User.where(role: :patient).limit(6).to_a if dia_patients.size < 3
+  flow = %i[in_progress in_progress scheduled completed scheduled]
+
+  if dia_doc && dia_patients.any? && stations_today.any?
+    stations_today.each_with_index do |station, i|
+      status = flow[i % flow.size]
+      start = case status
+      when :completed then Time.current - 5.hours
+      when :in_progress then Time.current - (i + 1).hours
+      else Time.current + (i + 1).hours
+      end
+      DialysisSession.create!(
+        patient: dia_patients[i % dia_patients.size], doctor: dia_doc, nurse: dia_nurse,
+        dialysis_machine: machines[i % machines.size], dialysis_station: station,
+        session_type: :hemodialysis, session_date: Date.current,
+        start_time: start, end_time: (status == :completed ? start + 4.hours : nil),
+        duration_minutes: 240, access_type: :fistula, status: status,
+        pre_weight_kg: 70 + i, target_fluid_removal_ml: 2500,
+        blood_flow_rate: 250 + i * 10
+      )
+      station.update(status: :occupied) if status == :in_progress
+    end
+  end
+end
+puts "  ✓ today dialysis sessions=#{DialysisSession.where(session_date: Date.current).count}"
+
 # ── Billing for demo patients + repair invoice totals ──
 # The Invoice#calculate_totals callback runs before items are attached, so
 # seeded invoices end up with total_cents = 0. We set totals via update_columns
