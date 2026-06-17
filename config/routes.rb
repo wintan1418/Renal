@@ -86,6 +86,7 @@ Rails.application.routes.draw do
       resources :prescriptions, only: [ :new, :create, :show ]
     end
     resources :lab_results, only: [ :index, :edit, :update ]
+    get "dose_calculator", to: "dose_calculator#index", as: :dose_calculator
     post "ai/scribe", to: "ai#scribe", as: :ai_scribe
     resources :dialysis_sessions do
       member do
