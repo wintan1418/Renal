@@ -29,17 +29,19 @@
     </div>
   </div>
 
-  <!-- AI clinical briefing -->
-  <div class="card bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10 shadow">
-    <div class="card-body">
-      <h2 class="card-title text-base flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        AI clinical briefing
-        <span class="badge badge-xs badge-ghost"><%= @briefing_source || "rule-based" %></span>
-      </h2>
-      <p class="text-sm leading-relaxed text-base-content/80 whitespace-pre-line"><%= @briefing || a.summary %></p>
+  <!-- AI clinical briefing (lazy-loaded via Turbo so the page renders instantly) -->
+  <%= turbo_frame_tag "ai_briefing", src: admin_intelligence_patient_briefing_path(@patient), loading: "eager" do %>
+    <div class="card bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          AI clinical briefing
+          <span class="loading loading-dots loading-sm text-primary"></span>
+        </h2>
+        <p class="text-sm text-base-content/50">Analysing patient data…</p>
+      </div>
     </div>
-  </div>
+  <% end %>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- eGFR trajectory -->

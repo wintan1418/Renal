@@ -22,20 +22,19 @@ class PatientPortal::LabResultsController < PatientPortal::BaseController
         @trend_data[result.lab_test.name] = history.map { |r| [ r.result_date&.to_s || r.created_at.to_date.to_s, r.numeric_value.to_f ] }
       end
     end
-
-    load_explanation
+    @has_results = @lab_order.lab_results.any? { |r| r.value.present? }
+    # Explanation loads lazily via a Turbo frame (see #explanation).
   end
 
-  private
-
-  # Plain-language explanation of the results (AI when configured, otherwise a
-  # rule-based summary). Cached per order so we don't re-call the LLM.
-  def load_explanation
+  # Lazy-loaded Turbo frame: plain-language explanation of the results.
+  def explanation
+    @lab_order = current_user.lab_orders_as_patient.includes(lab_results: :lab_test).find(params[:id])
     results = @lab_order.lab_results.select { |r| r.value.present? }
-    return if results.empty?
-
-    @explanation = resilient_cache("ai/lab_explain/#{@lab_order.id}/#{@lab_order.updated_at.to_i}", expires_in: 30.days) do
-      Ai::LabExplainer.call(results).content
+    @explanation = if results.any?
+      resilient_cache("ai/lab_explain/#{@lab_order.id}/#{@lab_order.updated_at.to_i}", expires_in: 30.days) do
+        Ai::LabExplainer.call(results).content
+      end
     end
+    render :explanation, layout: false
   end
 end

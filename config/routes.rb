@@ -34,10 +34,14 @@ Rails.application.routes.draw do
     get "assistant", to: "assistant#index"
     post "assistant/message", to: "assistant#message", as: :assistant_message
     resources :medical_records, only: [ :index ]
-    resources :lab_results, only: [ :index, :show ]
+    resources :lab_results, only: [ :index, :show ] do
+      member { get :explanation }
+    end
     resources :prescriptions, only: [ :index, :show ]
     resources :dialysis_history, only: [ :index, :show ]
-    resources :diet_logs
+    resources :diet_logs do
+      collection { get :coaching }
+    end
     resources :emergency_contacts
     resources :surveys, only: [:new, :create], controller: "surveys"
     resources :invoices, only: [ :index, :show ] do
@@ -146,6 +150,7 @@ Rails.application.routes.draw do
     get "revenue", to: "revenue#index", as: :revenue
     get "intelligence", to: "intelligence#index", as: :intelligence
     get "intelligence/patients/:id", to: "intelligence#show", as: :intelligence_patient
+    get "intelligence/patients/:id/briefing", to: "intelligence#briefing", as: :intelligence_patient_briefing
   end
 
   # Shared notifications (authenticated)
