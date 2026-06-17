@@ -8,7 +8,7 @@
 
   <body class="mk">
     <% content_for(:title) { "Healthroom Renal Centre" } unless content_for?(:title) %>
-    <% nav = [["Home", root_path], ["Services", public_services_path], ["Our Doctors", doctors_path], ["About", about_path], ["Blog", blog_posts_path], ["Contact", contact_path]] %>
+    <% nav = [["Home", root_path], ["Services", public_services_path], ["Our Doctors", doctors_path], ["About", about_path], ["Blog", blog_posts_path], ["Demo", demo_guide_path], ["Contact", contact_path]] %>
     <% active = ->(path) { request.path == path || (path != "/" && request.path.start_with?(path)) } %>
 
     <div data-controller="marketing-booking">
