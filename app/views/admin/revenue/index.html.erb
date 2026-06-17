@@ -1,0 +1,134 @@
+<% content_for(:title) { "Revenue Cycle" } %>
+<% k = @data[:kpis] %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Revenue cycle</h1>
+    <p class="text-base-content/60 text-sm mt-1">Billing, collections and accounts-receivable health.</p>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <% [
+      ["Total invoiced", format_naira(k[:invoiced_cents]), "text-primary"],
+      ["Collected", format_naira(k[:collected_cents]), "text-success"],
+      ["Outstanding A/R", format_naira(k[:outstanding_cents]), "text-warning"],
+      ["Overdue", format_naira(k[:overdue_cents]), "text-error"]
+    ].each do |label, value, accent| %>
+      <div class="card bg-base-100 shadow"><div class="card-body p-5">
+        <p class="text-xs uppercase tracking-wider text-base-content/50"><%= label %></p>
+        <p class="text-xl font-bold <%= accent %> mt-1"><%= value %></p>
+      </div></div>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <% [
+      ["Collection rate", "#{k[:collection_rate]}%"],
+      ["Paid invoices", k[:paid_invoices]],
+      ["Open invoices", k[:open_invoices]],
+      ["Claims outstanding", format_naira(@data[:claims][:outstanding_cents])]
+    ].each do |label, value| %>
+      <div class="rounded-xl bg-base-200/60 p-4">
+        <p class="text-lg font-bold"><%= value %></p>
+        <p class="text-xs text-base-content/60"><%= label %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Collections trend -->
+    <div class="card bg-base-100 shadow lg:col-span-2">
+      <div class="card-body">
+        <h2 class="card-title text-base">Collections (6 months)</h2>
+        <% if @data[:monthly].present? %>
+          <%= column_chart @data[:monthly], colors: ["#2B8B75"], prefix: "₦", thousands: ",", height: "240px" %>
+        <% else %>
+          <p class="text-sm text-base-content/50 py-10 text-center">No payments recorded yet.</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Invoices by status -->
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">Invoiced by status</h2>
+        <% if @data[:by_status].present? %>
+          <%= pie_chart @data[:by_status], colors: ["#9CA3AF","#3B82F6","#22C55E","#EF4444","#6B7280"], height: "240px", donut: true, prefix: "₦", thousands: "," %>
+        <% else %>
+          <p class="text-sm text-base-content/50 py-10 text-center">No invoices yet.</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- A/R aging -->
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">Accounts-receivable aging</h2>
+        <p class="text-xs text-base-content/50 mb-2">Outstanding balance by age of invoice.</p>
+        <div class="space-y-2">
+          <% max = [@data[:aging].values.max, 1].max %>
+          <% @data[:aging].each do |bucket, amount| %>
+            <div>
+              <div class="flex justify-between text-sm">
+                <span><%= bucket %></span>
+                <span class="font-medium">₦<%= number_with_delimiter(amount) %></span>
+              </div>
+              <progress class="progress <%= bucket == '90+ days' ? 'progress-error' : (bucket == 'Current' ? 'progress-success' : 'progress-warning') %> w-full h-2" value="<%= amount %>" max="<%= max %>"></progress>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment methods + top debtors -->
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h2 class="card-title text-base">Top outstanding balances</h2>
+        <% if @data[:top_debtors].any? %>
+          <div class="overflow-x-auto">
+            <table class="table table-sm">
+              <thead><tr><th>Patient</th><th class="text-right">Balance</th></tr></thead>
+              <tbody>
+                <% @data[:top_debtors].each do |row| %>
+                  <tr>
+                    <td><%= row[:patient].full_name %></td>
+                    <td class="text-right font-medium text-warning"><%= format_naira(row[:balance_cents]) %></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <p class="text-sm text-base-content/50 py-6 text-center">No outstanding balances. 🎉</p>
+        <% end %>
+        <% if @data[:by_method].present? %>
+          <div class="divider text-xs text-base-content/50 my-2">Payments by method</div>
+          <div class="flex flex-wrap gap-2">
+            <% @data[:by_method].each do |method, amount| %>
+              <span class="badge badge-ghost"><%= method %>: ₦<%= number_with_delimiter(amount) %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claims -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base">Insurance claims</h2>
+      <% if @data[:claims][:count].positive? %>
+        <div class="flex flex-wrap gap-2 mt-1">
+          <% @data[:claims][:by_status].each do |status, count| %>
+            <span class="badge badge-outline"><%= status %>: <%= count %></span>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-sm text-base-content/50">No insurance claims submitted yet.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

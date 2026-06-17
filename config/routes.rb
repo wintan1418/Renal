@@ -143,6 +143,7 @@ Rails.application.routes.draw do
     resources :transplant_waitlist_entries
     resources :patient_surveys, only: [:index, :show, :destroy]
     get "analytics", to: "analytics#index", as: :analytics
+    get "revenue", to: "revenue#index", as: :revenue
     get "intelligence", to: "intelligence#index", as: :intelligence
     get "intelligence/patients/:id", to: "intelligence#show", as: :intelligence_patient
   end
