@@ -9,7 +9,8 @@ module Intelligence
         at_risk: at_risk_patients,
         revenue: revenue_insights,
         inventory: inventory_forecast,
-        operations: operations
+        operations: operations,
+        no_show_risks: Intelligence::NoShowPredictor.call(limit: 8)
       }
     end
 

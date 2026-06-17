@@ -107,6 +107,34 @@
     </div>
   </div>
 
+  <!-- Appointment no-show risk -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base">Appointment no-show risk</h2>
+      <p class="text-xs text-base-content/50 mb-2">Upcoming appointments most likely to be missed — prioritise confirmation calls.</p>
+      <% risks = (@data[:no_show_risks] || []).select { |p| p.risk != :low } %>
+      <% if risks.any? %>
+        <div class="overflow-x-auto">
+          <table class="table table-sm">
+            <thead><tr><th>Patient</th><th>Date</th><th>Risk</th><th>Why</th></tr></thead>
+            <tbody>
+              <% risks.each do |p| %>
+                <tr>
+                  <td class="font-medium"><%= p.appointment.patient.full_name %></td>
+                  <td class="text-sm"><%= p.appointment.scheduled_date.strftime("%b %d") %> · <%= p.appointment.start_time %></td>
+                  <td><span class="badge badge-sm <%= p.risk == :high ? 'badge-error' : 'badge-warning' %>"><%= p.score %>%</span></td>
+                  <td class="text-xs text-base-content/60"><%= p.reasons.first(2).join(" · ") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-base-content/50 py-6 text-center">No high-risk upcoming appointments.</p>
+      <% end %>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Inventory forecast -->
     <div class="card bg-base-100 shadow">

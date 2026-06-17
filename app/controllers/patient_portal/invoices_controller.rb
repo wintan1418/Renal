@@ -16,30 +16,24 @@ class PatientPortal::InvoicesController < PatientPortal::BaseController
   end
 
   def initiate_payment
-    reference = "HR-#{SecureRandom.alphanumeric(12).upcase}"
-    payment = @invoice.payments.create!(
-      patient: current_user,
-      amount_cents: @invoice.balance_due_cents,
-      payment_method: :paystack,
-      status: :pending,
-      paystack_reference: reference
-    )
-
-    result = Billing::PaystackService.call(
-      action: :initialize_transaction,
-      email: current_user.email,
-      amount_cents: payment.amount_cents,
-      reference: reference,
-      callback_url: patient_portal_payments_callback_url,
-      metadata: { invoice_id: @invoice.id, payment_id: payment.id }
-    )
-
-    if result.success?
-      redirect_to result.data["authorization_url"], allow_other_host: true
-    else
-      payment.destroy
-      redirect_to pay_patient_portal_invoice_path(@invoice), alert: "Payment initialization failed: #{result.error}"
+    # Demo mode: live payment gateways (Paystack, cards) are not yet activated.
+    # Record a simulated successful payment so the flow completes end-to-end,
+    # then explain that integrations go live at launch.
+    amount = @invoice.balance_due_cents
+    if amount.positive?
+      @invoice.payments.create!(
+        patient: current_user,
+        amount_cents: amount,
+        payment_method: :paystack,
+        status: :successful,
+        paystack_reference: "DEMO-#{SecureRandom.alphanumeric(10).upcase}",
+        notes: "Demo payment — gateway not yet live"
+      )
+      @invoice.update(amount_paid_cents: @invoice.amount_paid_cents + amount, status: :paid)
     end
+
+    redirect_to patient_portal_invoice_path(@invoice),
+      notice: "✅ Demo payment recorded. This is a demonstration — live Paystack and card processing will be activated when the clinic goes live."
   end
 
   private

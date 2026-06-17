@@ -909,15 +909,25 @@ neph_dept = Department.find_by(name: "Nephrology")
 if consult && neph_dept && labdocs.any?
   User.where(role: :patient).where("email LIKE ?", "demo.patient.%").find_each.with_index do |patient, i|
     # Count-gated (not keyed on relative dates) so re-runs on a later day don't duplicate.
-    next if patient.appointments_as_patient.count >= 2
+    next if patient.appointments_as_patient.count >= 3
     doc = labdocs[patient.id % labdocs.size]
-    [
-      [ (20 + i).days.ago.to_date, :completed, format("%02d:00", 9 + i % 6), "Initial nephrology review" ],
-      [ (i + 1).days.from_now.to_date, :confirmed, format("%02d:30", 9 + i % 7), "Routine kidney function review" ]
-    ].each do |date, status, time, reason|
-      Appointment.create!(patient: patient, doctor: doc, service: consult, department: neph_dept,
-                          scheduled_date: date, start_time: time, appointment_type: :scheduled,
-                          reason: reason, status: status)
+    # Mixed past history (some no-shows/cancellations) feeds the no-show predictor.
+    past = [ %i[completed no_show completed], %i[completed completed no_show],
+             %i[completed completed completed], %i[no_show cancelled completed],
+             %i[completed completed completed] ][i % 5]
+    future_status = (i % 3).zero? ? :pending : :confirmed
+
+    slots = past.each_with_index.map { |st, j| [ (10 * (j + 1) + i).days.ago.to_date, st, format("%02d:%02d", 9 + (i + j) % 7, (j * 20) % 60), "Nephrology review" ] }
+    slots << [ (i + 1).days.from_now.to_date, future_status, format("%02d:30", 9 + i % 7), "Routine kidney function review" ]
+
+    slots.each do |date, status, time, reason|
+      begin
+        Appointment.create!(patient: patient, doctor: doc, service: consult, department: neph_dept,
+                            scheduled_date: date, start_time: time, appointment_type: :scheduled,
+                            reason: reason, status: status)
+      rescue ActiveRecord::RecordInvalid
+        # skip rare double-booking collisions
+      end
     end
   end
 end

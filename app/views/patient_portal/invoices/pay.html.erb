@@ -50,15 +50,20 @@
       <% end %>
     </div>
 
-    <!-- Paystack Payment Button -->
-    <%= form_with url: initiate_payment_patient_portal_invoice_path(@invoice), method: :post do |f| %>
-      <div class="space-y-3">
-        <p class="text-xs text-base-content/50 text-center">
-          You will be redirected to Paystack to complete payment securely.
-        </p>
-        <%= f.submit "Pay ₦#{number_with_delimiter(@invoice.balance_due_cents / 100)} with Paystack",
-          class: "btn btn-primary btn-block btn-lg" %>
+    <!-- Demo-mode notice -->
+    <div class="rounded-xl bg-warning/10 border border-warning/30 p-4 mb-4 text-sm">
+      <div class="flex items-start gap-2">
+        <span class="text-lg leading-none">🚧</span>
+        <div>
+          <p class="font-semibold">Demo phase</p>
+          <p class="text-base-content/70 mt-1">Online payment gateways (Paystack, debit cards, bank transfer) are not yet live — they'll be activated when the clinic goes live. You can record a demo payment below to see the full flow.</p>
+        </div>
       </div>
+    </div>
+
+    <%= form_with url: initiate_payment_patient_portal_invoice_path(@invoice), method: :post do |f| %>
+      <%= f.submit "Record demo payment of ₦#{number_with_delimiter(@invoice.balance_due_cents / 100)}",
+        class: "btn btn-primary btn-block btn-lg" %>
     <% end %>
   </div>
 
@@ -73,6 +78,6 @@
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
       <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
     </svg>
-    <span>Payments are secured and processed by Paystack</span>
+    <span>Live payments will be secured &amp; processed by Paystack</span>
   </div>
 </div>
