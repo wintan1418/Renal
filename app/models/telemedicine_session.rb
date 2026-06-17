@@ -18,6 +18,12 @@ class TelemedicineSession < ApplicationRecord
   end
 
   def self.generate_room_id
-    "room-#{SecureRandom.hex(8)}"
+    "HR-TELE-#{SecureRandom.hex(6).upcase}"
+  end
+
+  # Public Jitsi Meet room — works with no API key/account. The prefix keeps
+  # the room name unique so it won't collide with other public rooms.
+  def jitsi_url
+    "https://meet.jit.si/HealthroomRenal-#{room_id}"
   end
 end

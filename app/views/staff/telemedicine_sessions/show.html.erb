@@ -1,0 +1,8 @@
+<% content_for(:title, "Telemedicine — #{@session.patient.full_name}") %>
+<div class="max-w-4xl mx-auto space-y-4">
+  <div class="flex items-center gap-2 text-sm text-base-content/60">
+    <%= link_to "Telemedicine", staff_telemedicine_sessions_path, class: "hover:text-primary" %>
+    <span>/</span><span class="text-base-content font-medium"><%= @session.patient.full_name %></span>
+  </div>
+  <%= render "shared/video_room", session: @session, end_url: staff_telemedicine_session_path(@session) %>
+</div>

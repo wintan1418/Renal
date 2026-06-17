@@ -148,6 +148,7 @@
                 <%= sidebar_link(staff_patients_path, "Patients") { ico.call("M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z") } %>
                 <%= sidebar_link(staff_lab_results_path, "Lab Results", match: "/staff/lab_results") { ico.call("M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z") } %>
                 <%= sidebar_link(staff_dose_calculator_path, "Dose Calculator", match: "/staff/dose_calculator") { ico.call("M9 7h6m0 10v-3m-3 3h.01M9 17h.01M12 14h.01M15 11h.01M9 11h.01M12 11h.01m-3 3h.01M5 5h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z") } %>
+                <%= sidebar_link(staff_telemedicine_sessions_path, "Telemedicine", match: "/staff/telemedicine") { ico.call("M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z") } %>
 
                 <%= section.call("Dialysis") %>
                 <%= sidebar_link(board_staff_dialysis_sessions_path, "Dialysis Board") { ico.call("M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2") } %>
@@ -182,6 +183,7 @@
                 <%= sidebar_link(patient_portal_conversations_path, "Messages") { ico.call("M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z") } %>
                 <%= sidebar_link(patient_portal_assistant_path, "Health Assistant", match: "/patient_portal/assistant") { ico.call("M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 4v-4z") } %>
                 <%= sidebar_link(patient_portal_home_readings_path, "Home Monitoring", match: "/patient_portal/home_readings") { ico.call("M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z") } %>
+                <%= sidebar_link(patient_portal_telemedicine_sessions_path, "Video Visits", match: "/patient_portal/telemedicine") { ico.call("M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z") } %>
 
                 <%= section.call("Billing") %>
                 <%= sidebar_link(patient_portal_invoices_path, "Invoices") { ico.call("M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z") } %>

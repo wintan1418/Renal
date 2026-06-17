@@ -1,0 +1,36 @@
+<%#
+  Embedded Jitsi Meet room — no API key/account required. Pass `session:` and
+  optional `end_url:` (renders an "End session" form for the clinician).
+%>
+<div class="card bg-base-100 shadow-xl">
+  <div class="card-body p-0">
+    <div class="p-4 border-b border-base-200 flex items-center justify-between gap-3">
+      <div>
+        <h2 class="font-bold">Video consultation</h2>
+        <p class="text-xs text-base-content/50">Room <%= session.room_id %> · secured peer-to-peer (Jitsi)</p>
+      </div>
+      <span class="badge <%= session.status_completed? ? 'badge-ghost' : 'badge-success' %> badge-sm gap-1">
+        <% unless session.status_completed? %><span class="w-2 h-2 rounded-full bg-success animate-pulse inline-block"></span><% end %>
+        <%= session.status.humanize %>
+      </span>
+    </div>
+
+    <% if session.status_completed? %>
+      <div class="p-10 text-center text-base-content/50">
+        <p>This session has ended<%= " (#{session.duration_minutes} min)" if session.duration_minutes %>.</p>
+      </div>
+    <% else %>
+      <div class="relative w-full" style="aspect-ratio:16/9;background:#0b2437">
+        <iframe src="<%= session.jitsi_url %>#config.prejoinPageEnabled=true"
+                allow="camera; microphone; fullscreen; display-capture; autoplay"
+                class="absolute inset-0 w-full h-full" style="border:0"></iframe>
+      </div>
+      <div class="p-3 flex items-center justify-between gap-2 flex-wrap">
+        <a href="<%= session.jitsi_url %>" target="_blank" rel="noopener" class="btn btn-ghost btn-sm">Open in new tab ↗</a>
+        <% if defined?(end_url) && end_url %>
+          <%= button_to "End session", end_url, method: :patch, class: "btn btn-error btn-sm", data: { turbo_confirm: "End this consultation?" } %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

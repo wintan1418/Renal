@@ -1,0 +1,40 @@
+<% content_for(:title, "Telemedicine") %>
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold">Telemedicine</h1>
+      <p class="text-base-content/60 text-sm">Video consultations with your patients.</p>
+    </div>
+    <%= link_to "New consultation", new_staff_telemedicine_session_path, class: "btn btn-primary btn-sm" %>
+  </div>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body p-0">
+      <% if @sessions.any? %>
+        <div class="overflow-x-auto">
+          <table class="table table-sm">
+            <thead><tr><th>Patient</th><th>Status</th><th>Created</th><th></th></tr></thead>
+            <tbody>
+              <% @sessions.each do |s| %>
+                <tr class="hover">
+                  <td class="font-medium"><%= s.patient.full_name %></td>
+                  <td><span class="badge badge-sm <%= s.status_active? ? 'badge-success' : (s.status_completed? ? 'badge-ghost' : 'badge-info') %> capitalize"><%= s.status.humanize %></span></td>
+                  <td class="text-sm text-base-content/60"><%= s.created_at.strftime("%b %d, %Y") %></td>
+                  <td class="text-right">
+                    <% unless s.status_completed? %>
+                      <%= link_to "Join", staff_telemedicine_session_path(s), class: "btn btn-xs btn-primary" %>
+                    <% else %>
+                      <span class="text-xs text-base-content/40"><%= "#{s.duration_minutes} min" if s.duration_minutes %></span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-base-content/50 text-center py-10">No telemedicine sessions yet.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

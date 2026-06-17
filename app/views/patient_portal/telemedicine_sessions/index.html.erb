@@ -1,0 +1,31 @@
+<% content_for(:title, "Video Consultations") %>
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Video consultations</h1>
+    <p class="text-base-content/60 text-sm">Join a video appointment with your care team.</p>
+  </div>
+
+  <div class="card bg-base-100 shadow">
+    <div class="card-body p-0">
+      <% if @sessions.any? %>
+        <ul class="divide-y divide-base-200">
+          <% @sessions.each do |s| %>
+            <li class="flex items-center justify-between gap-3 p-4">
+              <div>
+                <p class="font-medium text-sm">Dr. <%= s.doctor.last_name %></p>
+                <p class="text-xs text-base-content/50"><%= s.created_at.strftime("%b %d, %Y") %> · <%= s.status.humanize %></p>
+              </div>
+              <% if s.status_completed? %>
+                <span class="text-xs text-base-content/40">Ended</span>
+              <% else %>
+                <%= link_to "Join call", patient_portal_telemedicine_session_path(s), class: "btn btn-primary btn-sm" %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-base-content/50 text-center py-10">No video consultations scheduled.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

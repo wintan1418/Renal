@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     get "assistant", to: "assistant#index"
     post "assistant/message", to: "assistant#message", as: :assistant_message
     resources :home_readings, only: [ :index, :create ]
+    resources :telemedicine_sessions, only: [ :index, :show ]
     resources :medical_records, only: [ :index ]
     resources :lab_results, only: [ :index, :show ] do
       member { get :explanation }
@@ -89,6 +90,7 @@ Rails.application.routes.draw do
     end
     resources :lab_results, only: [ :index, :edit, :update ]
     get "dose_calculator", to: "dose_calculator#index", as: :dose_calculator
+    resources :telemedicine_sessions, only: [ :index, :new, :create, :show, :update ]
     post "ai/scribe", to: "ai#scribe", as: :ai_scribe
     resources :dialysis_sessions do
       member do
