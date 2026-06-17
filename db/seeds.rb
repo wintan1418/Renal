@@ -103,7 +103,23 @@ doctors_data = [
   { email: "oluwaseun.adeleke@healthroom.ng",  first_name: "Oluwaseun",   last_name: "Adeleke",
     phone: "+2348011111004", dept: dialysis_dept, specialization: "Dialysis Medicine",
     qualification: "MBBS, FWACP", years: 10, fee: 2_000_000,
-    bio: "Heads the dialysis unit ensuring highest standards of care for hemodialysis and peritoneal dialysis patients." }
+    bio: "Heads the dialysis unit ensuring highest standards of care for hemodialysis and peritoneal dialysis patients." },
+  { email: "ibrahim.danjuma@healthroom.ng",    first_name: "Ibrahim",     last_name: "Danjuma",
+    phone: "+2348011111005", dept: nephrology,    specialization: "Interventional Nephrology",
+    qualification: "MBBS, FWACP, Fellowship (Vascular Access)", years: 14, fee: 2_800_000,
+    bio: "Specialist in dialysis vascular access and interventional procedures, with a focus on fistula creation and salvage." },
+  { email: "ngozi.eze@healthroom.ng",          first_name: "Ngozi",       last_name: "Eze",
+    phone: "+2348011111006", dept: nephrology,    specialization: "Glomerular Diseases",
+    qualification: "MBBS, FMCP (Nephrology)", years: 11, fee: 2_500_000,
+    bio: "Focuses on glomerulonephritis, lupus nephritis and complex proteinuric kidney disease." },
+  { email: "tunde.bakare.md@healthroom.ng",    first_name: "Tunde",       last_name: "Bakare",
+    phone: "+2348011111007", dept: nephrology,    specialization: "Hypertension & Renal Care",
+    qualification: "MBBS, FWACP, MPH", years: 9, fee: 2_200_000,
+    bio: "Manages resistant hypertension and its renal complications, with a strong preventive-care focus." },
+  { email: "amina.suleiman@healthroom.ng",     first_name: "Amina",       last_name: "Suleiman",
+    phone: "+2348011111008", dept: dialysis_dept, specialization: "Dialysis & Critical Care",
+    qualification: "MBBS, FWACP (Nephrology)", years: 13, fee: 2_600_000,
+    bio: "Oversees acute dialysis and critical-care nephrology, including CRRT for intensive-care patients." }
 ]
 
 doctors = doctors_data.map do |d|
@@ -802,6 +818,110 @@ ContactSubmission.find_or_create_by!(email: "mrs.ade@example.com") do |cs|
 end
 
 end # ─── end demo / transactional data guard ───────────────
+
+# ─── BULK DEMO POPULATION (no Faker; tops up to targets, safe to re-run) ───
+# Runs OUTSIDE the guard so it fills out an existing database too. Idempotent
+# via count checks + stable emails, and uses only plain Ruby so it works under
+# RAILS_ENV=production (Faker is dev/test-only).
+puts "\n[+] Bulk demo population..."
+
+ng_first = %w[Chidi Amaka Yusuf Bola Ifeoma Emeka Halima Sade Obinna Zainab Tope Uche Kelechi Aisha Femi Suleiman Bisi Chinedu Folake Damilola]
+ng_last  = %w[Okafor Adeyemi Bello Okeke Lawal Eze Mohammed Balogun Nwankwo Aliyu Obi Adebayo Danjuma Chukwu Olawale Ogunleye Sani Onyeka Afolabi Ndukwe]
+cities   = [ [ "Lagos", "Lagos", "Eti-Osa" ], [ "Abuja", "FCT", "Abuja Municipal" ], [ "Port Harcourt", "Rivers", "Port Harcourt" ], [ "Kano", "Kano", "Nassarawa" ], [ "Ibadan", "Oyo", "Ibadan North" ] ]
+occs     = %w[Trader Teacher Engineer Civil-Servant Nurse Accountant Retired Farmer Banker Student]
+stages   = %i[stage_1 stage_2 stage_3a stage_3b stage_4 stage_5]
+bloods   = %i[o_positive a_positive b_positive ab_positive o_negative a_negative]
+genos    = %i[aa as_genotype aa ac aa]
+
+target_patients = 18
+start_n = User.where(role: :patient).count
+(start_n...target_patients).each do |i|
+  u = create_user(email: "demo.patient.#{i + 1}@healthroom.ng",
+                  first_name: ng_first[i % ng_first.size], last_name: ng_last[(i * 3) % ng_last.size],
+                  phone: format("+23480%08d", 51_000_000 + i * 311), role: :patient)
+  city, state, lga = cities[i % cities.size]
+  stage = stages[i % stages.size]
+  PatientProfile.find_or_create_by!(user: u) do |pp|
+    pp.date_of_birth = Date.new(1948 + (i * 13) % 50, (i % 12) + 1, (i % 27) + 1)
+    pp.gender = i.even? ? :male : :female
+    pp.blood_group = bloods[i % bloods.size]
+    pp.genotype = genos[i % genos.size]
+    pp.marital_status = %i[single married widowed divorced][i % 4]
+    pp.address = "#{(i % 90) + 1} #{ng_last[i % ng_last.size]} Street"
+    pp.city = city; pp.state = state; pp.lga = lga
+    pp.occupation = occs[i % occs.size]
+    pp.nok_name = "#{ng_first[(i + 5) % ng_first.size]} #{ng_last[(i * 3) % ng_last.size]}"
+    pp.nok_phone = format("+23481%08d", 52_000_000 + i * 271)
+    pp.nok_relationship = %w[Spouse Sibling Parent Child][i % 4]
+    pp.ckd_stage = stage
+    pp.on_dialysis = (stage == :stage_5)
+  end
+end
+puts "  ✓ patients now #{User.where(role: :patient).count}"
+
+# Renal-panel history so eGFR trends, charts and the intelligence engine have data.
+egfr_baseline = { "stage_1" => 98, "stage_2" => 78, "stage_3a" => 52, "stage_3b" => 38, "stage_4" => 22, "stage_5" => 11 }
+labdocs = User.doctors.active.to_a
+lab_flag = lambda do |code, v|
+  case code
+  when "EGFR" then v < 60 ? :low : :normal
+  when "CREAT" then v > 1.2 ? :high : :normal
+  when "K" then v > 5.0 ? :high : (v < 3.5 ? :low : :normal)
+  when "HGB" then v < 12 ? :low : :normal
+  when "UREA", "BUN" then v > 20 ? :high : :normal
+  when "NA" then (v < 136 || v > 145) ? :high : :normal
+  else :normal
+  end
+end
+
+User.where(role: :patient).find_each do |patient|
+  existing = patient.lab_orders_as_patient.count
+  next if existing >= 4
+  doc = labdocs[patient.id % labdocs.size] || labdocs.first
+  next unless doc
+  base = egfr_baseline[patient.patient_profile&.ckd_stage] || 70
+  [ 6, 4, 2, 0 ].last(4 - existing).each_with_index do |m, idx|
+    date = m.months.ago.to_date
+    egfr  = [ (base - idx * 2 + (patient.id % 5) - 2).round, 5 ].max
+    creat = (1.0 + (100.0 / [ egfr, 8 ].max) * 0.9).round(1)
+    values = {
+      "EGFR" => egfr, "CREAT" => creat,
+      "K"   => (4.2 + ((patient.id + m) % 9) * 0.1).round(1),
+      "HGB" => (13.5 - (60 - [ egfr, 60 ].min) * 0.04).round(1),
+      "UREA" => (15 + (60 - [ egfr, 60 ].min) * 0.4).round,
+      "NA"  => 138 + (patient.id % 6)
+    }
+    lo = LabOrder.create!(patient: patient, ordered_by: doc, status: :completed, priority: :routine,
+                          completed_at: date.to_time + 12.hours, created_at: date.to_time + 9.hours)
+    values.each do |code, v|
+      test = LabTest.find_by(code: code)
+      next unless test
+      LabResult.create!(lab_order: lo, lab_test: test, patient: patient, value: v.to_s,
+                        numeric_value: v, flag: lab_flag.call(code, v.to_f), result_date: date, resulted_by: doc)
+    end
+  end
+end
+puts "  ✓ lab_orders=#{LabOrder.count}, lab_results=#{LabResult.count}"
+
+# Spread appointments for the demo patients so calendars/queues aren't empty.
+consult = Service.find_by(name: "Nephrology Consultation")
+neph_dept = Department.find_by(name: "Nephrology")
+if consult && neph_dept && labdocs.any?
+  User.where(role: :patient).where("email LIKE ?", "demo.patient.%").find_each.with_index do |patient, i|
+    # Count-gated (not keyed on relative dates) so re-runs on a later day don't duplicate.
+    next if patient.appointments_as_patient.count >= 2
+    doc = labdocs[patient.id % labdocs.size]
+    [
+      [ (20 + i).days.ago.to_date, :completed, format("%02d:00", 9 + i % 6), "Initial nephrology review" ],
+      [ (i + 1).days.from_now.to_date, :confirmed, format("%02d:30", 9 + i % 7), "Routine kidney function review" ]
+    ].each do |date, status, time, reason|
+      Appointment.create!(patient: patient, doctor: doc, service: consult, department: neph_dept,
+                          scheduled_date: date, start_time: time, appointment_type: :scheduled,
+                          reason: reason, status: status)
+    end
+  end
+end
+puts "  ✓ appointments=#{Appointment.count}"
 
 puts "\n" + "=" * 60
 puts "SEED COMPLETE!"
