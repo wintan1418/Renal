@@ -1,29 +1,80 @@
 <% content_for(:title) { "Guided Demo — Healthroom" } %>
-<% content_for(:meta_description) { "A guided walkthrough of the Healthroom renal hospital platform." } %>
+<% content_for(:meta_description) { "An animated guided walkthrough of the Healthroom renal hospital platform." } %>
 
-<div class="mk-pg">
-  <!-- Hero -->
-  <section class="mk-section--cream" style="border-top:none;padding:64px 0 48px;text-align:center">
-    <div class="mk-wrap" style="max-width:760px">
-      <div class="mk-eyebrow">— Guided demo</div>
-      <h1 class="mk-h1">Healthroom platform walkthrough</h1>
-      <p class="mk-lead" style="margin:18px auto 0;max-width:620px">A complete renal-hospital management system — public site, patient portal, clinical workflows, dialysis unit, billing, a CRM, and an AI intelligence layer. Use the accounts below to explore each role.</p>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px">
-        <%= link_to "Open the app", new_user_session_path, class: "mk-btn mk-btn--cta mk-btn--lg" %>
+<div class="mk-pg dx">
+  <!-- ===== HERO ===== -->
+  <section class="dx-hero">
+    <div class="dx-hero__bg"></div>
+    <div class="dx-blob dx-blob--1"></div>
+    <div class="dx-blob dx-blob--2"></div>
+    <div class="mk-wrap dx-hero__inner">
+      <div class="dx-badge">● Live interactive demo</div>
+      <h1 class="dx-title">The complete renal hospital,<br><span class="dx-grad">reimagined with AI</span></h1>
+      <p class="dx-sub">Public site · patient portal · clinical workflows · dialysis unit · billing · CRM · and an AI intelligence layer — all in one platform.</p>
+      <div class="dx-cta">
+        <%= link_to "Open the app →", new_user_session_path, class: "mk-btn mk-btn--cta mk-btn--lg" %>
         <%= link_to "View public site", root_path, class: "mk-btn mk-btn--outline mk-btn--lg" %>
+      </div>
+      <div class="dx-chips">
+        <% ["eGFR prediction", "AI clinical scribe", "Lab explainer", "Diet coach", "Triage chatbot", "CRM + AI replies", "Revenue cycle", "Live dialysis board"].each do |c| %>
+          <span class="dx-chip"><%= c %></span>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Animated app preview mockups -->
+    <div class="mk-wrap dx-stage">
+      <!-- Dashboard browser mockup -->
+      <div class="dx-window dx-float">
+        <div class="dx-window__bar"><i></i><i></i><i></i><span class="dx-url">app.healthroom.health/admin/intelligence</span></div>
+        <div class="dx-app">
+          <aside class="dx-side">
+            <span class="dx-logo"></span>
+            <% 6.times do |i| %><span class="dx-navitem <%= 'is-on' if i == 1 %>"></span><% end %>
+          </aside>
+          <main class="dx-main">
+            <div class="dx-kpis">
+              <% [["Patients","var(--mk-teal)"],["Revenue","#22c55e"],["A/R","#E8773F"],["At-risk","#ef4444"]].each do |label, col| %>
+                <div class="dx-kpi"><span class="dx-kpi__t"><%= label %></span><span class="dx-kpi__v" style="color:<%= col %>"></span><span class="dx-kpi__s"></span></div>
+              <% end %>
+            </div>
+            <div class="dx-row">
+              <div class="dx-card dx-chartcard">
+                <div class="dx-bars">
+                  <% [40,65,50,80,60,90,72].each_with_index do |h, i| %><span class="dx-bar" style="--h:<%= h %>%; --d:<%= i*0.08 %>s"></span><% end %>
+                </div>
+              </div>
+              <div class="dx-card dx-donutcard"><span class="dx-donut"></span></div>
+            </div>
+            <div class="dx-list">
+              <% 3.times do |i| %><div class="dx-listrow"><span class="dx-dot"></span><span class="dx-line"></span><span class="dx-pill"></span></div><% end %>
+            </div>
+          </main>
+        </div>
+      </div>
+
+      <!-- Phone — AI assistant chat -->
+      <div class="dx-phone dx-float dx-float--delay">
+        <div class="dx-phone__notch"></div>
+        <div class="dx-chat">
+          <div class="dx-msg dx-msg--in">What does my eGFR mean?</div>
+          <div class="dx-msg dx-msg--out">Your eGFR shows how well your kidneys filter…</div>
+          <div class="dx-msg dx-msg--in">Should I book a visit?</div>
+          <div class="dx-typing"><span></span><span></span><span></span></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Demo accounts -->
+  <!-- ===== DEMO ACCOUNTS ===== -->
   <section class="mk-section">
     <div class="mk-wrap">
-      <div style="text-align:center;margin-bottom:8px"><h2 class="mk-h2">Demo accounts</h2></div>
-      <p style="text-align:center;color:var(--mk-muted);margin-bottom:28px">Every account uses the password <strong>password123</strong>. On the sign-in page you can also click a role button to log in with one tap.</p>
+      <div style="text-align:center;margin-bottom:8px"><h2 class="mk-h2">Sign in & explore</h2></div>
+      <p style="text-align:center;color:var(--mk-muted);margin-bottom:28px">Every account uses the password <strong>password123</strong>. On the sign-in page, tap a role button to log in instantly.</p>
       <div class="mk-grid mk-grid--3">
-        <% demo_accounts.each do |acct| %>
-          <div class="mk-card mk-card--pad" style="display:flex;align-items:center;gap:14px">
-            <span style="width:42px;height:42px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;background:var(--mk-teal)"><%= acct[:badge] %></span>
+        <% demo_accounts.each_with_index do |acct, i| %>
+          <div class="mk-card mk-card--pad dx-acct" style="--i:<%= i %>">
+            <span class="dx-acct__badge"><%= acct[:badge] %></span>
             <div style="min-width:0">
               <div style="font-weight:700;color:var(--mk-ink)"><%= acct[:role] %> · <%= acct[:name] %></div>
               <div style="font-size:13px;color:var(--mk-muted-2);overflow:hidden;text-overflow:ellipsis"><%= acct[:email] %></div>
@@ -34,52 +85,45 @@
     </div>
   </section>
 
-  <!-- Role tour -->
+  <!-- ===== ROLE TOUR ===== -->
   <section class="mk-section--cream">
     <div class="mk-wrap">
       <div style="text-align:center;margin-bottom:32px"><h2 class="mk-h2">What to show, by role</h2></div>
       <%
         tours = [
-          { role: "Admin", who: "admin@healthroom.health", color: "var(--mk-navy)", items: [
-            "Smart Intelligence — eGFR decline prediction, AI clinical briefing per patient, no-show risk, at-risk ranking, inventory forecast",
+          { role: "Admin", who: "admin@healthroom.health", color: "#0B2437", items: [
+            "Smart Intelligence — eGFR decline prediction, AI clinical briefing, no-show risk, inventory forecast",
             "Revenue Cycle — collections, A/R aging, top debtors, insurance claims",
-            "CRM / Leads — drag leads across the pipeline, open a lead → \"Draft a reply\" (AI)",
-            "Analytics, Users, Services, Departments, Lab tests"
-          ] },
-          { role: "Doctor", who: "adaeze.okonkwo@healthroom.health", color: "var(--mk-teal)", items: [
+            "CRM / Leads — drag leads across the pipeline, then \"Draft a reply\" (AI)",
+            "Analytics, Users, Services, Lab tests" ] },
+          { role: "Doctor", who: "adaeze.okonkwo@healthroom.health", color: "#2B8B75", items: [
             "Dashboard — today's clinic, patients needing attention, recent labs",
-            "Patients → open a chart → Visits → \"Add clinical note\" with the AI scribe (rough notes → SOAP)",
-            "Dialysis Unit Board — live station status with running timers"
-          ] },
-          { role: "Patient", who: "patient@healthroom.health", color: "var(--mk-orange)", items: [
-            "Book an appointment from the public site (3-step wizard)",
-            "Lab Results → open one → \"What your results mean\" (AI explainer)",
+            "Patients → chart → Visits → \"Add clinical note\" with the AI scribe (rough notes → SOAP)",
+            "Dialysis Unit Board — live station status with running timers" ] },
+          { role: "Patient", who: "patient@healthroom.health", color: "#E8773F", items: [
+            "Book an appointment (3-step wizard)",
+            "Lab Results → \"What your results mean\" (AI explainer)",
             "Diet & Fluid Tracker → \"Your diet coach\" (AI)",
             "Health Assistant — AI triage chatbot",
-            "Invoices → Pay → record a demo payment"
-          ] },
+            "Invoices → Pay → demo payment" ] },
           { role: "Receptionist", who: "receptionist@healthroom.health", color: "#6366F1", items: [
             "Front-desk appointments, check-in & walk-ins",
-            "Invoices, payments and insurance claims"
-          ] },
+            "Invoices, payments and insurance claims" ] },
           { role: "Nurse", who: "nurse.johnson@healthroom.health", color: "#0EA5E9", items: [
             "Record vitals and assist dialysis sessions",
-            "Dialysis unit board"
-          ] }
+            "Live dialysis unit board" ] }
         ]
       %>
       <div class="mk-grid mk-grid--2">
         <% tours.each do |t| %>
-          <div class="mk-card mk-card--pad">
+          <div class="mk-card mk-card--pad dx-tour" style="--accent:<%= t[:color] %>">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-              <span style="width:10px;height:10px;border-radius:50%;background:<%= t[:color] %>"></span>
+              <span class="dx-tour__dot"></span>
               <h3 class="mk-h3" style="margin:0"><%= t[:role] %></h3>
               <span style="font-size:12.5px;color:var(--mk-muted-2);margin-left:auto"><%= t[:who] %></span>
             </div>
-            <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">
-              <% t[:items].each do |item| %>
-                <li style="font-size:14.5px;line-height:1.55;color:oklch(0.36 0.02 165)"><%= item %></li>
-              <% end %>
+            <ol class="dx-steps">
+              <% t[:items].each do |item| %><li><%= item %></li><% end %>
             </ol>
           </div>
         <% end %>
@@ -87,12 +131,107 @@
     </div>
   </section>
 
-  <!-- AI note -->
+  <!-- ===== AI ===== -->
   <section class="mk-section">
     <div class="mk-wrap" style="max-width:760px;text-align:center">
-      <h2 class="mk-h2">About the AI</h2>
-      <p class="mk-lead" style="margin:16px auto 0">The AI features (clinical briefing, lab explainer, diet coach, clinical scribe, triage chatbot, CRM reply drafting) run through a configurable provider layer — OpenAI, Gemini or OpenRouter. When no key is set they fall back to clear rule-based output, so nothing ever breaks. Payments and currency are configurable; the demo uses simulated payments.</p>
-      <div style="margin-top:24px"><%= link_to "Start the walkthrough →", new_user_session_path, class: "mk-btn mk-btn--teal mk-btn--lg" %></div>
+      <div class="dx-aiorb"></div>
+      <h2 class="mk-h2">Powered by a configurable AI layer</h2>
+      <p class="mk-lead" style="margin:16px auto 0">Clinical briefings, lab explanations, diet coaching, the SOAP scribe, the triage chatbot and CRM reply drafting run through one provider layer — OpenAI, Gemini or OpenRouter. With no key set they fall back to clear rule-based output, so nothing ever breaks.</p>
+      <div style="margin-top:26px"><%= link_to "Start the walkthrough →", new_user_session_path, class: "mk-btn mk-btn--teal mk-btn--lg" %></div>
     </div>
   </section>
 </div>
+
+<style>
+/* ===== Demo page animations (scoped to .dx) ===== */
+.dx-hero{position:relative;overflow:hidden;padding:72px 0 90px;text-align:center}
+.dx-hero__bg{position:absolute;inset:0;background:linear-gradient(120deg,#0B2437,#143a52,#1f6e5c,#0B2437);background-size:300% 300%;animation:dxGradient 16s ease infinite;z-index:0}
+.dx-hero__inner{position:relative;z-index:2;color:#fff}
+.dx-blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.5;z-index:1}
+.dx-blob--1{width:420px;height:420px;background:#2B8B75;top:-120px;left:-80px;animation:dxFloat 9s ease-in-out infinite}
+.dx-blob--2{width:360px;height:360px;background:#E8773F;bottom:-120px;right:-60px;animation:dxFloat 11s ease-in-out infinite reverse}
+.dx-badge{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#bff3e4;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:7px 15px;border-radius:999px;backdrop-filter:blur(6px)}
+.dx-badge::before{content:"";width:8px;height:8px;border-radius:50%;background:#3ad9a8;box-shadow:0 0 0 0 rgba(58,217,168,.7);animation:dxPulse 1.8s infinite}
+.dx-title{font-family:var(--mk-display);font-weight:900;font-size:clamp(30px,5.2vw,56px);line-height:1.05;margin:18px 0 0;letter-spacing:-.02em}
+.dx-grad{background:linear-gradient(90deg,#3ad9a8,#7fe7cd,#f0a06a,#3ad9a8);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:dxShine 6s linear infinite}
+.dx-sub{max-width:600px;margin:18px auto 0;font-size:17px;line-height:1.6;color:rgba(255,255,255,.8)}
+.dx-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.dx-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:30px;max-width:680px;margin-left:auto;margin-right:auto}
+.dx-chip{font-size:12.5px;font-weight:600;color:#dff6ef;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);padding:7px 13px;border-radius:999px;animation:dxFadeUp .6s both;transition:transform .2s,background .2s}
+.dx-chip:hover{transform:translateY(-3px);background:rgba(255,255,255,.16)}
+
+/* App preview stage */
+.dx-stage{position:relative;z-index:2;display:flex;justify-content:center;align-items:flex-end;gap:0;margin-top:54px;min-height:340px}
+.dx-window{width:min(680px,84vw);background:#0e2233;border:1px solid rgba(255,255,255,.12);border-radius:16px;box-shadow:0 40px 90px -30px rgba(0,0,0,.6);overflow:hidden}
+.dx-window__bar{display:flex;align-items:center;gap:6px;padding:11px 14px;background:#0a1a28;border-bottom:1px solid rgba(255,255,255,.08)}
+.dx-window__bar i{width:11px;height:11px;border-radius:50%;background:#33485a}
+.dx-window__bar i:first-child{background:#ff5f57}.dx-window__bar i:nth-child(2){background:#febc2e}.dx-window__bar i:nth-child(3){background:#28c840}
+.dx-url{margin-left:12px;font-size:11.5px;color:#7d97a8;background:#0e2233;padding:4px 12px;border-radius:6px}
+.dx-app{display:flex;height:300px;background:#f4f7f6}
+.dx-side{width:64px;background:#0B2437;padding:14px 0;display:flex;flex-direction:column;align-items:center;gap:11px}
+.dx-logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#2B8B75,#3ad9a8);margin-bottom:6px}
+.dx-navitem{width:34px;height:9px;border-radius:5px;background:rgba(255,255,255,.13)}
+.dx-navitem.is-on{background:#3ad9a8}
+.dx-main{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px}
+.dx-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.dx-kpi{background:#fff;border-radius:10px;padding:10px;box-shadow:0 4px 12px -8px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:6px}
+.dx-kpi__t{height:6px;width:60%;border-radius:3px;background:#d6e0dc}
+.dx-kpi__v{height:14px;width:50%;border-radius:4px;background:currentColor;opacity:.85}
+.dx-kpi__s{height:5px;width:80%;border-radius:3px;background:#e7eeec}
+.dx-row{display:grid;grid-template-columns:1.7fr 1fr;gap:12px;flex:1}
+.dx-card{background:#fff;border-radius:12px;box-shadow:0 6px 16px -10px rgba(0,0,0,.3)}
+.dx-chartcard{padding:14px;display:flex;align-items:flex-end}
+.dx-bars{display:flex;align-items:flex-end;gap:9px;width:100%;height:100%}
+.dx-bar{flex:1;height:var(--h);background:linear-gradient(180deg,#3aaa91,#2B8B75);border-radius:5px 5px 0 0;transform:scaleY(0);transform-origin:bottom;animation:dxGrow .9s var(--d) forwards cubic-bezier(.2,.8,.2,1)}
+.dx-donutcard{display:flex;align-items:center;justify-content:center}
+.dx-donut{width:84px;height:84px;border-radius:50%;background:conic-gradient(#2B8B75 0 45%,#E8773F 45% 70%,#6366F1 70% 88%,#e7eeec 88% 100%);-webkit-mask:radial-gradient(circle 26px at center,transparent 98%,#000 100%);mask:radial-gradient(circle 26px at center,transparent 98%,#000 100%);animation:dxSpin 1s ease both}
+.dx-list{display:flex;flex-direction:column;gap:8px}
+.dx-listrow{display:flex;align-items:center;gap:9px;background:#fff;border-radius:9px;padding:9px 11px}
+.dx-dot{width:22px;height:22px;border-radius:50%;background:#dbe7e3;flex-shrink:0}
+.dx-line{height:7px;border-radius:4px;background:#e7eeec;flex:1}
+.dx-pill{width:52px;height:16px;border-radius:8px;background:#d6efe7}
+
+.dx-phone{position:relative;width:172px;height:336px;background:#0e2233;border:6px solid #0a1a28;border-radius:28px;box-shadow:0 40px 80px -30px rgba(0,0,0,.6);margin-left:-46px;margin-bottom:30px;overflow:hidden;flex-shrink:0}
+.dx-phone__notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:64px;height:16px;background:#0a1a28;border-radius:0 0 12px 12px;z-index:3}
+.dx-chat{padding:30px 12px 12px;display:flex;flex-direction:column;gap:8px;background:linear-gradient(180deg,#eef5f3,#fff);height:100%}
+.dx-msg{max-width:80%;font-size:11px;line-height:1.4;padding:8px 10px;border-radius:13px;animation:dxFadeUp .5s both}
+.dx-msg--in{align-self:flex-end;background:var(--mk-teal,#2B8B75);color:#fff;border-bottom-right-radius:4px}
+.dx-msg--out{align-self:flex-start;background:#fff;color:#1a2b34;border:1px solid #e2eae7;border-bottom-left-radius:4px}
+.dx-msg--in:nth-of-type(3){animation-delay:.6s}
+.dx-typing{align-self:flex-start;display:flex;gap:4px;background:#fff;border:1px solid #e2eae7;padding:9px 11px;border-radius:13px}
+.dx-typing span{width:6px;height:6px;border-radius:50%;background:#9bb4ab;animation:dxBlink 1.4s infinite}
+.dx-typing span:nth-child(2){animation-delay:.2s}.dx-typing span:nth-child(3){animation-delay:.4s}
+
+.dx-float{animation:dxFloat 7s ease-in-out infinite}
+.dx-float--delay{animation-delay:1.2s}
+
+/* Account & tour cards */
+.dx-acct{display:flex;align-items:center;gap:14px;transition:transform .2s,box-shadow .2s}
+.dx-acct:hover{transform:translateY(-4px)}
+.dx-acct__badge{width:42px;height:42px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;background:linear-gradient(135deg,#2B8B75,#3ad9a8)}
+.dx-tour{border-left:4px solid var(--accent);transition:transform .2s,box-shadow .2s}
+.dx-tour:hover{transform:translateY(-4px);box-shadow:0 24px 50px -28px color-mix(in srgb,var(--accent) 50%,transparent)}
+.dx-tour__dot{width:11px;height:11px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
+.dx-steps{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px}
+.dx-steps li{font-size:14.5px;line-height:1.55;color:oklch(0.36 0.02 165)}
+.dx-aiorb{width:72px;height:72px;border-radius:50%;margin:0 auto 8px;background:radial-gradient(circle at 35% 30%,#7fe7cd,#2B8B75 60%,#0B2437);box-shadow:0 0 0 0 rgba(43,139,117,.5);animation:dxPulse 2.4s infinite}
+
+@keyframes dxGradient{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes dxShine{to{background-position:200% center}}
+@keyframes dxFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes dxGrow{to{transform:scaleY(1)}}
+@keyframes dxSpin{from{transform:rotate(-90deg);opacity:.3}to{transform:rotate(0);opacity:1}}
+@keyframes dxPulse{0%{box-shadow:0 0 0 0 rgba(58,217,168,.6)}70%{box-shadow:0 0 0 16px rgba(58,217,168,0)}100%{box-shadow:0 0 0 0 rgba(58,217,168,0)}}
+@keyframes dxBlink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+@keyframes dxFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+@media (max-width:760px){
+  .dx-phone{display:none}
+  .dx-app{height:240px}
+  .dx-stage{margin-top:38px;min-height:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .dx-hero__bg,.dx-blob,.dx-float,.dx-grad,.dx-aiorb,.dx-bar,.dx-donut,.dx-typing span,.dx-badge::before{animation:none}
+  .dx-bar{transform:scaleY(1)}
+}
+</style>
