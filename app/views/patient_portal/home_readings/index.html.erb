@@ -1,0 +1,94 @@
+<% content_for(:title, "Home Monitoring") %>
+<% bp_badge = { critical: "badge-error", high: "badge-warning", low: "badge-info", normal: "badge-success" } %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-bold">Home monitoring</h1>
+    <p class="text-base-content/60 text-sm">Log your daily blood pressure, weight and medication check-in. Your care team can see flagged readings.</p>
+  </div>
+
+  <!-- Snapshot -->
+  <div class="grid grid-cols-3 gap-4">
+    <div class="card bg-base-100 shadow"><div class="card-body p-4 text-center">
+      <p class="text-2xl font-bold text-primary"><%= @avg_systolic && @avg_diastolic ? "#{@avg_systolic}/#{@avg_diastolic}" : "—" %></p>
+      <p class="text-xs text-base-content/60">Avg BP (30d)</p>
+    </div></div>
+    <div class="card bg-base-100 shadow"><div class="card-body p-4 text-center">
+      <p class="text-2xl font-bold <%= @adherence && @adherence < 80 ? 'text-warning' : 'text-success' %>"><%= @adherence ? "#{@adherence}%" : "—" %></p>
+      <p class="text-xs text-base-content/60">Med adherence (30d)</p>
+    </div></div>
+    <div class="card bg-base-100 shadow"><div class="card-body p-4 text-center">
+      <p class="text-2xl font-bold"><%= @readings.size %></p>
+      <p class="text-xs text-base-content/60">Recent check-ins</p>
+    </div></div>
+  </div>
+
+  <!-- Log form -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base">Today's check-in</h2>
+      <%= form_with model: @reading, url: patient_portal_home_readings_path, method: :post, class: "grid grid-cols-2 sm:grid-cols-4 gap-3 mt-1" do |f| %>
+        <div class="form-control col-span-2 sm:col-span-1">
+          <label class="label label-text text-xs">Date</label>
+          <%= f.date_field :recorded_on, class: "input input-bordered input-sm w-full" %>
+        </div>
+        <div class="form-control">
+          <label class="label label-text text-xs">Systolic</label>
+          <%= f.number_field :systolic_bp, placeholder: "120", class: "input input-bordered input-sm w-full" %>
+        </div>
+        <div class="form-control">
+          <label class="label label-text text-xs">Diastolic</label>
+          <%= f.number_field :diastolic_bp, placeholder: "80", class: "input input-bordered input-sm w-full" %>
+        </div>
+        <div class="form-control">
+          <label class="label label-text text-xs">Pulse</label>
+          <%= f.number_field :pulse, placeholder: "72", class: "input input-bordered input-sm w-full" %>
+        </div>
+        <div class="form-control">
+          <label class="label label-text text-xs">Weight (kg)</label>
+          <%= f.number_field :weight_kg, step: "0.1", placeholder: "70.0", class: "input input-bordered input-sm w-full" %>
+        </div>
+        <div class="form-control col-span-2 sm:col-span-2 justify-end">
+          <label class="label cursor-pointer justify-start gap-2">
+            <%= f.check_box :meds_taken, class: "checkbox checkbox-primary checkbox-sm" %>
+            <span class="label-text text-sm">I took all my medications today</span>
+          </label>
+        </div>
+        <div class="form-control col-span-2 sm:col-span-1 justify-end">
+          <%= f.submit "Save check-in", class: "btn btn-primary btn-sm w-full" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body p-0">
+      <div class="p-4 border-b border-base-200"><h2 class="font-bold">Recent check-ins</h2></div>
+      <% if @readings.any? %>
+        <div class="overflow-x-auto">
+          <table class="table table-sm">
+            <thead><tr><th>Date</th><th>BP</th><th>Pulse</th><th>Weight</th><th>Meds</th></tr></thead>
+            <tbody>
+              <% @readings.each do |r| %>
+                <tr>
+                  <td><%= r.recorded_on.strftime("%b %d, %Y") %></td>
+                  <td>
+                    <% if r.bp %>
+                      <span class="badge <%= bp_badge[r.bp_level] %> badge-sm"><%= r.bp %></span>
+                    <% else %>—<% end %>
+                  </td>
+                  <td><%= r.pulse || "—" %></td>
+                  <td><%= r.weight_kg ? "#{r.weight_kg} kg" : "—" %></td>
+                  <td><%= r.meds_taken ? "✓" : "✗" %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-base-content/50 text-center py-8">No check-ins yet — log your first above.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

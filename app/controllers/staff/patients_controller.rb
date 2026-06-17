@@ -22,6 +22,8 @@ class Staff::PatientsController < Staff::BaseController
     @tab = params[:tab] || "demographics"
     @renal_panel = Clinical::RenalLabPanel.call(@patient)
     @vascular_accesses = @patient.vascular_accesses.recent
+    @home_readings = @patient.home_readings.recent.limit(10)
+    @home_adherence = HomeReading.adherence_rate(@patient.home_readings.since(30.days.ago.to_date))
 
     case @tab
     when "visits"

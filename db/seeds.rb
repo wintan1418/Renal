@@ -1071,6 +1071,23 @@ User.where(role: :patient).joins(:patient_profile).where(patient_profiles: { on_
 end
 puts "  ✓ vascular accesses=#{VascularAccess.count}"
 
+# Home monitoring check-ins (14 days) for patients — idempotent per patient.
+User.where(role: :patient).find_each.with_index do |patient, pi|
+  next if patient.home_readings.exists?
+  hyper = pi.odd? # some patients run high so the care team sees flags
+  14.downto(1) do |d|
+    sys = (hyper ? 148 : 124) + ((pi + d) % 7) - 3
+    HomeReading.create!(
+      patient: patient, recorded_on: d.days.ago.to_date,
+      systolic_bp: sys, diastolic_bp: (sys - 56), pulse: 70 + ((pi + d) % 9),
+      weight_kg: (70 + pi % 8 + (d.even? ? 0.6 : 0)).round(1),
+      meds_taken: !(d % (hyper ? 4 : 9)).zero?, # occasional missed dose
+      notes: nil
+    )
+  end
+end
+puts "  ✓ home readings=#{HomeReading.count}"
+
 # Backfill dialysis adequacy (Kt/V, URR, IDWG) on completed sessions that lack
 # urea readings — idempotent, fixes existing data so the metrics show.
 DialysisSession.status_completed.where(pre_urea: nil).find_each.with_index do |ds, i|

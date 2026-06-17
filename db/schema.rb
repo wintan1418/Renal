@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_17_000002) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_17_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -369,6 +369,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_000002) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["patient_id"], name: "index_emergency_contacts_on_patient_id"
+  end
+
+  create_table "home_readings", force: :cascade do |t|
+    t.bigint "patient_id", null: false
+    t.date "recorded_on", null: false
+    t.integer "systolic_bp"
+    t.integer "diastolic_bp"
+    t.integer "pulse"
+    t.decimal "weight_kg", precision: 5, scale: 2
+    t.boolean "meds_taken", default: true, null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["patient_id", "recorded_on"], name: "index_home_readings_on_patient_id_and_recorded_on"
+    t.index ["patient_id"], name: "index_home_readings_on_patient_id"
   end
 
   create_table "hospitals", force: :cascade do |t|
@@ -898,6 +913,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_000002) do
   add_foreign_key "diet_logs", "users", column: "patient_id"
   add_foreign_key "doctor_schedules", "users", column: "doctor_id"
   add_foreign_key "emergency_contacts", "users", column: "patient_id"
+  add_foreign_key "home_readings", "users", column: "patient_id"
   add_foreign_key "insurance_claims", "invoices"
   add_foreign_key "insurance_claims", "users", column: "patient_id"
   add_foreign_key "invoice_items", "invoices"

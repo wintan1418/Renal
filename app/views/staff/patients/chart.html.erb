@@ -71,6 +71,33 @@
   </div>
 <% end %>
 
+<!-- Home monitoring (RPM) -->
+<% if @home_readings.any? %>
+  <% bp_badge = { critical: "badge-error", high: "badge-warning", low: "badge-info", normal: "badge-success" } %>
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <div class="flex items-center justify-between">
+        <h2 class="card-title text-base">Home monitoring</h2>
+        <div class="flex items-center gap-2 text-sm">
+          <span class="text-base-content/50">Med adherence (30d):</span>
+          <span class="badge <%= @home_adherence && @home_adherence < 80 ? 'badge-warning' : 'badge-success' %> badge-sm"><%= @home_adherence ? "#{@home_adherence}%" : "—" %></span>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-3">
+        <% @home_readings.first(8).each do |r| %>
+          <div class="rounded-lg border border-base-200 px-3 py-2 text-center">
+            <div class="text-xs text-base-content/50"><%= r.recorded_on.strftime("%b %d") %></div>
+            <div class="font-bold text-sm">
+              <% if r.bp %><span class="<%= r.flagged? ? 'text-warning' : '' %>"><%= r.bp %></span><% else %>—<% end %>
+            </div>
+            <div class="text-[10px] <%= r.meds_taken ? 'text-success' : 'text-error' %>"><%= r.meds_taken ? "meds ✓" : "missed" %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
 <!-- Vascular access -->
 <div class="card bg-base-100 shadow-xl mb-6">
   <div class="card-body">

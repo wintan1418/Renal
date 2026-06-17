@@ -34,6 +34,7 @@ Rails.application.routes.draw do
     end
     get "assistant", to: "assistant#index"
     post "assistant/message", to: "assistant#message", as: :assistant_message
+    resources :home_readings, only: [ :index, :create ]
     resources :medical_records, only: [ :index ]
     resources :lab_results, only: [ :index, :show ] do
       member { get :explanation }
