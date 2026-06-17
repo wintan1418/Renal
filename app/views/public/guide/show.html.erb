@@ -1,0 +1,98 @@
+<% content_for(:title) { "Guided Demo — Healthroom" } %>
+<% content_for(:meta_description) { "A guided walkthrough of the Healthroom renal hospital platform." } %>
+
+<div class="mk-pg">
+  <!-- Hero -->
+  <section class="mk-section--cream" style="border-top:none;padding:64px 0 48px;text-align:center">
+    <div class="mk-wrap" style="max-width:760px">
+      <div class="mk-eyebrow">— Guided demo</div>
+      <h1 class="mk-h1">Healthroom platform walkthrough</h1>
+      <p class="mk-lead" style="margin:18px auto 0;max-width:620px">A complete renal-hospital management system — public site, patient portal, clinical workflows, dialysis unit, billing, a CRM, and an AI intelligence layer. Use the accounts below to explore each role.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px">
+        <%= link_to "Open the app", new_user_session_path, class: "mk-btn mk-btn--cta mk-btn--lg" %>
+        <%= link_to "View public site", root_path, class: "mk-btn mk-btn--outline mk-btn--lg" %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo accounts -->
+  <section class="mk-section">
+    <div class="mk-wrap">
+      <div style="text-align:center;margin-bottom:8px"><h2 class="mk-h2">Demo accounts</h2></div>
+      <p style="text-align:center;color:var(--mk-muted);margin-bottom:28px">Every account uses the password <strong>password123</strong>. On the sign-in page you can also click a role button to log in with one tap.</p>
+      <div class="mk-grid mk-grid--3">
+        <% demo_accounts.each do |acct| %>
+          <div class="mk-card mk-card--pad" style="display:flex;align-items:center;gap:14px">
+            <span style="width:42px;height:42px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;background:var(--mk-teal)"><%= acct[:badge] %></span>
+            <div style="min-width:0">
+              <div style="font-weight:700;color:var(--mk-ink)"><%= acct[:role] %> · <%= acct[:name] %></div>
+              <div style="font-size:13px;color:var(--mk-muted-2);overflow:hidden;text-overflow:ellipsis"><%= acct[:email] %></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Role tour -->
+  <section class="mk-section--cream">
+    <div class="mk-wrap">
+      <div style="text-align:center;margin-bottom:32px"><h2 class="mk-h2">What to show, by role</h2></div>
+      <%
+        tours = [
+          { role: "Admin", who: "admin@healthroom.health", color: "var(--mk-navy)", items: [
+            "Smart Intelligence — eGFR decline prediction, AI clinical briefing per patient, no-show risk, at-risk ranking, inventory forecast",
+            "Revenue Cycle — collections, A/R aging, top debtors, insurance claims",
+            "CRM / Leads — drag leads across the pipeline, open a lead → \"Draft a reply\" (AI)",
+            "Analytics, Users, Services, Departments, Lab tests"
+          ] },
+          { role: "Doctor", who: "adaeze.okonkwo@healthroom.health", color: "var(--mk-teal)", items: [
+            "Dashboard — today's clinic, patients needing attention, recent labs",
+            "Patients → open a chart → Visits → \"Add clinical note\" with the AI scribe (rough notes → SOAP)",
+            "Dialysis Unit Board — live station status with running timers"
+          ] },
+          { role: "Patient", who: "patient@healthroom.health", color: "var(--mk-orange)", items: [
+            "Book an appointment from the public site (3-step wizard)",
+            "Lab Results → open one → \"What your results mean\" (AI explainer)",
+            "Diet & Fluid Tracker → \"Your diet coach\" (AI)",
+            "Health Assistant — AI triage chatbot",
+            "Invoices → Pay → record a demo payment"
+          ] },
+          { role: "Receptionist", who: "receptionist@healthroom.health", color: "#6366F1", items: [
+            "Front-desk appointments, check-in & walk-ins",
+            "Invoices, payments and insurance claims"
+          ] },
+          { role: "Nurse", who: "nurse.johnson@healthroom.health", color: "#0EA5E9", items: [
+            "Record vitals and assist dialysis sessions",
+            "Dialysis unit board"
+          ] }
+        ]
+      %>
+      <div class="mk-grid mk-grid--2">
+        <% tours.each do |t| %>
+          <div class="mk-card mk-card--pad">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+              <span style="width:10px;height:10px;border-radius:50%;background:<%= t[:color] %>"></span>
+              <h3 class="mk-h3" style="margin:0"><%= t[:role] %></h3>
+              <span style="font-size:12.5px;color:var(--mk-muted-2);margin-left:auto"><%= t[:who] %></span>
+            </div>
+            <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px">
+              <% t[:items].each do |item| %>
+                <li style="font-size:14.5px;line-height:1.55;color:oklch(0.36 0.02 165)"><%= item %></li>
+              <% end %>
+            </ol>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI note -->
+  <section class="mk-section">
+    <div class="mk-wrap" style="max-width:760px;text-align:center">
+      <h2 class="mk-h2">About the AI</h2>
+      <p class="mk-lead" style="margin:16px auto 0">The AI features (clinical briefing, lab explainer, diet coach, clinical scribe, triage chatbot, CRM reply drafting) run through a configurable provider layer — OpenAI, Gemini or OpenRouter. When no key is set they fall back to clear rule-based output, so nothing ever breaks. Payments and currency are configurable; the demo uses simulated payments.</p>
+      <div style="margin-top:24px"><%= link_to "Start the walkthrough →", new_user_session_path, class: "mk-btn mk-btn--teal mk-btn--lg" %></div>
+    </div>
+  </section>
+</div>

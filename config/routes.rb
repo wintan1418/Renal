@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   root "public/home#index"
 
   scope module: :public do
+    get "demo", to: "guide#show", as: :demo_guide
     get "about", to: "home#about", as: :about
     get "services", to: "home#services", as: :public_services
     get "contact", to: "contact#new", as: :contact
