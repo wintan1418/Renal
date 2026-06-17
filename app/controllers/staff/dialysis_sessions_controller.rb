@@ -17,6 +17,11 @@ class Staff::DialysisSessionsController < Staff::BaseController
     @machines = DialysisMachine.active.order(:name)
   end
 
+  def schedule
+    @week_start = params[:week_start].present? ? Date.parse(params[:week_start]) : Date.current.beginning_of_week
+    @plan = Dialysis::ChairScheduler.call(week_start: @week_start)
+  end
+
   def show
   end
 

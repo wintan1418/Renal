@@ -1,0 +1,67 @@
+<% content_for(:title, "Chair Schedule") %>
+<% p = @plan %>
+
+<div class="space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold">Chair schedule</h1>
+      <p class="text-base-content/60 text-sm">Weekly chair utilisation across shifts — spot free capacity and over-booking.</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <%= link_to "← Prev", schedule_staff_dialysis_sessions_path(week_start: (p[:week_start] - 7.days)), class: "btn btn-ghost btn-sm" %>
+      <span class="text-sm font-medium"><%= p[:week_start].strftime("%b %d") %> – <%= (p[:week_start] + 6.days).strftime("%b %d") %></span>
+      <%= link_to "Next →", schedule_staff_dialysis_sessions_path(week_start: (p[:week_start] + 7.days)), class: "btn btn-ghost btn-sm" %>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <% [
+      ["Chairs", p[:chairs], "text-primary"],
+      ["Booked this week", p[:total_booked], "text-info"],
+      ["Weekly capacity", p[:weekly_capacity], "text-base-content"],
+      ["Utilisation", "#{p[:utilisation]}%", p[:utilisation] > 85 ? "text-error" : "text-success"]
+    ].each do |label, value, accent| %>
+      <div class="card bg-base-100 shadow"><div class="card-body p-5">
+        <p class="text-xs uppercase tracking-wider text-base-content/50"><%= label %></p>
+        <p class="text-2xl font-bold <%= accent %> mt-1"><%= value %></p>
+      </div></div>
+    <% end %>
+  </div>
+
+  <!-- Week grid -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body overflow-x-auto">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Shift</th>
+            <% p[:days].each do |day| %>
+              <th class="text-center <%= 'text-primary' if day[:date] == Date.current %>">
+                <%= day[:date].strftime("%a") %><br><span class="font-normal text-base-content/50"><%= day[:date].strftime("%d") %></span>
+              </th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <% Dialysis::ChairScheduler::SHIFTS.each_with_index do |sh, si| %>
+            <tr>
+              <td class="font-medium"><%= sh[:label] %></td>
+              <% p[:days].each do |day| %>
+                <% cell = day[:shifts][si] %>
+                <% tone = cell[:over] ? "bg-error/15 text-error" : (cell[:pct] >= 85 ? "bg-warning/15 text-warning" : (cell[:booked].zero? ? "bg-base-200/50 text-base-content/40" : "bg-success/10 text-success")) %>
+                <td class="text-center">
+                  <div class="rounded-lg px-2 py-1.5 <%= tone %>">
+                    <div class="font-bold text-sm"><%= cell[:booked] %>/<%= cell[:capacity] %></div>
+                    <div class="text-[10px]"><%= cell[:free] %> free</div>
+                  </div>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <p class="text-xs text-base-content/40 mt-2">Each chair seats one patient per shift. <span class="text-success">Green</span> = capacity available · <span class="text-warning">amber</span> ≥85% · <span class="text-error">red</span> = over capacity.</p>
+    </div>
+  </div>
+</div>

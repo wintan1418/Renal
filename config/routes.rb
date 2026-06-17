@@ -98,6 +98,7 @@ Rails.application.routes.draw do
       end
       collection do
         get :board
+        get :schedule
       end
     end
   end
