@@ -1,51 +1,200 @@
 <% content_for(:title, "Staff Dashboard") %>
+<%
+  appt_badge = ->(status) {
+    map = { "pending" => "badge-ghost", "confirmed" => "badge-info", "checked_in" => "badge-warning",
+            "in_progress" => "badge-warning", "completed" => "badge-success", "cancelled" => "badge-error", "no_show" => "badge-error" }
+    "badge #{map[status] || 'badge-ghost'} badge-sm"
+  }
+  flag_badge = ->(flag) { flag.to_s == "critical" ? "badge-error" : "badge-warning" }
+%>
 
 <div class="space-y-6">
-  <div>
-    <h1 class="text-2xl font-bold">Welcome, Dr. <%= current_user.last_name %></h1>
-    <p class="text-base-content/60"><%= Time.current.strftime("%A, %B %d, %Y") %></p>
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <h1 class="text-2xl font-bold">Welcome, <%= current_user.doctor? ? "Dr. #{current_user.last_name}" : current_user.first_name %></h1>
+      <p class="text-base-content/60"><%= Time.current.strftime("%A, %B %d, %Y") %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "My Schedule", staff_doctor_schedules_path, class: "btn btn-sm btn-ghost" %>
+      <%= link_to "Patients", staff_patients_path, class: "btn btn-sm btn-primary" %>
+    </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="stat bg-base-100 rounded-box shadow">
-      <div class="stat-title">Today's Appointments</div>
-      <div class="stat-value text-primary">0</div>
-      <div class="stat-desc">Scheduled for today</div>
+  <!-- Stat cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <% [
+      ["Today's Appointments", @stats[:today], "text-primary", "Scheduled for today"],
+      ["Patients Seen", @stats[:seen_today], "text-success", "Completed today"],
+      ["Pending Lab Orders", @stats[:pending_labs], "text-warning", "Awaiting results"],
+      ["Dialysis Sessions", @stats[:dialysis_today], "text-info", "Scheduled today"]
+    ].each do |title, value, accent, desc| %>
+      <div class="card bg-base-100 shadow">
+        <div class="card-body p-5">
+          <p class="text-xs uppercase tracking-wider text-base-content/50"><%= title %></p>
+          <p class="text-3xl font-extrabold <%= accent %> mt-1"><%= value %></p>
+          <p class="text-xs text-base-content/50 mt-1"><%= desc %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Today's schedule -->
+    <div class="card bg-base-100 shadow lg:col-span-2">
+      <div class="card-body">
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Today's Schedule</h2>
+          <%= link_to "All appointments →", staff_appointments_path, class: "text-sm text-primary hover:underline" %>
+        </div>
+        <% if @today_appointments.any? %>
+          <ul class="divide-y divide-base-200 -mx-2">
+            <% @today_appointments.each do |appt| %>
+              <li>
+                <%= link_to staff_appointment_path(appt), class: "flex items-center gap-3 px-2 py-3 hover:bg-base-200/50 rounded-lg" do %>
+                  <div class="text-center w-14 shrink-0">
+                    <div class="font-bold text-sm"><%= appt.start_time.to_s %></div>
+                  </div>
+                  <%= avatar_for appt.patient, size: "w-9 h-9", text_size: "text-xs" %>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-sm truncate"><%= appt.patient.full_name %></p>
+                    <p class="text-xs text-base-content/50 truncate"><%= appt.service&.name || appt.reason %></p>
+                  </div>
+                  <span class="<%= appt_badge.call(appt.status) %> capitalize"><%= appt.status.humanize %></span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <div class="text-center py-10 text-base-content/40">
+            <p>No appointments scheduled for today.</p>
+            <% if @upcoming.any? %>
+              <p class="text-xs mt-1">Next: <%= @upcoming.first.patient.full_name %> on <%= @upcoming.first.scheduled_date.strftime("%b %d") %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
     </div>
-    <div class="stat bg-base-100 rounded-box shadow">
-      <div class="stat-title">Patients Seen</div>
-      <div class="stat-value text-secondary">0</div>
-      <div class="stat-desc">Completed today</div>
-    </div>
-    <div class="stat bg-base-100 rounded-box shadow">
-      <div class="stat-title">Pending Lab Orders</div>
-      <div class="stat-value text-accent">0</div>
-      <div class="stat-desc">Awaiting results</div>
-    </div>
-    <div class="stat bg-base-100 rounded-box shadow">
-      <div class="stat-title">Dialysis Sessions</div>
-      <div class="stat-value text-info">0</div>
-      <div class="stat-desc">Scheduled today</div>
+
+    <!-- Right column: weekly volume + upcoming -->
+    <div class="space-y-6">
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title text-base">This Week</h2>
+          <% max = [ @week_volume.map(&:last).max, 1 ].max %>
+          <div class="flex items-end justify-between gap-1.5 h-24 mt-2">
+            <% @week_volume.each do |date, count| %>
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full rounded-t bg-primary/80 <%= 'opacity-100' if date == Date.current %>" style="height: <%= [ (count.to_f / max * 80).round, 4 ].max %>px" title="<%= count %>"></div>
+                <span class="text-[10px] text-base-content/50"><%= date.strftime("%a") %></span>
+              </div>
+            <% end %>
+          </div>
+          <p class="text-xs text-base-content/50 mt-1 text-center">Appointments per day</p>
+        </div>
+      </div>
+
+      <div class="card bg-base-100 shadow">
+        <div class="card-body">
+          <h2 class="card-title text-base">Upcoming</h2>
+          <% if @upcoming.any? %>
+            <ul class="space-y-2">
+              <% @upcoming.each do |appt| %>
+                <li>
+                  <%= link_to staff_appointment_path(appt), class: "flex items-center justify-between gap-2 text-sm hover:text-primary" do %>
+                    <span class="truncate"><%= appt.patient.full_name %></span>
+                    <span class="text-xs text-base-content/50 shrink-0"><%= appt.scheduled_date.strftime("%b %d") %></span>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-sm text-base-content/40 py-2">No upcoming appointments.</p>
+          <% end %>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Patients needing attention -->
     <div class="card bg-base-100 shadow">
       <div class="card-body">
-        <h2 class="card-title">Today's Schedule</h2>
-        <div class="text-center py-8 text-base-content/40">
-          <p>No appointments scheduled for today</p>
-        </div>
+        <h2 class="card-title text-base">Needs attention</h2>
+        <p class="text-xs text-base-content/50 mb-1">Patients with recent abnormal results.</p>
+        <% if @attention.any? %>
+          <ul class="divide-y divide-base-200 -mx-2">
+            <% @attention.each do |r| %>
+              <li>
+                <%= link_to chart_staff_patient_path(r.patient), class: "flex items-center gap-3 px-2 py-2.5 hover:bg-base-200/50 rounded-lg" do %>
+                  <%= avatar_for r.patient, size: "w-8 h-8", text_size: "text-xs" %>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-sm truncate"><%= r.patient.full_name %></p>
+                    <p class="text-xs text-base-content/50"><%= r.lab_test&.name %>: <%= r.value %> <%= r.lab_test&.unit %></p>
+                  </div>
+                  <span class="badge <%= flag_badge.call(r.flag) %> badge-sm capitalize"><%= r.flag.humanize %></span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-base-content/40 py-6 text-center">No abnormal results flagged. 🎉</p>
+        <% end %>
       </div>
     </div>
 
+    <!-- Lab results to review -->
     <div class="card bg-base-100 shadow">
       <div class="card-body">
-        <h2 class="card-title">Recent Patients</h2>
-        <div class="text-center py-8 text-base-content/40">
-          <p>No recent patient activity</p>
+        <div class="flex items-center justify-between">
+          <h2 class="card-title text-base">Recent lab results</h2>
         </div>
+        <% if @lab_review.any? %>
+          <ul class="divide-y divide-base-200 -mx-2">
+            <% @lab_review.each do |lo| %>
+              <% abnormal = lo.lab_results.count { |r| r.flag.to_s != "normal" } %>
+              <li>
+                <%= link_to staff_patient_lab_order_path(lo.patient, lo), class: "flex items-center gap-3 px-2 py-2.5 hover:bg-base-200/50 rounded-lg" do %>
+                  <%= avatar_for lo.patient, size: "w-8 h-8", text_size: "text-xs" %>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-medium text-sm truncate"><%= lo.patient.full_name %></p>
+                    <p class="text-xs text-base-content/50"><%= lo.lab_results.size %> results · <%= lo.completed_at&.strftime("%b %d") %></p>
+                  </div>
+                  <% if abnormal.positive? %>
+                    <span class="badge badge-warning badge-sm"><%= abnormal %> abnormal</span>
+                  <% else %>
+                    <span class="badge badge-success badge-sm">Normal</span>
+                  <% end %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-base-content/40 py-6 text-center">No completed lab orders yet.</p>
+        <% end %>
       </div>
+    </div>
+  </div>
+
+  <!-- Recent patients -->
+  <div class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h2 class="card-title text-base">Recent patients</h2>
+      <% if @recent_visits.any? %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
+          <% @recent_visits.each do |visit| %>
+            <%= link_to chart_staff_patient_path(visit.patient), class: "flex items-center gap-3 rounded-xl border border-base-200 p-3 hover:border-primary/40 hover:bg-base-200/40" do %>
+              <%= avatar_for visit.patient, size: "w-10 h-10", text_size: "text-sm" %>
+              <div class="min-w-0">
+                <p class="font-medium text-sm truncate"><%= visit.patient.full_name %></p>
+                <p class="text-xs text-base-content/50 truncate"><%= visit.visit_date.strftime("%b %d") %> · <%= visit.chief_complaint.presence&.truncate(30) || visit.visit_type.humanize %></p>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-8 text-base-content/40"><p>No recent patient activity.</p></div>
+      <% end %>
     </div>
   </div>
 </div>
