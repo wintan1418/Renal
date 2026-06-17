@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_16_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_17_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -303,6 +303,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_000001) do
     t.boolean "patient_tolerated_well", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "pre_urea", precision: 6, scale: 2
+    t.decimal "post_urea", precision: 6, scale: 2
+    t.decimal "kt_v", precision: 4, scale: 2
+    t.decimal "urr", precision: 5, scale: 2
     t.index ["appointment_id"], name: "index_dialysis_sessions_on_appointment_id"
     t.index ["dialysis_machine_id"], name: "index_dialysis_sessions_on_dialysis_machine_id"
     t.index ["dialysis_station_id"], name: "index_dialysis_sessions_on_dialysis_station_id"

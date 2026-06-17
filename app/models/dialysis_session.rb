@@ -19,6 +19,8 @@ class DialysisSession < ApplicationRecord
   validates :session_date, presence: true
   validates :patient, :doctor, :session_type, presence: true
 
+  before_save :compute_adequacy
+
   scope :today, -> { where(session_date: Date.current) }
   scope :upcoming, -> { where("session_date >= ?", Date.current).order(:session_date, :start_time) }
   scope :recent, -> { order(session_date: :desc, created_at: :desc) }
@@ -48,5 +50,43 @@ class DialysisSession < ApplicationRecord
   def duration_hours
     return nil unless duration_minutes
     (duration_minutes / 60.0).round(1)
+  end
+
+  # Interdialytic weight gain (fluid gained since dry weight) in kg.
+  def idwg_kg
+    return nil unless pre_weight_kg && dry_weight_kg
+    (pre_weight_kg - dry_weight_kg).round(2)
+  end
+
+  # Adequacy targets: Kt/V >= 1.2 and URR >= 65% are the accepted minimums.
+  def adequate?
+    return nil if kt_v.blank? && urr.blank?
+    (kt_v.present? && kt_v >= 1.2) || (urr.present? && urr >= 65)
+  end
+
+  def adequacy_label
+    return "Not measured" if kt_v.blank? && urr.blank?
+    adequate? ? "Adequate" : "Below target"
+  end
+
+  private
+
+  # URR + single-pool Kt/V (Daugirdas 2nd-generation) from pre/post urea,
+  # session time, ultrafiltration volume and post-dialysis weight.
+  def compute_adequacy
+    return if pre_urea.blank? || post_urea.blank? || pre_urea.to_f <= 0
+
+    pre = pre_urea.to_f
+    post = post_urea.to_f
+    self.urr = (((pre - post) / pre) * 100).round(1)
+
+    t_hours = duration_minutes.to_i / 60.0
+    uf_litres = fluid_removed_ml.to_f / 1000.0
+    weight = post_weight_kg.to_f
+    if t_hours.positive? && weight.positive?
+      r = post / pre
+      ratio = [ r - 0.008 * t_hours, 0.01 ].max
+      self.kt_v = (-Math.log(ratio) + (4 - 3.5 * r) * (uf_litres / weight)).round(2)
+    end
   end
 end

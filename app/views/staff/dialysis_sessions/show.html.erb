@@ -276,6 +276,39 @@
       </div>
     <% end %>
 
+    <!-- Dialysis Adequacy -->
+    <% if @session.kt_v.present? || @session.urr.present? || @session.idwg_kg.present? %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="flex items-center justify-between">
+            <h2 class="card-title text-base">Dialysis adequacy</h2>
+            <% if @session.adequate? == true %>
+              <span class="badge badge-success badge-sm">Adequate</span>
+            <% elsif @session.adequate? == false %>
+              <span class="badge badge-warning badge-sm">Below target</span>
+            <% end %>
+          </div>
+          <div class="grid grid-cols-3 gap-3 mt-2 text-center">
+            <div class="rounded-xl bg-base-200/60 p-3">
+              <div class="text-xl font-bold <%= @session.kt_v && @session.kt_v < 1.2 ? 'text-warning' : 'text-success' %>"><%= @session.kt_v || "—" %></div>
+              <div class="text-xs text-base-content/60 mt-1">Kt/V <span class="text-base-content/40">(≥1.2)</span></div>
+            </div>
+            <div class="rounded-xl bg-base-200/60 p-3">
+              <div class="text-xl font-bold <%= @session.urr && @session.urr < 65 ? 'text-warning' : 'text-success' %>"><%= @session.urr ? "#{@session.urr}%" : "—" %></div>
+              <div class="text-xs text-base-content/60 mt-1">URR <span class="text-base-content/40">(≥65%)</span></div>
+            </div>
+            <div class="rounded-xl bg-base-200/60 p-3">
+              <div class="text-xl font-bold"><%= @session.idwg_kg ? "#{@session.idwg_kg} kg" : "—" %></div>
+              <div class="text-xs text-base-content/60 mt-1">IDWG</div>
+            </div>
+          </div>
+          <% if @session.pre_urea.present? %>
+            <p class="text-xs text-base-content/50 mt-2">Pre-urea <%= @session.pre_urea %> → post-urea <%= @session.post_urea %> mg/dL · single-pool Kt/V (Daugirdas)</p>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Outcomes -->
     <% if @session.status.in?(["completed", "aborted"]) %>
       <div class="card bg-base-100 shadow-xl">

@@ -580,9 +580,13 @@ dialysis_apts.each_with_index do |apt, idx|
     ds.duration_minutes = 240
     ds.pre_weight_kg  = (71.0 + rand(-1..3)).round(1)
     ds.post_weight_kg = (68.5 + rand(-1..2)).round(1)
+    ds.dry_weight_kg  = 68.0
+    ds.duration_minutes = 240
     ds.fluid_removed_ml = (2000 + rand(-200..600)).round(-2)
     ds.target_fluid_removal_ml = 2500
     ds.blood_flow_rate = 250 + rand(0..50)
+    ds.pre_urea = (52 + rand(0..18))            # pre-dialysis BUN
+    ds.post_urea = (ds.pre_urea * (0.28 + rand(0..8) / 100.0)).round(1) # URR ~ 65-72%
     ds.access_type = :fistula
     ds.pre_systolic_bp = 165 + rand(-10..15); ds.pre_diastolic_bp = 95 + rand(-5..10)
     ds.post_systolic_bp = 138 + rand(-8..12); ds.post_diastolic_bp = 85 + rand(-5..8)
@@ -1011,14 +1015,31 @@ if DialysisSession.where(session_date: Date.current).none?
         session_type: :hemodialysis, session_date: Date.current,
         start_time: start, end_time: (status == :completed ? start + 4.hours : nil),
         duration_minutes: 240, access_type: :fistula, status: status,
-        pre_weight_kg: 70 + i, target_fluid_removal_ml: 2500,
-        blood_flow_rate: 250 + i * 10
+        pre_weight_kg: 70 + i, post_weight_kg: 67.5 + i, dry_weight_kg: 67.0 + i,
+        fluid_removed_ml: 2400, target_fluid_removal_ml: 2500,
+        blood_flow_rate: 250 + i * 10,
+        pre_urea: (status == :completed ? 58 + i : nil),
+        post_urea: (status == :completed ? (58 + i) * 0.31 : nil)
       )
       station.update(status: :occupied) if status == :in_progress
     end
   end
 end
 puts "  ✓ today dialysis sessions=#{DialysisSession.where(session_date: Date.current).count}"
+
+# Backfill dialysis adequacy (Kt/V, URR, IDWG) on completed sessions that lack
+# urea readings — idempotent, fixes existing data so the metrics show.
+DialysisSession.status_completed.where(pre_urea: nil).find_each.with_index do |ds, i|
+  ds.pre_weight_kg ||= 71.0
+  ds.post_weight_kg ||= 68.0
+  ds.dry_weight_kg ||= 67.5
+  ds.duration_minutes ||= 240
+  ds.fluid_removed_ml ||= 2400
+  ds.pre_urea = 55 + (i % 18)
+  ds.post_urea = (ds.pre_urea * (0.29 + (i % 6) / 100.0)).round(1)
+  ds.save!
+end
+puts "  ✓ sessions with adequacy: #{DialysisSession.where.not(kt_v: nil).count}"
 
 # ── Billing for demo patients + repair invoice totals ──
 # The Invoice#calculate_totals callback runs before items are attached, so
