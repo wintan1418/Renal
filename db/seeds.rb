@@ -933,6 +933,24 @@ if consult && neph_dept && labdocs.any?
 end
 puts "  ✓ appointments=#{Appointment.count}"
 
+# ── Today's clinic for the primary demo doctor so the dashboard is busy ──
+lead_doc = User.find_by(email: "adaeze.okonkwo@healthroom.ng")
+if consult && neph_dept && lead_doc && lead_doc.appointments_as_doctor.where(scheduled_date: Date.current).count < 5
+  pts = User.where(role: :patient).order(:id).limit(6).to_a
+  [ [ "09:00", :completed ], [ "09:45", :completed ], [ "10:30", :in_progress ],
+    [ "11:30", :confirmed ], [ "12:15", :confirmed ], [ "14:00", :pending ] ].each_with_index do |(time, status), i|
+    next unless pts[i]
+    begin
+      Appointment.create!(patient: pts[i], doctor: lead_doc, service: consult, department: neph_dept,
+                          scheduled_date: Date.current, start_time: time, appointment_type: :scheduled,
+                          reason: "Nephrology consultation", status: status)
+    rescue ActiveRecord::RecordInvalid
+      next
+    end
+  end
+end
+puts "  ✓ today's clinic for Dr. #{lead_doc&.last_name}: #{lead_doc&.appointments_as_doctor&.where(scheduled_date: Date.current)&.count}"
+
 # ── Diet & fluid logs (7 days, 3 meals/day) for the tracker + AI diet coach ──
 meal_set = %w[breakfast lunch dinner]
 notes_set = [ "Oat porridge, low-potassium", "Rice and grilled fish", "Yam with vegetable soup" ]
