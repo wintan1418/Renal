@@ -923,6 +923,29 @@ User.where(role: :patient).find_each do |patient|
     end
   end
 end
+# Backfill bone/mineral & ferritin markers so the renal panel is complete (idempotent).
+User.where(role: :patient).find_each do |patient|
+  next if LabResult.joins(:lab_test).where(patient_id: patient.id, lab_tests: { code: "PTH" }).exists?
+  doc = labdocs[patient.id % labdocs.size]
+  next unless doc
+  egfr = LabResult.joins(:lab_test).where(patient_id: patient.id, lab_tests: { code: "EGFR" })
+                  .where.not(numeric_value: nil).order(:result_date).last&.numeric_value&.to_f || 60.0
+  deficit = (60 - [ egfr, 60 ].min)
+  vals = {
+    "FER"  => 120 + (patient.id % 5) * 90,
+    "CA"   => (9.6 - deficit * 0.02).round(1),
+    "PHOS" => (3.6 + deficit * 0.04).round(1),
+    "PTH"  => (60 + deficit * 6 + (patient.id % 4) * 20).round
+  }
+  lo = LabOrder.create!(patient: patient, ordered_by: doc, status: :completed, priority: :routine,
+                        completed_at: Time.current, created_at: Time.current)
+  vals.each do |code, v|
+    t = LabTest.find_by(code: code)
+    next unless t
+    LabResult.create!(lab_order: lo, lab_test: t, patient: patient, value: v.to_s,
+                      numeric_value: v, flag: :normal, result_date: Date.current, resulted_by: doc)
+  end
+end
 puts "  ✓ lab_orders=#{LabOrder.count}, lab_results=#{LabResult.count}"
 
 # Spread appointments for the demo patients so calendars/queues aren't empty.
