@@ -153,6 +153,8 @@ Rails.application.routes.draw do
     get "revenue", to: "revenue#index", as: :revenue
     get "data_assistant", to: "data_assistant#index", as: :data_assistant
     post "data_assistant/ask", to: "data_assistant#ask", as: :data_assistant_ask
+    get "quality", to: "quality#index", as: :quality
+    get "quality/export", to: "quality#export", as: :quality_export
     get "intelligence", to: "intelligence#index", as: :intelligence
     get "intelligence/patients/:id", to: "intelligence#show", as: :intelligence_patient
     get "intelligence/patients/:id/briefing", to: "intelligence#briefing", as: :intelligence_patient_briefing
