@@ -86,7 +86,7 @@ group :development, :test do
   gem "brakeman", require: false
   gem "rubocop-rails-omakase", require: false
   gem "factory_bot_rails", "~> 6.4"
-  gem "faker", "~> 3.4"
+  gem "faker", "~> 3.6"
   gem "shoulda-matchers", "~> 6.2"
 end
 
